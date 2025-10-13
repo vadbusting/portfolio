@@ -17,6 +17,10 @@ const STAGE_SCROLL_LENGTH_SCALE = 4;
 let initialRenderPending = false;
 let resolveInitialRender;
 
+const normalizeAssetPath = (value) =>
+  (typeof value === 'string' && typeof value.normalize === 'function'
+    ? value.normalize('NFC')
+    : value);
 
 window.scrollTo(0, 0);
 document.documentElement.scrollTop = 0;
@@ -75,14 +79,16 @@ if (!stage || !canvas) {
   let stageMetrics = { top: 0, maxScroll: 1 };
 
   const textureLoader = new THREE.TextureLoader(loadingManager);
-  const sources = (window.PORTFOLIO_IMAGES || []).filter(Boolean);
+  const sources = (window.PORTFOLIO_IMAGES || [])
+    .map(normalizeAssetPath)
+    .filter(Boolean);
 
   const fallbackSources = [
     'image/portfolio-ページ22 2 65.webp',
     'image/portfolio-ページ22 2 66.webp',
     'image/portfolio-ページ22 2 67.webp',
     'image/portfolio-ページ22 2 68.webp',
-  ];
+  ].map(normalizeAssetPath);
 
 const analysisCanvas = document.createElement('canvas');
 const analysisCtx = analysisCanvas.getContext('2d', { willReadFrequently: true }) || null;

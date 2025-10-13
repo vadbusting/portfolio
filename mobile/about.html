@@ -6,19 +6,39 @@
     <title>プロフィール | Mobile</title>
     <script>
         (function () {
-            if (document.querySelector('base[data-auto-base]')) return;
-            var href = window.location.href.split('#')[0].split('?')[0];
-            if (!href.endsWith('/')) {
-                if (href.includes('.')) {
-                    href = href.replace(/[^/]*$/, '');
-                } else {
-                    href += '/';
+            var baseEl = document.querySelector('base[data-auto-base]');
+            if (!baseEl) {
+                var href = window.location.href.split('#')[0].split('?')[0];
+                if (!href.endsWith('/')) {
+                    if (href.includes('.')) {
+                        href = href.replace(/[^/]*$/, '');
+                    } else {
+                        href += '/';
+                    }
                 }
+                baseEl = document.createElement('base');
+                baseEl.setAttribute('data-auto-base', 'true');
+                baseEl.href = href;
+                document.head.appendChild(baseEl);
             }
-            var baseEl = document.createElement('base');
-            baseEl.setAttribute('data-auto-base', 'true');
-            baseEl.href = href;
-            document.head.appendChild(baseEl);
+
+            var applyNormalizedSources = function () {
+                var nodes = document.querySelectorAll('[data-normalize-src]');
+                nodes.forEach(function (node) {
+                    var raw = node.getAttribute('data-normalize-src');
+                    if (typeof raw !== 'string' || !raw) return;
+                    var normalized = typeof raw.normalize === 'function' ? raw.normalize('NFC') : raw;
+                    if (node.getAttribute('src') !== normalized) {
+                        node.setAttribute('src', normalized);
+                    }
+                });
+            };
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', applyNormalizedSources, { once: true });
+            } else {
+                applyNormalizedSources();
+            }
         })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">

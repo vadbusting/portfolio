@@ -1,4 +1,4 @@
-const images = [
+const rawImages = [
   '../image/手ラフ中面 5.webp',
   '../image/2410_JA_owari_B3_ 10.webp',
   '../image/BRICH 5.webp',
@@ -18,6 +18,14 @@ const images = [
   '../image/B3rough-ページ1.webp',
   '../image/堀田商事_B3_ 9.webp'
 ];
+
+const normalizeAssetPath = (value) => (
+  typeof value === 'string' && typeof value.normalize === 'function'
+    ? value.normalize('NFC')
+    : value
+);
+
+const images = rawImages.map(normalizeAssetPath);
 
 export const initTrail = () => {
   const trailContainer = document.getElementById('image-trail-container');

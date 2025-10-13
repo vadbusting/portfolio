@@ -6,19 +6,39 @@
     <title>制作事例 | Mobile</title>
     <script>
         (function () {
-            if (document.querySelector('base[data-auto-base]')) return;
-            var href = window.location.href.split('#')[0].split('?')[0];
-            if (!href.endsWith('/')) {
-                if (href.includes('.')) {
-                    href = href.replace(/[^/]*$/, '');
-                } else {
-                    href += '/';
+            var baseEl = document.querySelector('base[data-auto-base]');
+            if (!baseEl) {
+                var href = window.location.href.split('#')[0].split('?')[0];
+                if (!href.endsWith('/')) {
+                    if (href.includes('.')) {
+                        href = href.replace(/[^/]*$/, '');
+                    } else {
+                        href += '/';
+                    }
                 }
+                baseEl = document.createElement('base');
+                baseEl.setAttribute('data-auto-base', 'true');
+                baseEl.href = href;
+                document.head.appendChild(baseEl);
             }
-            var baseEl = document.createElement('base');
-            baseEl.setAttribute('data-auto-base', 'true');
-            baseEl.href = href;
-            document.head.appendChild(baseEl);
+
+            var applyNormalizedSources = function () {
+                var nodes = document.querySelectorAll('[data-normalize-src]');
+                nodes.forEach(function (node) {
+                    var raw = node.getAttribute('data-normalize-src');
+                    if (typeof raw !== 'string' || !raw) return;
+                    var normalized = typeof raw.normalize === 'function' ? raw.normalize('NFC') : raw;
+                    if (node.getAttribute('src') !== normalized) {
+                        node.setAttribute('src', normalized);
+                    }
+                });
+            };
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', applyNormalizedSources, { once: true });
+            } else {
+                applyNormalizedSources();
+            }
         })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,24 +69,24 @@
     <main class="m-main m-main--center">
         <section class="m-works m-hero--center">
             <div class="m-works__grid">
-                <img src="../image/手ラフ中面 5.webp" alt="" loading="lazy">
-                <img src="../image/2410_JA_owari_B3_ 10.webp" alt="" loading="lazy">
-                <img src="../image/BRICH 5.webp" alt="" loading="lazy">
-                <img src="../image/2411_brich_B4_ge_ol 9.webp" alt="" loading="lazy">
-                <img src="../image/アクビィ3 5.webp" alt="" loading="lazy">
-                <img src="../image/2411_acteng_A4_ge_ol 9.webp" alt="" loading="lazy">
-                <img src="../image/スーパーナース手ラフ 5.webp" alt="" loading="lazy">
-                <img src="../image/2412_Bee-NS_A4-1.webp" alt="" loading="lazy">
-                <img src="../image/Harikisama 5.webp" alt="" loading="lazy">
-                <img src="../image/241122_c21hariki_B5_ 5.webp" alt="" loading="lazy">
-                <img src="../image/HALLO 5.webp" alt="" loading="lazy">
-                <img src="../image/2411_hallo_A4_ge_ol 9.webp" alt="" loading="lazy">
-                <img src="../image/安心相続カフェ打合せ用資料0703 5.webp" alt="" loading="lazy">
-                <img src="../image/a4 2 5.webp" alt="" loading="lazy">
-                <img src="../image/手ラフ 4 5.webp" alt="" loading="lazy">
-                <img src="../image/初校 9.webp" alt="" loading="lazy">
-                <img src="../image/B3rough-ページ1.webp" alt="" loading="lazy">
-                <img src="../image/堀田商事_B3_ 9.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/手ラフ中面 5.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/2410_JA_owari_B3_ 10.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/BRICH 5.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/2411_brich_B4_ge_ol 9.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/アクビィ3 5.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/2411_acteng_A4_ge_ol 9.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/スーパーナース手ラフ 5.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/2412_Bee-NS_A4-1.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/Harikisama 5.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/241122_c21hariki_B5_ 5.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/HALLO 5.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/2411_hallo_A4_ge_ol 9.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/安心相続カフェ打合せ用資料0703 5.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/a4 2 5.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/手ラフ 4 5.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/初校 9.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/B3rough-ページ1.webp" alt="" loading="lazy">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAACADs=" data-normalize-src="../image/堀田商事_B3_ 9.webp" alt="" loading="lazy">
             </div>
         </section>
 

@@ -1,4 +1,4 @@
-const images = [
+const rawImages = [
         'image/13919-360701_favor_A4_1k2 10.webp',
         'image/13919-360701_favor_A4_1k2 9.webp',
         'image/15824-370101_OM_otakaraya_B4_flyer_omote_2k 10.webp',
@@ -151,6 +151,14 @@ const images = [
         'image/本店チラシ (手ラフ） 10.webp',
         'image/本店チラシ (手ラフ） 9.webp'
     ];
+
+const normalizeAssetPath = (value) => (
+    typeof value === 'string' && typeof value.normalize === 'function'
+        ? value.normalize('NFC')
+        : value
+);
+
+const images = rawImages.map(normalizeAssetPath);
 
 window.PORTFOLIO_IMAGES = images;
 
