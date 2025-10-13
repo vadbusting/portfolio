@@ -22,6 +22,20 @@ const normalizeAssetPath = (value) =>
     ? value.normalize('NFC')
     : value);
 
+const detectIPad = () => {
+  const ua = navigator.userAgent || '';
+  const hasTouch = 'ontouchstart' in window || (navigator.maxTouchPoints || 0) > 0;
+  const isIPadUA = /ipad/i.test(ua);
+  const isTouchMac = /macintosh/i.test(ua) && hasTouch;
+  return isIPadUA || isTouchMac;
+};
+
+const isIPad = detectIPad();
+
+const applyIPadThinning = (list) => (
+  Array.isArray(list) && isIPad ? list.filter((_, index) => index % 2 === 0) : list
+);
+
 window.scrollTo(0, 0);
 document.documentElement.scrollTop = 0;
 document.body.scrollTop = 0;
@@ -54,7 +68,7 @@ if (!stage || !canvas) {
     canvas,
     antialias: true,
     alpha: true,
-    powerPreference: 'high-performance',
+    powerPreference: isIPad ? 'low-power' : 'high-performance',
   });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -79,16 +93,13 @@ if (!stage || !canvas) {
   let stageMetrics = { top: 0, maxScroll: 1 };
 
   const textureLoader = new THREE.TextureLoader(loadingManager);
-  const sources = (window.PORTFOLIO_IMAGES || [])
-    .map(normalizeAssetPath)
-    .filter(Boolean);
 
-  const fallbackSources = [
+  const fallbackSources = applyIPadThinning([
     'image/portfolio-ページ22 2 65.webp',
     'image/portfolio-ページ22 2 66.webp',
     'image/portfolio-ページ22 2 67.webp',
     'image/portfolio-ページ22 2 68.webp',
-  ].map(normalizeAssetPath);
+  ].map(normalizeAssetPath));
 
 const analysisCanvas = document.createElement('canvas');
 const analysisCtx = analysisCanvas.getContext('2d', { willReadFrequently: true }) || null;
@@ -426,7 +437,14 @@ const isMonochromeImage = (image) => {
 
   (async () => {
     const isMobile = window.innerWidth <= 768;
-    let initialSources = (window.PORTFOLIO_IMAGES || []).filter(Boolean);
+    const normalizedSources = applyIPadThinning(
+      (window.PORTFOLIO_IMAGES || [])
+        .map(normalizeAssetPath)
+        .filter(Boolean)
+    );
+
+    const initialSources =
+      normalizedSources.length > 0 ? normalizedSources : fallbackSources;
     
     const allItems = await Promise.all(initialSources.map(loadTexture)).catch((err) => {
       console.error("Error loading initial textures:", err);
