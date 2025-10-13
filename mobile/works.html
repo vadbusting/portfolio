@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>制作事例 | Mobile</title>
+    <script>
+        (function () {
+            if (document.querySelector('base[data-auto-base]')) return;
+            var href = window.location.href.split('#')[0].split('?')[0];
+            if (!href.endsWith('/')) {
+                if (href.includes('.')) {
+                    href = href.replace(/[^/]*$/, '');
+                } else {
+                    href += '/';
+                }
+            }
+            var baseEl = document.createElement('base');
+            baseEl.setAttribute('data-auto-base', 'true');
+            baseEl.href = href;
+            document.head.appendChild(baseEl);
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+JP:wght@400;700;900&family=Shippori+Mincho:wght@400;700&display=swap" rel="stylesheet">
