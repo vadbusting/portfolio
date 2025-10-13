@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プロフィール | Mobile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+JP:wght@400;700;900&family=Shippori+Mincho:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="mobile-detect.js"></script>
+</head>
+<body class="m-body">
+    <header class="m-header">
+        <a class="m-header__logo" href="index.html">PORTFOLIO</a>
+        <button class="m-header__menu" type="button" data-menu-toggle aria-expanded="false" aria-controls="mobile-drawer">
+            CONTACT
+        </button>
+    </header>
+
+    <nav class="m-drawer" id="mobile-drawer" data-drawer aria-hidden="true">
+        <div class="m-drawer__inner">
+            <button class="m-drawer__close" type="button" data-menu-close aria-label="閉じる">×</button>
+            <div class="m-drawer__contact">
+                <p class="m-drawer__name">TESHIMA TAKASHI</p>
+                <a class="m-drawer__mail" href="mailto:vadbusting@gmail.com">vadbusting@gmail.com</a>
+            </div>
+            <button class="m-drawer__desktop" type="button" data-open-desktop>PC版で見る</button>
+        </div>
+    </nav>
+
+    <main class="m-main m-main--center">
+        <section class="m-hero m-hero--center">
+            <h1 class="m-hero__title">ABOUT</h1>
+        </section>
+
+        <section class="m-about">
+            <p class="m-about__heading"><strong>経歴</strong></p>
+            <p><strong>2000年</strong> 広告デザイン専門学校コピーライティングコース 卒業</p>
+            <p><strong>2000年</strong> 有限会社アド・バンテージ（出版） 編集/ライター入社</p>
+            <p><strong>2000年</strong> クイックサインズQs&amp;At株式会社（SP） DTPオペレーターアルバイト入社</p>
+            <p><strong>2002年</strong> 有限会社エフブレイン（デザイン事務所） グラフィックデザイナー入社</p>
+            <p><strong>2006年</strong> 個人事業開業 ディレクター（ナショナルクライアント）</p>
+            <p><strong>2021年</strong> 株式会社Rise Agency（広告代理店） ディレクター（ローカルエリアマーケティング）入社</p>
+
+            <p class="m-about__heading"><strong>スキルセット</strong></p>
+            <p>プロジェクトマネジメント ／ 企画・コンセプト ／ 進行管理・品質管理 ／ 印刷知識・校正 ／ クリエイティブディレクション ／ コミュニケーション・調整力 ／ ドキュメンテーション</p>
+
+            <p class="m-about__heading"><strong>スタンス</strong></p>
+            <p><strong>本質を追求する:</strong> 無駄を排除し、本当に必要な価値に集中します。</p>
+            <p><strong>明確なコミュニケーション:</strong> 情報を分かりやすく伝え、関係者全員が同じ方向を向けるよう努めます。</p>
+            <p><strong>誠実な進行:</strong> 常に正直であり、透明性の高いプロジェクト進行を心がけます。</p>
+            <p><strong>細部へのこだわり:</strong> 全体像だけでなく、細部の品質にも徹底的にこだわります。</p>
+            <p><strong>持続可能な成果:</strong> 長期的に価値を生み出す成果を目指します。</p>
+        </section>
+
+    </main>
+
+    <footer class="m-footer">
+        <small>© TESHIMA TAKASHI</small>
+    </footer>
+
+    <script type="module">
+        import { initMenu } from './script.js';
+        initMenu();
+    </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+(() => {
+  const MOBILE_MAX_WIDTH = 920;
+  const ua = (navigator.userAgent || '').toLowerCase();
+  const isMobileUA = /android|iphone|ipad|ipod|blackberry|windows phone|mobile/.test(ua);
+  const hasTouch = 'ontouchstart' in window || (navigator.maxTouchPoints || 0) > 0;
+  const isSmallViewport = typeof window.matchMedia === 'function'
+    ? window.matchMedia(`(max-width: ${MOBILE_MAX_WIDTH}px)`).matches
+    : window.innerWidth <= MOBILE_MAX_WIDTH;
+  const isAlreadyMobile = window.location.pathname.includes('/mobile/');
+  let forcedDesktop = false;
+
+  try {
+    forcedDesktop = localStorage.getItem('portfolioViewMode') === 'desktop';
+  } catch (error) {
+    console.warn('Unable to read view preference.', error);
+  }
+
+  if (isAlreadyMobile || forcedDesktop) {
+    return;
+  }
+
+  if (isMobileUA || (isSmallViewport && hasTouch)) {
+    const currentPath = window.location.pathname || '';
+    let mobileTarget = 'mobile/index.html';
+
+    if (currentPath.includes('works.html')) {
+      mobileTarget = 'mobile/works.html';
+    } else if (currentPath.includes('about.html')) {
+      mobileTarget = 'mobile/about.html';
+    }
+
+    const basePath = currentPath.replace(/[^/]*$/, '');
+    const targetUrl = `${window.location.origin}${basePath}${mobileTarget}`;
+    window.location.replace(targetUrl);
+  }
+})();

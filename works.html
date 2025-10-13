@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WORKS | PORTFOLIO</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Shippori+Mincho:wght@400;700&display=swap" rel="stylesheet">
+  <script src="device-detect.js"></script>
+</head>
+<body class="floating-world-page is-loading">
+  <header class="main-header">
+    <div class="header-item"><a href="index.html" style="text-decoration: none; color: inherit;">PORTFOLIO</a></div>
+    <div class="header-item menu-btn">CONTACT</div>
+  </header>
+
+  <div id="floating-loader" class="floating-loader" role="status" aria-live="polite">
+    <div class="floating-loader__inner">
+      <span class="floating-loader__label">Loading</span>
+      <span class="floating-loader__progress" data-progress>0%</span>
+    </div>
+  </div>
+
+  <div id="app" data-page="floating-world">
+    <main id="main" class="floating-main">
+      <section class="floating-stage">
+        <div class="floating-scene">
+          <canvas id="floating-canvas"></canvas>
+        </div>
+        <div class="floating-scroll-spacer"></div>
+      </section>
+
+      <div class="ending-card">
+        <p>BREAK THROUGH</p>
+      </div>
+    </main>
+  </div>
+
+  <div class="menu-overlay">
+    <button type="button" class="menu-close close-btn" aria-label="閉じる">CLOSE</button>
+    <div class="menu-content">
+      <p class="menu-contact__name">TESHIMA TAKASHI</p>
+      <a href="mailto:vadbusting@gmail.com">vadbusting@gmail.com</a>
+    </div>
+  </div>
+
+
+
+  <div class="floating-lightbox" id="floating-lightbox" aria-hidden="true">
+    <div class="floating-lightbox__backdrop" data-lightbox-close></div>
+    <div class="floating-lightbox__inner" role="dialog" aria-modal="true">
+      <button type="button" class="floating-lightbox__close" data-lightbox-close aria-label="閉じる">×</button>
+      <div class="floating-lightbox__content">
+        <img src="" alt="" class="floating-lightbox__image">
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script type="module" src="floating-world.js"></script>
+</body>
+</html>

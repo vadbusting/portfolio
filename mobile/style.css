@@ -1,0 +1,351 @@
+:root {
+    color-scheme: light;
+    --bg-color: #f8f7f4;
+    --card-color: rgba(255, 255, 255, 0.84);
+    --text-color: #1a1a1a;
+    --accent-color: #121212;
+    --muted-color: rgba(18, 18, 18, 0.58);
+    --border-color: rgba(18, 18, 18, 0.12);
+    --shadow-soft: 0 18px 48px rgba(12, 12, 12, 0.12);
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    border-radius: 0 !important;
+}
+
+body {
+    margin: 0;
+    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.86), var(--bg-color));
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+body.m-home {
+    min-height: 100vh;
+}
+
+.trail-root {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.trail-image {
+    position: absolute;
+    width: 90px;
+    height: 110px;
+    object-fit: cover;
+    opacity: 0;
+}
+
+.m-body {
+    font-family: inherit;
+}
+
+.m-header {
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    background: rgba(248, 247, 244, 0.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(18, 18, 18, 0.04);
+    z-index: 200;
+}
+
+.m-header__logo {
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    color: var(--text-color);
+}
+
+.m-header__menu {
+    background: transparent;
+    border: 1px solid rgba(18, 18, 18, 0.3);
+    padding: 8px 18px;
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.m-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px;
+}
+
+.m-main--center {
+    align-items: center;
+    text-align: center;
+}
+
+.m-main {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    gap: 24px;
+    padding: 32px 16px 40px;
+}
+
+
+.m-hero {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.m-hero--center {
+    align-items: center;
+}
+
+.m-hero__subtitle {
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    color: var(--muted-color);
+}
+
+.m-hero__title {
+    margin: 0;
+    font-family: 'Shippori Mincho', serif;
+    font-weight: 700;
+    font-size: clamp(2.2rem, 6.8vw, 2.8rem);
+    line-height: 1.05;
+}
+
+.m-hero__accent {
+    display: block;
+}
+
+.m-hero__accent--em {
+    letter-spacing: -0.12em;
+}
+
+.m-hero__tagline {
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted-color);
+}
+
+.m-actions {
+    display: grid;
+    gap: 12px;
+    width: min(260px, 100%);
+}
+
+.m-about {
+    width: min(580px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+    font-size: 0.95rem;
+    line-height: 1.75;
+}
+
+.m-about__heading {
+    margin-top: 24px;
+}
+
+.m-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 22px;
+    border: 1px solid var(--text-color);
+    background: var(--text-color);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.18em;
+    text-decoration: none;
+}
+
+.m-btn--ghost {
+    background: transparent;
+    color: var(--text-color);
+}
+
+.m-contact {
+    text-align: center;
+    padding: 24px 16px;
+    background: var(--card-color);
+}
+
+.m-section-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 1.6rem;
+    margin: 0 0 16px;
+    letter-spacing: 0.06em;
+}
+
+.m-contact__name {
+    margin: 0 0 10px;
+    font-family: 'Shippori Mincho', serif;
+    font-size: 1.4rem;
+    letter-spacing: -0.06em;
+}
+
+.m-contact__mail {
+    display: inline-block;
+    font-size: 0.95rem;
+    text-decoration: none;
+    letter-spacing: 0.06em;
+    color: var(--accent-color);
+    margin-bottom: 16px;
+}
+
+.m-contact__desktop {
+    width: 100%;
+}
+
+.m-works {
+    width: min(640px, 100%);
+    display: flex;
+    justify-content: center;
+}
+
+.m-works__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    width: min(360px, 100%);
+}
+
+.m-works__grid img {
+    width: 100%;
+    object-fit: cover;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    background: #ffffff;
+}
+
+.m-ending {
+    text-align: center;
+}
+
+.m-ending__text {
+    font-family: 'Shippori Mincho', serif;
+    font-size: clamp(2.4rem, 11vw, 3.8rem);
+    font-weight: 900;
+    letter-spacing: -0.1em;
+}
+
+.m-ending__desktop {
+    margin-top: 18px;
+    width: min(220px, 80%);
+}
+
+.trail-image--mobile {
+    width: min(22vw, 96px);
+    height: min(28vw, 120px);
+    opacity: 0.75;
+    filter: grayscale(1);
+}
+
+.m-footer {
+    padding: 14px 0 18px;
+    text-align: center;
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    color: var(--muted-color);
+}
+
+.m-drawer {
+    position: fixed;
+    inset: 0;
+    background: rgba(12, 12, 16, 0.7);
+    backdrop-filter: blur(14px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 300;
+}
+
+.m-drawer[data-open="true"] {
+    opacity: 1;
+    visibility: visible;
+}
+
+.m-drawer__inner {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: min(76vw, 320px);
+    background: var(--bg-color);
+    padding: 70px 24px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: -18px 0 38px rgba(12, 12, 12, 0.24);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+}
+
+.m-drawer[data-open="true"] .m-drawer__inner {
+    transform: translateX(0);
+}
+
+.m-drawer__contact {
+    margin-top: auto;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.m-drawer__name {
+    margin: 0;
+    font-family: 'Shippori Mincho', serif;
+    font-size: 1.4rem;
+    letter-spacing: -0.06em;
+}
+
+.m-drawer__mail {
+    color: var(--text-color);
+    text-decoration: none;
+    letter-spacing: 0.06em;
+    font-size: 0.95rem;
+}
+
+.m-drawer__close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    border: none;
+    background: transparent;
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.m-drawer__desktop {
+    border: 1px solid rgba(18, 18, 18, 0.24);
+    padding: 12px 16px;
+    background: transparent;
+    letter-spacing: 0.18em;
+    font-weight: 700;
+}
+
+@media (min-width: 768px) {
+    body {
+        display: block;
+        background: #ffffff;
+    }
+}

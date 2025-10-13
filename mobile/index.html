@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PORTFOLIO | Mobile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+JP:wght@400;700;900&family=Shippori+Mincho:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="mobile-detect.js"></script>
+</head>
+<body class="m-body m-home">
+    <header class="m-header">
+        <a class="m-header__logo" href="index.html">PORTFOLIO</a>
+        <button class="m-header__menu" type="button" data-menu-toggle aria-expanded="false" aria-controls="mobile-drawer">
+            CONTACT
+        </button>
+    </header>
+
+    <nav class="m-drawer" id="mobile-drawer" data-drawer aria-hidden="true">
+        <div class="m-drawer__inner">
+            <button class="m-drawer__close" type="button" data-menu-close aria-label="閉じる">×</button>
+            <div class="m-drawer__contact">
+                <p class="m-drawer__name">TESHIMA TAKASHI</p>
+                <a class="m-drawer__mail" href="mailto:vadbusting@gmail.com">vadbusting@gmail.com</a>
+            </div>
+            <button class="m-drawer__desktop" type="button" data-open-desktop>PC版で見る</button>
+        </div>
+    </nav>
+
+    <div id="image-trail-container" class="trail-root"></div>
+
+    <main class="m-main m-main--center">
+        <section class="m-hero m-hero--center">
+            <p class="m-hero__subtitle">同じ条件を異なる結果へ</p>
+            <h1 class="m-hero__title">
+                <span class="m-hero__accent">その差は</span>
+                <span class="m-hero__accent m-hero__accent--em">ディレクション</span>
+            </h1>
+            <p class="m-hero__tagline">Form follows function</p>
+        </section>
+
+        <nav class="m-actions">
+            <a href="works.html" class="m-btn">制作事例</a>
+            <a href="about.html" class="m-btn m-btn--ghost">ABOUT</a>
+            <a href="https://new.express.adobe.com/webpage/XRy2MzIpmkxug" target="_blank" rel="noopener noreferrer" class="m-btn m-btn--ghost">LP 1</a>
+            <a href="http://vadbusting.tilda.ws" target="_blank" rel="noopener noreferrer" class="m-btn m-btn--ghost">LP 2</a>
+            <a href="https://www.originalsoccerball.com/" target="_blank" rel="noopener noreferrer" class="m-btn m-btn--ghost">WEB</a>
+        </nav>
+    </main>
+
+    <footer class="m-footer">
+        <small>© TESHIMA TAKASHI</small>
+    </footer>
+
+    <script type="module">
+        import { initTrail } from './trail.js';
+        import { initMenu } from './script.js';
+
+        initTrail();
+        initMenu();
+    </script>
+</body>
+</html>
