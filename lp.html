@@ -1,0 +1,2718 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SPECIALIST LP — 手島 崇 (Mono)</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
+<!-- GSAP & ScrollTrigger for High-End Web Performance Animations -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<style>
+/* ============================================================
+   DESIGN TOKENS: Solid Corporate (Mono Minimal Style with Category Accent)
+   ============================================================ */
+:root {
+  --bg: #0A0A0A;       /* Absolute Deep Black */
+  --deck: #141414;     /* Dark Charcoal background */
+  --acc: #FFFFFF;      /* Pure white accent */
+  --acc-d: #444444;    /* Medium gray accent */
+  --acc-x: #333333;    /* Normal solid gray for border lines */
+  --t0: #FFFFFF;       /* Pure white text */
+  --t1: #E0E0E0;       /* Off-white text */
+  --t2: #999999;       /* Medium gray text */
+  --t3: #555555;       /* Dark gray text */
+  --t-dark: #111111;   /* Black text */
+  --radius: 0px;       /* Sharp corporate corners */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg);
+  font-family: 'Noto Sans JP', sans-serif;
+  color: var(--t1);
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: auto;
+  scroll-behavior: smooth;
+  display: block;
+}
+
+/* ── LP HEADER ── */
+.lp-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Direct alignment to the top-left */
+  padding: 0 40px;
+}
+
+.lp-back-btn {
+  font-size: 14px; /* Bold statement matching old logo styling */
+  font-weight: 800;
+  color: #FFF;
+  text-decoration: none;
+  transition: opacity 0.3s, transform 0.3s;
+  letter-spacing: 0.15em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lp-back-btn:hover {
+  opacity: 0.8;
+  transform: translateX(-3px);
+}
+
+/* ── AMBIENT ENVIRONMENT GLOW (背景環境光) ── */
+.ambient-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(circle at 50% 50%, #0c0c0c 0%, #050505 100%);
+  transition: background 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.presentation-wrapper {
+  width: 100%;
+  height: auto;
+  display: block;
+  padding: 60px 0 0 0;
+  position: relative;
+  z-index: 2;
+}
+
+/* 3D Perspective Context */
+.slide-deck {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  background: transparent;
+  overflow: visible;
+  box-shadow: none;
+  margin: 0;
+  perspective: none;
+  transform-style: flat;
+}
+
+/* ── SLIDE BASE ── */
+.slide {
+  position: relative;
+  top: auto;
+  left: auto;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 160px auto; /* Centered, generous bottom spacing instead of boxed borders */
+  height: auto;
+  min-height: auto;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  background: transparent !important; /* Transparent seamless block */
+  transform-style: flat;
+  backface-visibility: visible;
+  transition: none;
+  border-radius: 0px !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 40px;
+  scroll-margin-top: 100px; /* Offset for header */
+}
+
+/* Slide 1 Cover slide goes absolute full-bleed screen size */
+.slide.title-slide {
+  max-width: 100% !important;
+  width: 100% !important;
+  min-height: 94vh !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 120px !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.slide.active {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 10;
+  transform: translate3d(0, 0, 0) rotateY(0deg) !important;
+}
+
+img { max-width: 100%; }
+
+/* ── SERVICE BAND (Default s-band style) ── */
+.s-band {
+  display: flex;
+  align-items: center;
+  background: var(--acc-x);
+  height: 96px;
+  flex-shrink: 0;
+  z-index: 5;
+  position: relative;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.s-icon-block {
+  display: flex;
+  width: 96px;
+  height: 96px;
+  background: var(--acc-d);
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 32px;
+  color: #FFFFFF;
+}
+
+.s-title-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 30px;
+  flex: 1;
+}
+
+.s-category-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.15em;
+  margin-bottom: 6px;
+}
+
+.s-title {
+  display: block;
+  font-size: 24px;
+  color: #FFFFFF;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.5px;
+}
+
+/* ── SLIDE HEADER ── */
+.slide-header {
+  padding: 40px 60px 0;
+  flex-shrink: 0;
+  z-index: 5;
+}
+
+.slide-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--t0);
+  font-family: 'Noto Sans JP', sans-serif;
+  border-left: 5px solid var(--acc-d); /* Dim gray border */
+  padding-left: 20px;
+  line-height: 1.3;
+}
+
+/* ── SLIDE BODY ── */
+.slide-body {
+  flex: 1;
+  padding: 30px 60px 60px;
+  z-index: 5;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ── COVER SLIDE (MONO 2D logarithmic particles) ── */
+.slide.title-slide {
+  padding: 0;
+  flex-direction: column;
+  background: #050505;
+}
+
+.cover-top {
+  height: 440px;
+  width: 100%;
+  background: transparent;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+  padding: 60px 80px;
+}
+
+.cover-top h1 {
+  font-size: 48px;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1.5;
+  font-family: 'Noto Sans JP', sans-serif;
+  letter-spacing: 1px;
+  z-index: 2;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+}
+
+.cover-top h1 .cover-sub-title {
+  font-size: 19px;
+  font-weight: 500;
+  color: #FFFFFF;
+  opacity: 0.85;
+  display: block;
+  margin-bottom: 24px;
+  letter-spacing: 0.5px;
+  line-height: 1.4;
+}
+
+.cover-bottom {
+  height: 280px;
+  width: 100%;
+  background: #0c0c0c;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.03);
+  position: relative;
+}
+
+.cover-bottom .cover-author {
+  font-size: 28px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  font-family: 'Noto Sans JP', sans-serif;
+  z-index: 2;
+}
+
+.cover-bottom .cover-author .hl {
+  color: #888888;
+}
+
+#escherCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 1;
+}
+
+/* ── TOC GRID ── */
+.toc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.toc-item {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-left: 6px solid var(--acc-x); /* Normal: Solid gray line #333333 */
+  padding: 24px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+}
+
+.toc-item:hover {
+  transform: translate3d(0, -6px, 30px);
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+  border-left-color: #FFFFFF; /* Hover: White highlight */
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+.toc-icon-wrap {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.toc-content h3 {
+  font-size: 16px;
+  color: var(--t0);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.toc-content p {
+  font-size: 12.5px;
+  color: var(--t2);
+  line-height: 1.6;
+}
+
+/* ── 2-COL GRID ── */
+.grid-2col {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.grid-2col-equal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+/* ── TEXT SIDE ── */
+.text-side {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  padding: 40px;
+  z-index: 5;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+
+.text-side h3 {
+  font-size: 22px;
+  color: var(--acc);
+  margin-bottom: 20px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.text-side p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--t1);
+  margin-bottom: 15px;
+}
+
+.text-side ul {
+  list-style: none;
+  margin-top: 15px;
+}
+
+/* ── FIXING THE ALIGNMENT ISSUES (MONO BUG RESOLUTION) ── */
+.text-side li {
+  position: relative;
+  padding-left: 24px;
+  font-size: 13.5px;
+  color: var(--t2);
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  line-height: 1.6;
+}
+
+.text-side li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 16px;
+  width: 8px;
+  height: 8px;
+  background: var(--acc);
+  display: block;
+  border-radius: var(--radius);
+}
+
+/* ── GRAPHICS PANEL ── */
+.graphics-panel {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  padding: 20px;
+  height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.graphics-panel img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  filter: grayscale(100%) contrast(1.1); /* Enforce mono styling */
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.graphics-panel:hover img {
+  transform: scale(1.05);
+}
+
+/* ── TILES ── */
+.tiles-container {
+  display: flex;
+  gap: 20px;
+}
+
+.tile {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-left: 6px solid var(--acc-x); /* Normal: Solid gray line #333333 */
+  padding: 30px 24px;
+  flex: 1;
+  text-align: left; /* Aligned left for consistent reading flow */
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+}
+
+.tile:hover {
+  transform: translate3d(0, -6px, 30px);
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+  border-left-color: #FFFFFF; /* Hover: White highlight */
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+/*スライド5の右側タイルの特別な白ハイライトスタイル*/
+.tile.highlight {
+  background: #FFFFFF !important;
+  border: 1px solid #FFFFFF !important;
+  border-left: 6px solid #FFFFFF !important;
+  color: #111111 !important;
+}
+
+.tile.highlight h3 {
+  color: #000000 !important;
+}
+
+.tile.highlight p {
+  color: #333333 !important;
+}
+
+.tile.highlight:hover {
+  background: #FFFFFF !important;
+  border-color: #FFFFFF !important;
+  border-left-color: #FFFFFF !important;
+}
+
+.tile .icon {
+  font-size: 36px;
+  color: var(--acc);
+  margin-bottom: 20px;
+}
+
+.tile h3 {
+  font-size: 16px;
+  color: var(--t0);
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.tile p {
+  font-size: 12.5px;
+  color: var(--t2);
+  line-height: 1.7;
+  text-align: left;
+}
+
+/* ── BEFORE / AFTER FLOWS ── */
+.flow-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.flow-card {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-left: 6px solid var(--acc-x); /* Normal: Solid gray line #333333 */
+  padding: 30px;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+}
+
+.flow-card:hover {
+  transform: translate3d(0, -6px, 30px);
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+  border-left-color: #FFFFFF; /* Hover: White highlight */
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+.flow-card.after {
+  background: #FFFFFF; /* High contrast white block */
+  border: 1px solid #FFFFFF;
+  border-left: 6px solid #FFFFFF; /* Matches the white card body */
+}
+
+.flow-card.after:hover {
+  background: #FFFFFF;
+  border-color: #FFFFFF;
+  border-left-color: #FFFFFF;
+}
+
+.flow-card h3 {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: var(--t0) !important;
+  font-weight: 700;
+}
+
+.flow-card.after h3 {
+  color: #000000 !important;
+  border-bottom: 2px solid #000000;
+  padding-bottom: 8px;
+  display: inline-block;
+}
+
+.flow-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.flow-step-item {
+  background: rgba(0, 0, 0, 0.3);
+  border-left: 4px solid var(--acc-d); /* Dim gray border #444444 */
+  color: var(--t1);
+  padding: 14px 18px;
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.flow-card.after .flow-step-item {
+  background: rgba(0,0,0,0.06);
+  border-left-color: #000;
+  color: #111;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+/* ── TIMELINE ── */
+.timeline-box {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  padding: 0 10px;
+  margin-top: 20px;
+}
+
+.timeline-line-bg {
+  position: absolute;
+  top: 33px;
+  left: 50px;
+  right: 50px;
+  height: 2px;
+  background: rgba(255,255,255,0.06);
+  z-index: 1;
+}
+
+.timeline-step {
+  width: 18%;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.timeline-step:hover {
+  transform: translate3d(0, -4px, 10px);
+}
+
+.timeline-node {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--deck);
+  border: 3px solid var(--acc);
+  margin: 0 auto 16px;
+  transition: all 0.3s ease;
+}
+
+.timeline-step:hover .timeline-node {
+  background: var(--acc);
+  box-shadow: 0 0 12px var(--acc);
+}
+
+.timeline-step h4 {
+  font-size: 11px;
+  color: var(--acc);
+  margin-bottom: 6px;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.timeline-step .step-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--t0);
+  margin-bottom: 4px;
+}
+
+.timeline-step .step-sub {
+  font-size: 10px;
+  font-family: 'Noto Sans JP', sans-serif;
+  color: var(--t3);
+  font-style: italic;
+}
+
+/* ── OEM GRID (MONOCHROME STRIPES) ── */
+.oem-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.oem-card {
+  background: rgba(255,255,255,0.01);
+  border: 1px solid rgba(255,255,255,0.03);
+  border-left: 6px solid var(--acc-x); /* Normal: Solid gray line #333333 */
+  padding: 24px 20px;
+  text-align: left; /* Aligned left for consistent reading flow */
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+}
+
+.oem-card:hover {
+  transform: translate3d(0, -6px, 30px);
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.08);
+  border-left-color: #FFFFFF; /* Hover: White highlight */
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+.oem-card .oem-icon {
+  font-size: 32px;
+  color: var(--acc);
+  margin-bottom: 16px;
+}
+
+.oem-card h4 {
+  color: var(--t0);
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.oem-card p {
+  color: var(--t2);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* ── ROOTS (SPECIAL 3D SPLIT PANEL) ── */
+.roots-full {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1.15fr .85fr;
+}
+
+.roots-left {
+  padding: 60px 60px 100px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.roots-right {
+  background: #0f0f0f;
+  border-left: 1px solid rgba(255,255,255,0.03);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.roots-right img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(100%); /* Mono mode */
+  transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.roots-right:hover img {
+  transform: scale(1.03);
+}
+
+.quote-box {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 21px;
+  color: var(--acc);
+  font-style: italic;
+  margin: 22px 0;
+  border-left: 3px solid var(--acc-d); /* Dim gray border */
+  padding-left: 18px;
+  line-height: 1.7;
+}
+
+/* ── ABOUT ── */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.career-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 14px;
+}
+
+.career-item {
+  display: flex;
+  gap: 16px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  padding-bottom: 8px;
+}
+
+.career-year {
+  font-weight: 700;
+  color: var(--acc);
+  min-width: 60px;
+  flex-shrink: 0;
+}
+
+.career-desc {
+  color: var(--t1);
+}
+
+.stance-list {
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.stance-list li {
+  margin-bottom: 14px;
+  list-style: none;
+  color: var(--t2);
+  position: relative;
+  padding-left: 20px;
+}
+
+.stance-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 6px;
+  height: 6px;
+  background: var(--acc);
+  border-radius: var(--radius);
+}
+
+/* ── FULL BLEED OVERRIDES ── */
+.slide.is-full-bleed .slide-body {
+  padding: 0 !important;
+}
+
+.slide.is-full-bleed .grid-2col {
+  display: flex !important;
+  height: 100% !important;
+  gap: 0 !important;
+}
+
+.slide.is-full-bleed .text-side {
+  flex: 1.1;
+  padding: 60px 80px !important;
+  box-shadow: none !important;
+  border: none !important;
+  border-right: 1px solid rgba(255,255,255,0.04);
+  background: transparent !important;
+}
+
+.slide.is-full-bleed .graphics-panel {
+  flex: 0.9;
+  padding: 0 !important;
+  height: 100% !important;
+  background: rgba(0,0,0,0.15) !important;
+  border: none !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+}
+
+.slide.is-full-bleed .graphics-panel img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* ── CONTROL BAR ── */
+.control-bar {
+  position: absolute;
+  bottom: 24px;
+  right: 40px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.control-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--t1);
+  padding: 8px 18px;
+  cursor: pointer;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  letter-spacing: .05em;
+}
+
+.control-btn:hover {
+  background: var(--acc);
+  border-color: var(--acc);
+  color: #000;
+}
+
+.control-btn:disabled {
+  background: rgba(255,255,255,0.01);
+  border-color: rgba(255,255,255,0.02);
+  color: var(--t3);
+  cursor: not-allowed;
+}
+
+.slide-indicator {
+  color: var(--t2);
+  font-size: 11px;
+  padding: 0 16px;
+  letter-spacing: .07em;
+}
+
+.slide-indicator .cur {
+  color: var(--acc);
+  font-weight: 700;
+}
+
+a { color: var(--acc); text-decoration: none; transition: color 0.2s ease; }
+a:hover { color: #888; }
+
+/* ── サービス別テーマカラー (帯 & アイコンブロックの背景色分け) ── */
+/* 1. AI・セキュリティコンサル (ロイヤルブルー - HSL明度 45% 統一) */
+.s-band.theme-ai { background: #1A85FF !important; }
+.s-band.theme-ai .s-icon-block { background: #0059B3 !important; }
+
+/* 2. Web制作・運用 (極上プレミアムネイビー - 累計10%薄く・気品あるロイヤルネイビー) */
+.s-band.theme-web { background: #194AA3 !important; }
+.s-band.theme-web .s-icon-block { background: #123575 !important; }
+
+/* 3. 制作進行ディレクション (極上ローズピンク - HSL明度 45% 統一) */
+.s-band.theme-dir { background: #E61A7B !important; }
+.s-band.theme-dir .s-icon-block { background: #B30E5C !important; }
+
+/* 4. オフライン・OEM制作 (極上純カーマイン - 累計10%薄く・気品あるラグジュアリーカーマイン) */
+.s-band.theme-oem { background: #DF1E43 !important; }
+.s-band.theme-oem .s-icon-block { background: #BD0F30 !important; }
+
+/* 5. 開発支援 (高貴なバイオレットパープル - HSL明度 45% 統一) */
+.s-band.theme-dev { background: #8522C7 !important; }
+.s-band.theme-dev .s-icon-block { background: #661A99 !important; }
+
+/* 6. サッカーボール.com (洗練されたガンメタルスレート - HSL明度 45% 統一) */
+.s-band.theme-ball { background: #5A6877 !important; }
+.s-band.theme-ball .s-icon-block { background: #434E5C !important; }
+
+/* TOC連動アイコンカラー (各アイコンの背景色をテーマの濃い色に同期) */
+.toc-icon-wrap.theme-ai-icon { background: #0059B3 !important; color: #FFFFFF !important; }
+.toc-icon-wrap.theme-web-icon { background: #123575 !important; color: #FFFFFF !important; }
+.toc-icon-wrap.theme-dir-icon { background: #B30E5C !important; color: #FFFFFF !important; }
+.toc-icon-wrap.theme-oem-icon { background: #BD0F30 !important; color: #FFFFFF !important; }
+.toc-icon-wrap.theme-dev-icon { background: #661A99 !important; color: #FFFFFF !important; }
+.toc-icon-wrap.theme-ball-icon { background: #434E5C !important; color: #FFFFFF !important; }
+
+/* TOC Item Theme Accents (Solid Category Coloring with Supreme Contrast) */
+/* 1. AI・セキュリティブロック通常背景 */
+.toc-item.theme-ai-item { 
+  background: #1A85FF !important; 
+  border-color: rgba(255,255,255,0.06) !important;
+  border-left: 6px solid #0059B3 !important; 
+}
+/* 2. Web制作・運用ブロック通常背景 (累計10%薄く・上品なネイビー) */
+.toc-item.theme-web-item { 
+  background: #194AA3 !important; 
+  border-color: rgba(255,255,255,0.06) !important;
+  border-left: 6px solid #123575 !important; 
+}
+/* 3. 制作進行ディレクションブロック通常背景 */
+.toc-item.theme-dir-item { 
+  background: #E61A7B !important; 
+  border-color: rgba(255,255,255,0.06) !important;
+  border-left: 6px solid #B30E5C !important; 
+}
+/* 4. オフライン・OEM制作ブロック通常背景 (累計10%薄く・上品なカーマイン) */
+.toc-item.theme-oem-item { 
+  background: #DF1E43 !important; 
+  border-color: rgba(255,255,255,0.06) !important;
+  border-left: 6px solid #BD0F30 !important; 
+}
+/* 5. 開発支援ブロック通常背景 */
+.toc-item.theme-dev-item { 
+  background: #8522C7 !important; 
+  border-color: rgba(255,255,255,0.06) !important;
+  border-left: 6px solid #661A99 !important; 
+}
+/* 6. サッカーボールブロック通常背景 */
+.toc-item.theme-ball-item { 
+  background: #5A6877 !important; 
+  border-color: rgba(255,255,255,0.06) !important;
+  border-left: 6px solid #434E5C !important; 
+}
+
+/* Hover States (Prism Shifting Vivid Colors and Pure White Border Highlights) */
+/* 1. ブルーホバー */
+.toc-item.theme-ai-item:hover { 
+  background: #4DA3FF !important; 
+  border-left-color: #FFFFFF !important; 
+  border-color: rgba(255,255,255,0.25) !important;
+  transform: translate3d(0, -6px, 30px) !important;
+}
+/* 2. ネイビーホバー */
+.toc-item.theme-web-item:hover { 
+  background: #205ED0 !important; 
+  border-left-color: #FFFFFF !important; 
+  border-color: rgba(255,255,255,0.25) !important;
+  transform: translate3d(0, -6px, 30px) !important;
+}
+/* 3. ピンクホバー */
+.toc-item.theme-dir-item:hover { 
+  background: #F0549E !important; 
+  border-left-color: #FFFFFF !important; 
+  border-color: rgba(255,255,255,0.25) !important;
+  transform: translate3d(0, -6px, 30px) !important;
+}
+/* 4. カーマインホバー */
+.toc-item.theme-oem-item:hover { 
+  background: #E74C6A !important; 
+  border-left-color: #FFFFFF !important; 
+  border-color: rgba(255,255,255,0.25) !important;
+  transform: translate3d(0, -6px, 30px) !important;
+}
+/* 5. 紫ホバー */
+.toc-item.theme-dev-item:hover { 
+  background: #A64DED !important; 
+  border-left-color: #FFFFFF !important; 
+  border-color: rgba(255,255,255,0.25) !important;
+  transform: translate3d(0, -6px, 30px) !important;
+}
+/* 6. スレートホバー */
+.toc-item.theme-ball-item:hover { 
+  background: #748496 !important; 
+  border-left-color: #FFFFFF !important; 
+  border-color: rgba(255,255,255,0.25) !important;
+  transform: translate3d(0, -6px, 30px) !important;
+}
+
+/* Ensure inside texts and icons look extremely sharp over the solid vivid backgrounds */
+.toc-item.theme-ai-item .toc-content h3,
+.toc-item.theme-web-item .toc-content h3,
+.toc-item.theme-dir-item .toc-content h3,
+.toc-item.theme-oem-item .toc-content h3,
+.toc-item.theme-dev-item .toc-content h3,
+.toc-item.theme-ball-item .toc-content h3,
+.toc-item.theme-ai-item .toc-icon-wrap,
+.toc-item.theme-web-item .toc-icon-wrap,
+.toc-item.theme-dir-item .toc-icon-wrap,
+.toc-item.theme-oem-item .toc-icon-wrap,
+.toc-item.theme-dev-item .toc-icon-wrap,
+.toc-item.theme-ball-item .toc-icon-wrap {
+  color: #FFFFFF !important;
+}
+
+.toc-item.theme-ai-item .toc-content p,
+.toc-item.theme-web-item .toc-content p,
+.toc-item.theme-dir-item .toc-content p,
+.toc-item.theme-oem-item .toc-content p,
+.toc-item.theme-dev-item .toc-content p,
+.toc-item.theme-ball-item .toc-content p {
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-weight: 500 !important;
+}
+
+/* ── 帯（s-band）のテキスト＆アイコン色（純白および高コントラスト半透明白） ── */
+.s-band.theme-ai .s-title,
+.s-band.theme-ai .s-icon-block i,
+.s-band.theme-web .s-title,
+.s-band.theme-web .s-icon-block i,
+.s-band.theme-dir .s-title,
+.s-band.theme-dir .s-icon-block i,
+.s-band.theme-oem .s-title,
+.s-band.theme-oem .s-icon-block i,
+.s-band.theme-dev .s-title,
+.s-band.theme-dev .s-icon-block i,
+.s-band.theme-ball .s-title,
+.s-band.theme-ball .s-icon-block i {
+  color: #FFFFFF !important;
+}
+
+.s-band.theme-ai .s-category-label,
+.s-band.theme-web .s-category-label,
+.s-band.theme-dir .s-category-label,
+.s-band.theme-oem .s-category-label,
+.s-band.theme-dev .s-category-label,
+.s-band.theme-ball .s-category-label {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* ── ELIMINATE REPETITIVE S-BANDS (同じ色の帯は2つもいらない) ── */
+#slide-4 .s-band, #slide-5 .s-band, #slide-6 .s-band, #slide-7 .s-band,
+#slide-9 .s-band,
+#slide-11 .s-band,
+#slide-13 .s-band,
+#slide-15 .s-band {
+  display: none !important;
+}
+
+/* Compensate padding for slides where s-band is hidden */
+/* Hide Slide 2 (業務内容 Menu) from content stream since it's presented in the side dot navigation indicator */
+#slide-2 {
+  display: none !important;
+}
+
+/* ── SEAMLESS EQUIDISTANT LAYOUT SYSTEM (余白等間隔化) ── */
+/* Ensure all slide wrappers are perfectly transparent to let conformal canvas glow through */
+.slide-deck, .slide, .cover-top, .cover-bottom, .slide.title-slide {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+#slide-3, #slide-4, #slide-5, #slide-6, #slide-7, #slide-8, #slide-9, #slide-10, #slide-11, #slide-12, #slide-13, #slide-14, #slide-15, #slide-16, #slide-17, #slide-18 {
+  scroll-margin-top: 100px !important;
+}
+
+/* Neon category band (左右を完全に最大幅まで伸ばしたダイナミック仕様！) */
+.s-band {
+  margin-top: 180px !important;     /* Huge page-sized gap before the band */
+  margin-bottom: 180px !important;  /* Huge page-sized gap after the band */
+  width: 100% !important;               /* 左右マージンを完全に排除し、最大まで伸ばす */
+  max-width: 1200px !important;         /* コンテンツエリア最大幅の1200pxに完全一致 */
+  margin-left: auto !important;
+  margin-right: auto !important;
+  border-radius: 0px !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important; /* フローティング感のある高級な影 */
+}
+
+/* Equalized content top offset for sections without s-bands (Matches 96px band height + 180px margin-bottom = 276px) */
+#slide-4, #slide-5, #slide-6, #slide-7, #slide-9, #slide-11, #slide-13, #slide-15, #slide-17, #slide-18 {
+  padding-top: 276px !important;   /* Flawless vertical rhythm matching s-band sections */
+}
+
+/* Ensure slide body paddings are clean and flat without legacy absolute slide constraints */
+.slide-body {
+  padding: 0 !important;
+  flex: none !important;
+  display: block !important;
+}
+
+/* ── CINEMATIC radial ambient glow in sections ── */
+.slide::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.015) 0%, rgba(0,0,0,0) 70%);
+  pointer-events: none;
+  z-index: 2;
+  transition: transform 0.5s ease;
+}
+
+.slide#slide-3::before, .slide#slide-4::before, .slide#slide-5::before, .slide#slide-6::before, .slide#slide-7::before {
+  background: radial-gradient(circle at 85% 15%, rgba(26,133,255,0.04) 0%, rgba(0,0,0,0) 50%);
+}
+.slide#slide-8::before, .slide#slide-9::before {
+  background: radial-gradient(circle at 85% 15%, rgba(25,74,163,0.05) 0%, rgba(0,0,0,0) 50%);
+}
+.slide#slide-10::before, .slide#slide-11::before {
+  background: radial-gradient(circle at 85% 15%, rgba(230,26,123,0.04) 0%, rgba(0,0,0,0) 50%);
+}
+.slide#slide-12::before, .slide#slide-13::before {
+  background: radial-gradient(circle at 85% 15%, rgba(223,30,67,0.04) 0%, rgba(0,0,0,0) 50%);
+}
+.slide#slide-14::before, .slide#slide-15::before {
+  background: radial-gradient(circle at 85% 15%, rgba(133,34,199,0.04) 0%, rgba(0,0,0,0) 50%);
+}
+
+/* ── TITLES WIDE ASPECT (タイトルを画面幅いっぱいに解放) ── */
+.cover-top {
+  height: auto !important;
+  min-height: 460px;
+  padding: 80px 40px !important;
+  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.cover-h1 {
+  font-size: 5vw !important; /* 画面幅いっぱいタイポグラフィ */
+  max-width: 100% !important;
+  width: 100% !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.02em !important;
+  font-weight: 900 !important;
+  color: var(--t0) !important;
+  word-break: keep-all;
+}
+
+.cover-sub-title {
+  font-size: 1.8vw !important;
+  margin-bottom: 24px !important;
+}
+
+.cover-bottom {
+  height: auto !important;
+  padding: 40px !important;
+  width: 100% !important;
+  background: #090909 !important;
+  border-top: 1px solid rgba(255,255,255,0.03);
+}
+
+.cover-bottom .cover-author {
+  font-size: 24px !important;
+}
+
+/* ── PRETTIER HOVER INTERACTIVE ACTIONS FOR CARDS (NO BOX OUTLINES / NO BORDERS) ── */
+.toc-item, .tile, .oem-card, .about-grid > div {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  border: none !important; /* Completely remove borders */
+  background: transparent !important; /* Completely transparent background */
+  border-radius: 0px !important;
+  padding: 10px 0 !important; /* Standard spacing without box borders */
+  box-shadow: none !important; /* Completely remove shadows */
+}
+
+.toc-item:hover, .tile:hover, .oem-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  border-color: transparent !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.toc-item {
+  display: flex !important;
+  cursor: pointer;
+}
+
+/* ── GSAP & NATIVE ANIMATION FAILGUARDS (防弾仕様) ── */
+/* 初期状態ではすべて表示されている状態（安全第一） */
+.slide .slide-header, 
+.slide .slide-body,
+.slide .roots-full {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* GSAP/JSが正常にロードされた場合のみ、初期非表示にしてGSAPでフェードインさせる */
+.gsap-loaded .slide:not(.title-slide) .slide-header,
+.gsap-loaded .slide:not(.title-slide) .slide-body,
+.gsap-loaded .slide:not(.title-slide) .roots-full {
+  opacity: 0;
+  transform: translateY(35px);
+}
+
+/* アラートクラス（スクロールでアクティブ、またはGSAP稼働時のアクティブ表示） */
+.slide.active:not(.title-slide) .slide-header,
+.slide.active:not(.title-slide) .roots-full {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  transition-delay: 0.1s;
+}
+
+.slide.active:not(.title-slide) .slide-body {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  transition-delay: 0.25s;
+}
+
+/* 3D images hover styling (NO BOXES / NO BORDERS) */
+.graphics-panel, .roots-right {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.graphics-panel img, .roots-right img {
+  border-radius: 0px !important;
+  border: none !important; /* Remove borders */
+  box-shadow: none !important; /* Remove shadows */
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: grayscale(100%) contrast(1.1); /* Enforce mono styling strictly */
+}
+
+.graphics-panel:hover img, .roots-right:hover img {
+  transform: scale(1.02);
+}
+
+/* ── FLOAT SCROLL TOP BUTTON ── */
+.scroll-top-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #FFF;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s, background-color 0.3s, transform 0.3s;
+}
+
+.scroll-top-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.scroll-top-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-3px);
+}
+
+/* ── RESPONSIVE MEDIA QUERIES ── */
+@media (max-width: 990px) {
+  .lp-nav {
+    display: none; /* Hide header nav links on tablet/mobile */
+  }
+}
+
+@media (max-width: 768px) {
+  .presentation-wrapper {
+    padding: 70px 10px 20px;
+  }
+  
+  .slide {
+    min-height: auto;
+    margin-bottom: 25px;
+  }
+  
+  .slide-header {
+    padding: 24px 24px 0 !important;
+  }
+  
+  .slide-title {
+    font-size: 20px !important;
+    padding-left: 12px !important;
+  }
+  
+  .slide-body {
+    padding: 24px !important;
+    overflow: visible !important;
+  }
+  
+  /* Stagger grid systems to 1 column on SP */
+  .grid-2col, .about-grid, .roots-full, .toc-grid, .tiles-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+  }
+  
+  .text-side, .graphics-panel, .roots-left, .roots-right {
+    width: 100% !important;
+    padding: 0 !important;
+  }
+  
+  .graphics-panel, .roots-right {
+    height: auto !important;
+    margin-top: 15px;
+  }
+  
+  .graphics-panel img, .roots-right img {
+    max-height: 250px;
+    width: auto;
+    margin: 0 auto;
+    display: block;
+  }
+  
+  /* Hero typography for SP */
+  .cover-top h1 {
+    font-size: 28px !important;
+  }
+  
+  .cover-top h1 .cover-sub-title {
+    font-size: 14px !important;
+    margin-bottom: 15px !important;
+  }
+  
+  .cover-bottom {
+    height: auto !important;
+    padding: 30px 20px !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+  }
+  
+  .cover-bottom .cover-author {
+    font-size: 20px !important;
+  }
+  
+  /* Height auto for s-band category label */
+  .s-band {
+    height: auto !important;
+    min-height: 72px;
+  }
+  
+  .s-icon-block {
+    width: 72px !important;
+    height: 72px !important;
+    font-size: 24px !important;
+  }
+  
+  .s-title-group {
+    padding: 10px 15px !important;
+  }
+  
+  
+  .s-title {
+    font-size: 16px !important;
+  }
+}
+
+/* ============================================================
+   EXTRA BRAND BRANDING: VETTVANGUR HIGH-END INTERACTION STYLES
+   ============================================================ */
+/* Custom Cursor (Vivid Accent Follower) */
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 999999;
+  mix-blend-mode: difference; /* Beautiful inversion blend */
+}
+.cursor-orb {
+  width: 12px;
+  height: 12px;
+  background: #FFFFFF; /* Pure white accent */
+  border-radius: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              height 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              background-color 0.3s, 
+              border 0.3s;
+}
+.custom-cursor.hovered .cursor-orb {
+  width: 70px;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1.5px solid #FFFFFF !important;
+}
+.custom-cursor.click-effect .cursor-orb {
+  width: 6px;
+  height: 6px;
+  background: #FFFFFF !important;
+  border: none !important;
+}
+
+/* Scroll Progress Bar at the absolute top */
+.scroll-progress-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  z-index: 100002;
+  background: rgba(255, 255, 255, 0.03);
+}
+.scroll-progress-bar {
+  width: 0%;
+  height: 100%;
+  background: #FFFFFF; /* Pure white progress line */
+}
+
+/* Luxury Side Dots Indicator (透過なし・コンパクトアイコン ✕ マウスオン時のみ帯表示) */
+.side-dots-nav {
+  position: fixed;
+  right: 20px; /* 透過せず、美しい一定の位置で固定 */
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 999999;
+  opacity: 1 !important; /* 透過は一切しない！ */
+  pointer-events: auto;
+}
+
+/* Dockの各アイテム（ミニ見出し帯） */
+.side-dot {
+  display: flex !important;
+  align-items: center;
+  background: rgba(16, 16, 16, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 0px !important; /* 見出し帯と同じシャープな角 */
+  padding: 0 !important;
+  height: 38px;
+  width: 38px; /* 普段は常に38pxの正方形アイコンのみでコンパクト！ */
+  min-width: 38px;
+  max-width: 38px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+  /* しまっている状態（アイコンのみ）から、乗ったら（帯の状態）への滑らかな幅変化トランジション */
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              min-width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              max-width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.3s,
+              border-color 0.3s;
+}
+
+/* アイコンブロック（通常時はグレー背景 ✕ グレーアイコン！） */
+.side-icon-block {
+  width: 36px;
+  height: 36px;
+  background: #2a2a2a; /* 通常時（非アクティブ）は上品なグレー背景 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #666666; /* 通常時（非アクティブ）はグレーアイコン */
+  flex-shrink: 0;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ラベルテキスト（日本語） */
+.side-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.05em;
+  padding: 0 15px 0 12px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* ── 通常アクティブ状態（active）のテーマカラー同期 ── */
+/* スクロール位置に合わせて、現在表示中のカテゴリだけが美しいテーマ背景色と白アイコンになる！ */
+.side-dot[data-target="ai"].active .side-icon-block { background: #0059B3; color: #FFFFFF; }
+.side-dot[data-target="web"].active .side-icon-block { background: #123575; color: #FFFFFF; }
+.side-dot[data-target="dir"].active .side-icon-block { background: #B30E5C; color: #FFFFFF; }
+.side-dot[data-target="oem"].active .side-icon-block { background: #BD0F30; color: #FFFFFF; }
+.side-dot[data-target="dev"].active .side-icon-block { background: #661A99; color: #FFFFFF; }
+.side-dot[data-target="ball"].active .side-icon-block { background: #434E5C; color: #FFFFFF; }
+.side-dot[data-target="about"].active .side-icon-block { background: #444444; color: #FFFFFF; }
+.side-dot[data-target="cover"].active .side-icon-block { background: #111111; color: #FFFFFF; }
+
+.side-dot[data-target="ai"].active { border-color: #1A85FF !important; }
+.side-dot[data-target="web"].active { border-color: #194AA3 !important; }
+.side-dot[data-target="dir"].active { border-color: #E61A7B !important; }
+.side-dot[data-target="oem"].active { border-color: #DF1E43 !important; }
+.side-dot[data-target="dev"].active { border-color: #8522C7 !important; }
+.side-dot[data-target="ball"].active { border-color: #5A6877 !important; }
+.side-dot[data-target="about"].active { border-color: #FFFFFF !important; }
+.side-dot[data-target="cover"].active { border-color: #FFFFFF !important; }
+
+/* ── マウスオンしたとき（hover）だけ幅220pxの帯にスライド展開して文字を表示！！！ ── */
+.side-dot:hover {
+  width: 220px !important;
+  min-width: 220px !important;
+  max-width: 220px !important;
+}
+
+.side-dot:hover .side-label {
+  opacity: 1;
+}
+
+/* ホバー時のテーマ発光＆アイコン白化同期 */
+.side-dot[data-target="ai"]:hover { border-color: #1A85FF !important; background: #1A85FF !important; }
+.side-dot[data-target="web"]:hover { border-color: #194AA3 !important; background: #194AA3 !important; }
+.side-dot[data-target="dir"]:hover { border-color: #E61A7B !important; background: #E61A7B !important; }
+.side-dot[data-target="oem"]:hover { border-color: #DF1E43 !important; background: #DF1E43 !important; }
+.side-dot[data-target="dev"]:hover { border-color: #8522C7 !important; background: #8522C7 !important; }
+.side-dot[data-target="ball"]:hover { border-color: #5A6877 !important; background: #5A6877 !important; }
+.side-dot[data-target="about"]:hover { border-color: #FFFFFF !important; background: #333333 !important; }
+.side-dot[data-target="cover"]:hover { border-color: #FFFFFF !important; background: #1a1a1a !important; }
+
+.side-dot[data-target="ai"]:hover .side-icon-block { background: #0059B3 !important; color: #FFFFFF !important; }
+.side-dot[data-target="web"]:hover .side-icon-block { background: #123575 !important; color: #FFFFFF !important; }
+.side-dot[data-target="dir"]:hover .side-icon-block { background: #B30E5C !important; color: #FFFFFF !important; }
+.side-dot[data-target="oem"]:hover .side-icon-block { background: #BD0F30 !important; color: #FFFFFF !important; }
+.side-dot[data-target="dev"]:hover .side-icon-block { background: #661A99 !important; color: #FFFFFF !important; }
+.side-dot[data-target="ball"]:hover .side-icon-block { background: #434E5C !important; color: #FFFFFF !important; }
+.side-dot[data-target="about"]:hover .side-icon-block { background: #444444 !important; color: #FFFFFF !important; }
+.side-dot[data-target="cover"]:hover .side-icon-block { background: #111111 !important; color: #FFFFFF !important; }
+
+
+
+/* Typography Overrides for Vettvangur Premium feel (Additional 1.4x Enlarge, total 1.96x scale!) */
+.cover-h1 {
+  font-size: 94px !important; /* 48pxの1.96倍 = 約94px */
+  letter-spacing: 1px !important;
+  line-height: 1.35 !important;
+  font-weight: 700 !important;
+}
+.cover-sub-title {
+  font-size: 37px !important; /* 19pxの1.96倍 = 約37px */
+  letter-spacing: 0.5px !important;
+  color: #FFFFFF !important;
+  opacity: 0.85 !important;
+  font-weight: 500 !important;
+  margin-bottom: 24px !important;
+}
+
+/* ============================================================
+   SLIDE 1 FULL BLEED HERO CANVAS VIEWPORT (上下左右全面・視覚いっぱいの解放)
+   ============================================================ */
+.slide.title-slide {
+  max-width: 100vw !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  position: relative !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important; /* Text on top, Author at bottom */
+  align-items: center !important;
+  margin: 0 0 160px 0 !important;
+  padding: 100px 0 60px 0 !important;
+  background: transparent !important; /* 完全に透過して背景の模様を見せる！ */
+  border-radius: 0px !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+#escherCanvas {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: block !important;
+  z-index: 1 !important;
+  pointer-events: none;
+}
+
+.cover-top {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 1200px !important;
+  height: auto !important;
+  min-height: auto !important;
+  padding: 0 40px !important;
+  margin: auto 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  z-index: 2 !important;
+  background: transparent !important;
+  transform: translateY(-55px) !important; /* タイトル文字位置を少し上にシフト */
+}
+
+.cover-bottom {
+  position: relative !important;
+  width: 100% !important;
+  height: auto !important;
+  padding: 20px 40px !important;
+  background: transparent !important;
+  border-top: none !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 2 !important;
+}
+
+/* Hide native cursor for a clean premium custom cursor feel (Desktop only) */
+@media (min-width: 1024px) {
+  html, body, a, button, .toc-item, .tile, .oem-card {
+    cursor: none !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor (Vettvangur Premium Style) -->
+<div class="custom-cursor" id="customCursor">
+  <div class="cursor-orb"></div>
+</div>
+
+<!-- Scroll Progress Bar -->
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scrollProgressBar"></div>
+</div>
+
+<!-- Luxury Side Accent Bar Navigation (見出し帯と同じアイコン帯デザイン) -->
+<div class="side-dots-nav">
+  <div class="side-dot active" data-target="cover" data-label="ホーム" onclick="scrollToSection('#slide-1')">
+    <div class="side-icon-block"><i class="fa-solid fa-house"></i></div>
+    <span class="side-label">ホーム</span>
+  </div>
+  <div class="side-dot" data-target="ai" data-label="AI・セキュリティコンサル" onclick="scrollToSection('#slide-3')">
+    <div class="side-icon-block"><i class="fa-solid fa-shield-halved"></i></div>
+    <span class="side-label">AI・セキュリティコンサル</span>
+  </div>
+  <div class="side-dot" data-target="web" data-label="Web制作・運用" onclick="scrollToSection('#slide-8')">
+    <div class="side-icon-block"><i class="fa-solid fa-laptop-code"></i></div>
+    <span class="side-label">Web制作・運用</span>
+  </div>
+  <div class="side-dot" data-target="dir" data-label="制作進行ディレクション" onclick="scrollToSection('#slide-10')">
+    <div class="side-icon-block"><i class="fa-solid fa-diagram-project"></i></div>
+    <span class="side-label">制作進行ディレクション</span>
+  </div>
+  <div class="side-dot" data-target="oem" data-label="OEM製品・印刷物" onclick="scrollToSection('#slide-12')">
+    <div class="side-icon-block"><i class="fa-solid fa-print"></i></div>
+    <span class="side-label">OEM製品・印刷物</span>
+  </div>
+  <div class="side-dot" data-target="dev" data-label="開発支援" onclick="scrollToSection('#slide-14')">
+    <div class="side-icon-block"><i class="fa-solid fa-gears"></i></div>
+    <span class="side-label">開発支援</span>
+  </div>
+  <div class="side-dot" data-target="ball" data-label="originalsoccerball.com" onclick="scrollToSection('#slide-16')">
+    <div class="side-icon-block"><i class="fa-solid fa-futbol"></i></div>
+    <span class="side-label">originalsoccerball.com</span>
+  </div>
+  <div class="side-dot" data-target="about" data-label="ABOUT" onclick="scrollToSection('#slide-17')">
+    <div class="side-icon-block"><i class="fa-solid fa-user"></i></div>
+    <span class="side-label">ABOUT</span>
+  </div>
+</div>
+
+<!-- Ambient Environment Glow Background -->
+<div class="ambient-glow" id="ambientGlow"></div>
+
+<!-- Site-wide Conformal Droste Canvas (サイト全面背景として固定配置) -->
+<canvas id="escherCanvas"></canvas>
+
+<!-- LP Fixed Header -->
+<header class="lp-header">
+  <a href="index.html" class="lp-back-btn" id="lpBackBtn"><i class="fa-solid fa-arrow-left"></i> BACK</a>
+</header>
+
+<!-- Floating Scroll Top Button -->
+<button class="scroll-top-btn" id="scrollTopBtn"><i class="fa-solid fa-chevron-up"></i></button>
+
+<div class="presentation-wrapper">
+<div class="slide-deck" id="slideDeck">
+
+<!-- ══ SLIDE 1: COVER (2D logarithmic particles) ══ -->
+<div class="slide active title-slide" id="slide-1">
+  <div class="cover-top">
+    <h1 class="cover-h1">
+      <span class="cover-sub-title">セキュア意識の高い「ＡＩ実務」✕「制作進行ディレクション」で</span>
+      現場実務の最適化を図る。
+    </h1>
+  </div>
+  <div class="cover-bottom">
+    <div class="cover-author">TAK<span class="hl">A</span>SHI TESH<span class="hl">I</span>MA</div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 2: 業務内容 ══ -->
+<div class="slide" id="slide-2">
+  <div class="slide-header">
+    <h2 class="slide-title">業務内容</h2>
+  </div>
+  <div class="slide-body">
+    <div class="toc-grid">
+      <a href="#slide-3" class="toc-item theme-ai-item">
+        <div class="toc-icon-wrap theme-ai-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="toc-content">
+          <h3>AI・セキュリティコンサル</h3>
+          <p>BtoB下請け向け：情報漏洩対策、ローカルLLM設定、簡易RAGの提案・構築</p>
+        </div>
+      </a>
+      <a href="#slide-8" class="toc-item theme-web-item">
+        <div class="toc-icon-wrap theme-web-icon"><i class="fa-solid fa-laptop-code"></i></div>
+        <div class="toc-content">
+          <h3>Web制作・運用</h3>
+          <p>LP・WebページのAI制作。ホスティングサーバー構築・公開、月額運用管理。AI効率化レクチャー</p>
+        </div>
+      </a>
+      <a href="#slide-10" class="toc-item theme-dir-item">
+        <div class="toc-icon-wrap theme-dir-icon"><i class="fa-solid fa-diagram-project"></i></div>
+        <div class="toc-content">
+          <h3>制作進行ディレクション</h3>
+          <p>進行状況の確認サポート。AI活用フロー設計、月額サポート</p>
+        </div>
+      </a>
+      <a href="#slide-12" class="toc-item theme-oem-item">
+        <div class="toc-icon-wrap theme-oem-icon"><i class="fa-solid fa-print"></i></div>
+        <div class="toc-content">
+          <h3>オフライン・OEM制作</h3>
+          <p>名刺、チラシ、看板等のOEM制作。ローカルDTP環境による規格適合チェックとデータ入稿調整</p>
+        </div>
+      </a>
+      <a href="#slide-14" class="toc-item theme-dev-item">
+        <div class="toc-icon-wrap theme-dev-icon"><i class="fa-solid fa-gears"></i></div>
+        <div class="toc-content">
+          <h3>開発支援</h3>
+          <p>AIを活用した社内インナーアプリ・クライアント向け簡易アプリの開発サポート</p>
+        </div>
+      </a>
+      <a href="#slide-16" class="toc-item theme-ball-item">
+        <div class="toc-icon-wrap theme-ball-icon"><i class="fa-solid fa-futbol"></i></div>
+        <div class="toc-content">
+          <h3>オリジナルサッカーボール.com運営</h3>
+          <p>originalsoccerball.com</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 3: AI導入のジレンマ ══ -->
+<div class="slide is-full-bleed" id="slide-3">
+  <div class="s-band theme-ai">
+    <div class="s-icon-block"><i class="fa-solid fa-shield-halved"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">AI・セキュリティコンサル</span>
+      <h2 class="s-title">AI導入における致命的なジレンマ</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2col">
+      <div class="text-side">
+        <h3>「AIで業務を効率化したい。<br>しかし、機密情報は外に出せない」</h3>
+        <p>製造業、卸売、制作会社など、BtoB下請け企業様の現場では深刻なジレンマが起きています。</p>
+        <p>製品図面や見積り基準などをクラウドAIに入力することは、情報漏洩リスクを伴うため、導入に踏み切れないのが実情です。</p>
+        <ul>
+          <li>製品図面データ・設計情報</li>
+          <li>詳細な見積情報・原価データ</li>
+          <li>顧客の個人情報・機密データ</li>
+        </ul>
+      </div>
+      <div class="graphics-panel">
+        <img src="slide3_ai_dilemma.png" alt="AI導入のジレンマ" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 4: 従来アプローチの限界 ══ -->
+<div class="slide" id="slide-4">
+  <div class="s-band theme-ai">
+    <div class="s-icon-block"><i class="fa-solid fa-shield-halved"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">AI・セキュリティコンサル</span>
+      <h2 class="s-title">限界を迎える従来のアプローチ</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <p style="margin-bottom:20px; font-size:14px; font-weight:500; color:var(--t0);">AIを導入できない現場では、従来の人海戦術と外注依存が続いています。</p>
+    <div class="tiles-container">
+      <div class="tile">
+        <div class="icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
+        <h3>外注依存の発生</h3>
+        <p>日々の制作からWeb更新まで外部への依存が続き、細かいコストが膨張し続けています。</p>
+      </div>
+      <div class="tile">
+        <div class="icon"><i class="fa-solid fa-business-time"></i></div>
+        <h3>属人的な手作業による遅延</h3>
+        <p>確認作業や属人的な手作業が残り、現場の負担と進行の遅れを招きます。</p>
+      </div>
+      <div class="tile">
+        <div class="icon"><i class="fa-solid fa-network-wired"></i></div>
+        <h3>要件定義・進行のパンク</h3>
+        <p>複数の外注先を束ねる伝言ゲームにより、プロジェクトの進行管理自体が破綻しやすくなります。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 5: 私のアプローチ ══ -->
+<div class="slide" id="slide-5">
+  <div class="s-band theme-ai">
+    <div class="s-icon-block"><i class="fa-solid fa-shield-halved"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">AI・セキュリティコンサル</span>
+      <h2 class="s-title">私のアプローチ</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2col-equal">
+      <div class="tile" style="border-top-color: var(--t3);">
+        <h3 style="font-size:18px; color:var(--t0); margin-bottom:12px;">現場の課題</h3>
+        <p style="font-size:13.5px; line-height:1.8;">長期のBtoBであるほど、属人的な手作業や確認作業にお困りのはずです。進行遅延や管理のパンクを招く原因を解決しようにも、適切な解決策が見つからないのが実情です。</p>
+      </div>
+      <div class="tile highlight">
+        <h3 style="font-size:18px; margin-bottom:12px;">スモールスタートで堅実に改善</h3>
+        <p style="font-size:13.5px; line-height:1.8;">大掛かりなシステム導入ではなく、現場のコストや管理工数を圧迫する要因をAIで見見直します。制作進行の時間短縮を図りながら、チーム本来のポテンシャルを最大化します。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 6: クローズドAI環境 ══ -->
+<div class="slide is-full-bleed" id="slide-6">
+  <div class="s-band theme-ai">
+    <div class="s-icon-block"><i class="fa-solid fa-shield-halved"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">AI・セキュリティコンサル</span>
+      <h2 class="s-title">手元で動かすクローズドAI環境</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2col">
+      <div class="text-side">
+        <h3>閉じられた安全なAI環境の構築</h3>
+        <p>手元のローカル環境や、管理されたクローズドなデータ構造を適切に選択し、外部にデータを送信しない仕組みを整備します。</p>
+        <p>機密情報を扱う現場でも安心してAIによる効率化の恩恵を受けることが可能になります。</p>
+        <ul>
+          <li>自社の見積りや図面を安全に読み込み</li>
+          <li>情報漏洩リスクを抑えた実務の自動化・補助</li>
+          <li>簡易RAG設定による独自知識のフル活用</li>
+        </ul>
+      </div>
+      <div class="graphics-panel">
+        <img src="slide6_closed_ai.png" alt="クローズドAI環境" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 7: BEFORE / AFTER ══ -->
+<div class="slide" id="slide-7">
+  <div class="s-band theme-ai">
+    <div class="s-icon-block"><i class="fa-solid fa-shield-halved"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">AI・セキュリティコンサル</span>
+      <h2 class="s-title">業務フローの再構築</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="flow-container">
+      <div class="flow-card">
+        <h3>複雑な伝言ゲーム</h3>
+        <div class="flow-steps">
+          <div class="flow-step-item">営業・ディレクター・外注デザイナー・外注コーダー・サーバー会社など、複数の外注先を束ねることでコミュニケーションロスが連鎖します。</div>
+          <div class="flow-step-item">進行の遅延や品質のばらつきが避けられない状態が続きます。</div>
+          <div class="flow-step-item">担当者変更のたびに引継ぎコストが発生し、属人的な依存が慢性化します。</div>
+        </div>
+      </div>
+      <div class="flow-card after">
+        <h3>スマートな実務体制へ</h3>
+        <div class="flow-steps">
+          <div class="flow-step-item">「ローカルAI」による効率化、「静的ホスティング」によるインフラ最適化、「ローカルDTP環境」による実務補助を組み合わせます。</div>
+          <div class="flow-step-item">進行とインフラ調整を適切にサポートするフローへ移行し、コスト抑制とスピードアップを支援します。</div>
+          <div class="flow-step-item">仕組みとして機能するフローを構築し、属人依存から脱却します。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 8: Web制作・運用 概要 ══ -->
+<div class="slide is-full-bleed" id="slide-8">
+  <div class="s-band theme-web">
+    <div class="s-icon-block"><i class="fa-solid fa-laptop-code"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">Web制作・運用</span>
+      <h2 class="s-title">AI × 静的サーバーホスティングで実現するスマートなWeb制作・運用</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2col">
+      <div class="text-side">
+        <h3>コストを抑え、アジャイルに構築・運用</h3>
+        <p>過剰に高機能なWebシステムやCMSは排します。AIツールを活用し、実用的なLP・Webページ・バナーを迅速に制作します。</p>
+        <p>公開先には静的サーバーホスティング等のモダンなホスティングを活用。サーバー維持費を抑え、継続しやすい月額運用体制を構築します。</p>
+        <ul>
+          <li>AI活用による制作スピード向上とコスト抑制</li>
+          <li>ホスティング公開による維持コストの最小化</li>
+          <li>更新・運用管理の包括サポート</li>
+          <li>チーム向けAI業務効率化レクチャー of 提供</li>
+        </ul>
+      </div>
+      <div class="graphics-panel">
+        <img src="slide8_web_production.png" alt="Web制作・運用" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 9: コスト構造最適化 ══ -->
+<div class="slide" id="slide-9">
+  <div class="s-band theme-web">
+    <div class="s-icon-block"><i class="fa-solid fa-laptop-code"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">Web制作・運用</span>
+      <h2 class="s-title">Web運用コスト構造の最適化</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="flow-container">
+      <div class="flow-card">
+        <h3>旧来の運用コスト構造</h3>
+        <div class="flow-steps">
+          <div class="flow-step-item"><strong>高額なサーバー・CMS費用：</strong>レンタルサーバーの月額費用に加え、CMSのセキュリティ更新が継続的なコストと工数を発生させます。</div>
+          <div class="flow-step-item"><strong>外注依存の更新フロー：</strong>テキスト1行の修正でも制作会社への発注が必要となり、スピードとコストの両面で非効率です。</div>
+          <div class="flow-step-item"><strong>属人的な保守体制：</strong>担当者変更のたびに引継ぎコストが発生し、長期的な運用品質が安定しません。</div>
+        </div>
+      </div>
+      <div class="flow-card after">
+        <h3>最適化された運用体制</h3>
+        <div class="flow-steps">
+          <div class="flow-step-item"><strong>静的ホスティングによる最小化された運用コスト：</strong>静的ホスティングの活用でサーバー費を削減。シンプルな構成で管理工数も抑えます。</div>
+          <div class="flow-step-item"><strong>AI活用で更新フローの補助：</strong>テキスト修正からバナー制作補助までスピーディに対応可能です。</div>
+          <div class="flow-step-item"><strong>月額での包括サポート：</strong>月次更新・レポーティング・レクチャーを含む明確な月額契約で安定した継続運用を実現します。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 10: ディレクション概要 ══ -->
+<div class="slide is-full-bleed" id="slide-10">
+  <div class="s-band theme-dir">
+    <div class="s-icon-block"><i class="fa-solid fa-diagram-project"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">制作進行ディレクション</span>
+      <h2 class="s-title">要件の整理から納品進行まで——AIを補助に用いた進行調整サポート</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2col">
+      <div class="text-side">
+        <h3>進行状況の確認・関係者間スケジュール調整をサポート</h3>
+        <p>要件の整理からデータ入稿進行・テストアップ時の確認調整まで、制作プロジェクトの進行調整を引き受けます。</p>
+        <p>スケジュール調整や関係者間の連絡の橋渡しを月額契約でサポートします。AIを補助的に用いて要件を整理し、現場のペースに沿った円滑な進行をサポートします。</p>
+        <ul>
+          <li>要件整理から納品進行までのスケジュール調整サポート</li>
+          <li>AIを補助に用いた要件・仕様の整理</li>
+          <li>月額契約による継続的な進行管理の代行</li>
+          <li>入稿・テストアップへの進行サポート</li>
+        </ul>
+      </div>
+      <div class="graphics-panel">
+        <img src="slide10_direction_hub.png" alt="制作進行ディレクション" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 11: 5ステップフロー ══ -->
+<div class="slide" id="slide-11">
+  <div class="s-band theme-dir">
+    <div class="s-icon-block"><i class="fa-solid fa-diagram-project"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">制作進行ディレクション</span>
+      <h2 class="s-title">制作進行フロー——5ステップでの確認サポート</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <p style="text-align:center; margin-bottom:40px; font-size:17px; color:var(--t1); line-height:1.8; font-weight:500;">
+      AIツールを要件整理の補助に用いることで、現場のペースに沿った効率的な管理・進行をサポートします。
+    </p>
+    <div class="timeline-box">
+      <div class="timeline-line-bg"></div>
+      <div class="timeline-step"><div class="timeline-node"></div><h4>Step 01</h4><p class="step-title">要件整理</p><p class="step-sub">Define Requirements</p></div>
+      <div class="timeline-step"><div class="timeline-node"></div><h4>Step 02</h4><p class="step-title">AI補助・効率化</p><p class="step-sub">AI Implementation</p></div>
+      <div class="timeline-step"><div class="timeline-node"></div><h4>Step 03</h4><p class="step-title">制作進行</p><p class="step-sub">Production Progress</p></div>
+      <div class="timeline-step"><div class="timeline-node"></div><h4>Step 04</h4><p class="step-title">確認・入稿</p><p class="step-sub">Review &amp; Submit</p></div>
+      <div class="timeline-step"><div class="timeline-node"></div><h4>Step 05</h4><p class="step-title">維持・運用</p><p class="step-sub">Maintenance</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 12: OEM制作概要 ══ -->
+<div class="slide is-full-bleed" id="slide-12">
+  <div class="s-band theme-oem">
+    <div class="s-icon-block"><i class="fa-solid fa-print"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">オフライン・OEM制作</span>
+      <h2 class="s-title">規格適合チェックとデータ調整</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2col">
+      <div class="text-side">
+        <h3>名刺から看板まで——オフラインOEM実務の進行調整</h3>
+        <p>名刺、チラシ、パンフレット、看板等のオフラインクリエイティブに関するOEM制作進行を引き受けます。</p>
+        <p>業界標準のローカル制作環境を活用し、正確な印刷入稿データの作成と校正実務をサポート。直接的な進行管理で、スムーズな納品を支援します。</p>
+        <ul>
+          <li>名刺・チラシ・パンフレット・看板等の各種印刷対応への橋渡し</li>
+          <li>業界標準DTPツールによる正確な入稿データチェック</li>
+          <li>校正・修正対応を含む進行管理サポート</li>
+          <li>印刷所等との直接的な窓口調整</li>
+        </ul>
+      </div>
+      <div class="graphics-panel">
+        <img src="slide12_oem_print.png" alt="オフライン・OEM制作" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 13: OEM対応範囲 ══ -->
+<div class="slide" id="slide-13">
+  <div class="s-band theme-oem">
+    <div class="s-icon-block"><i class="fa-solid fa-print"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">オフライン・OEM制作</span>
+      <h2 class="s-title">対応範囲——印刷・OEM制作アイテム</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="oem-grid">
+      <div class="oem-card">
+        <div class="oem-icon"><i class="fa-solid fa-id-card"></i></div>
+        <h4>名刺・カード類</h4>
+        <p>両面対応、特殊仕様の名刺・ショップカード等の入稿データ作成</p>
+      </div>
+      <div class="oem-card">
+        <div class="oem-icon"><i class="fa-solid fa-file-image"></i></div>
+        <h4>チラシ・フライヤー</h4>
+        <p>A4〜B2等、各種サイズの販促チラシ・フライヤーのデザインと入稿</p>
+      </div>
+      <div class="oem-card">
+        <div class="oem-icon"><i class="fa-solid fa-book-open"></i></div>
+        <h4>パンフレット・冊子</h4>
+        <p>会社案内・製品カタログ等の多ページ冊子のレイアウトと入稿対応</p>
+      </div>
+      <div class="oem-card">
+        <div class="oem-icon"><i class="fa-solid fa-sign-hanging"></i></div>
+        <h4>看板・サイン</h4>
+        <p>屋外・屋内サイン・バナースタンド等の大判印刷用データ作成</p>
+      </div>
+      <div class="oem-card">
+        <div class="oem-icon"><i class="fa-solid fa-image"></i></div>
+        <h4>バナー・ポスター</h4>
+        <p>Web用バナーから店頭ポスターまで幅広いフォーマットに対応</p>
+      </div>
+      <div class="oem-card">
+        <div class="oem-icon"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+        <h4>校正・入稿管理</h4>
+        <p>業界標準DTPツールによる正確な色校正・入稿規格確認を含む進行管理サポート</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 14: 開発支援概要 ══ -->
+<div class="slide is-full-bleed" id="slide-14">
+  <div class="s-band theme-dev">
+    <div class="s-icon-block"><i class="fa-solid fa-gears"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">開発支援</span>
+      <h2 class="s-title">AIコード生成を活用した、現場に特化した実用ツールの構築サポート</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2col">
+      <div class="text-side">
+        <h3>高額な外注なしで、現場専用ツールを形にする</h3>
+        <p>AIのコード生成・支援能力を引き出し、現場の日常業務を便利にする社内インナーアプリの構築をサポートします。</p>
+        <p>クライアントへの販売用簡易アプリも、高額なシステム外注を通すことなく、AIとディレクションを組み合わせて実現します。</p>
+        <ul>
+          <li>手元業務フローに特化した専用インナーアプリ・マクロの作成支援</li>
+          <li>動作要件の厳密な定義とAIによる高速プロトタイピング</li>
+          <li>クライアント向け販売用簡易ソフトウェアの開発サポート</li>
+          <li>外注会社への高額依頼を避けたコスト効率の高い開発サポート</li>
+        </ul>
+      </div>
+      <div class="graphics-panel">
+        <img src="slide14_dev_support.png" alt="開発支援" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 15: 3フェーズプロセス ══ -->
+<div class="slide" id="slide-15">
+  <div class="s-band theme-dev">
+    <div class="s-icon-block"><i class="fa-solid fa-gears"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">開発支援</span>
+      <h2 class="s-title">開発支援——3フェーズのサポートプロセス</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="tiles-container">
+      <div class="tile">
+        <div class="icon"><i class="fa-solid fa-list-check"></i></div>
+        <h3>Phase 1：要件整理・仕様策定</h3>
+        <p>「何を、どのように動かすか」を明確にします。現場ヒアリングをもとにAIが実現できる範囲で現実的な仕様を整理し、過剰な開発を防ぎます。</p>
+      </div>
+      <div class="tile">
+        <div class="icon"><i class="fa-solid fa-rocket"></i></div>
+        <h3>Phase 2：AI高速プロトタイピング</h3>
+        <p>AIコード生成ツールを活用して短期間で動作するプロトタイプを構築。試行錯誤のサイクルを高速化し、早期に動作確認できる環境を実現します。</p>
+      </div>
+      <div class="tile">
+        <div class="icon"><i class="fa-solid fa-circle-check"></i></div>
+        <h3>Phase 3：テスト・導入サポート</h3>
+        <p>動作検証・修正を経て導入をサポートします。現場で使えるまで徹底フォローします。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 16: オリジナルサッカーボール.com ══ -->
+<div class="slide" id="slide-16">
+  <div class="s-band theme-ball">
+    <div class="s-icon-block"><i class="fa-solid fa-futbol"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">originalsoccerball.com</span>
+      <h2 class="s-title">オリジナルサッカーボール.comの運営</h2>
+    </div>
+  </div>
+  <div class="slide-body" style="padding-top: 36px;">
+    <div class="grid-2col" style="height: 100%;">
+      <div class="text-side" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%;">
+        <a href="https://originalsoccerball.com/" target="_blank" style="font-size:24px; font-weight:700; color:var(--acc); border-bottom:2px solid var(--acc); padding-bottom:6px; letter-spacing:.02em;">
+          originalsoccerball.com <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:18px; margin-left: 8px;"></i>
+        </a>
+      </div>
+      <div class="graphics-panel" style="height:320px;">
+        <img src="スクリーンショット 2026-05-28 13.36.29.png" alt="オリジナルサッカーボール.com" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 17: ディレクターのルーツ ══ -->
+<div class="slide" id="slide-17">
+  <div class="roots-full">
+    <div class="roots-left">
+      <h2 style="font-size:27px; font-weight:700; color:var(--t0); font-family:'Noto Sans JP', sans-serif; border-left:5px solid var(--acc-d); padding-left:20px; margin-bottom:22px;">ディレクターのルーツ</h2>
+      <p style="font-size:14px; line-height:1.9; color:var(--t0); margin-bottom:12px;">私のディレクションの根本思想。ロジックによる機能美を追求したデザイン制作・物理的なプロダクト制作をルーツとしております。</p>
+      <div class="quote-box">
+        "Form follows function."<br>
+        <span style="font-size:13px; color:var(--t2); font-family:'Noto Sans JP', sans-serif; font-style:normal; font-weight:normal;">（形態は機能に従う）</span>
+      </div>
+      <p style="font-size:14px; line-height:1.9; color:var(--t2);">培われたデジタル領域とAIの活用においてもこの考えを適用しています。<br>無駄な装飾や過剰なシステムを排し、「本当に現場で機能する実務品質」だけを研ぎ澄まして提供いたします。</p>
+    </div>
+    <div class="roots-right">
+      <img src="IMG_0913.jpeg" alt="ディレクターのルーツ" />
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 18: ABOUT ══ -->
+<div class="slide" id="slide-18">
+  <div class="slide-header">
+    <h2 class="slide-title">ABOUT</h2>
+  </div>
+  <div class="slide-body">
+    <div class="about-grid">
+      <div>
+        <h3 style="font-size:15px; color:var(--t0); margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; letter-spacing:.06em; font-weight: 700;">略歴</h3>
+        <div class="career-timeline">
+          <div class="career-item"><span class="career-year">2000年</span><span class="career-desc">広告デザイン専門学校コピーライティングコース 卒業</span></div>
+          <div class="career-item"><span class="career-year">2000年</span><span class="career-desc">出版社にて編集・ライター業務に従事</span></div>
+          <div class="career-item"><span class="career-year">2000年</span><span class="career-desc">SP会社にてDTPデザイナーとして従事</span></div>
+          <div class="career-item"><span class="career-year">2002年</span><span class="career-desc">デザイン事務所にてグラフィックデザイナーとして従事</span></div>
+          <div class="career-item"><span class="career-year">2006年</span><span class="career-desc">個人事業開業 ディレクター（ナショナルクライアント案件等）</span></div>
+          <div class="career-item"><span class="career-year">2021年</span><span class="career-desc">広告代理店にてディレクター（ローカルエリア）として従事</span></div>
+          <div class="career-item"><span class="career-year">2026年</span><span class="career-desc">Web制作会社にてディレクターとして進行管理</span></div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:15px; color:var(--t0); margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; letter-spacing:.06em; font-weight: 700;">プロフェッショナルスキル</h3>
+        <ul class="stance-list">
+          <li><strong>コピーライティング・編集：</strong>出版・SP・Webを通じて、論理的で伝わるテキストを構築します。</li>
+          <li><strong>DTPデザイン：</strong>業界標準DTPツールを用いた入稿データ作成、校正、進行管理の実務をサポートします。</li>
+          <li><strong>Webディレクション＆進行管理：</strong>要件の整理から進行状況の確認、連絡調整までをサポートします。</li>
+          <li><strong>セキュアAI構築補助：</strong>各種クローズドツールを安全を考慮した形で実務の補助へ組み込みます。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /slide-deck -->
+</div><!-- /presentation-wrapper -->
+
+<script>
+// ── Global Smooth Scroll Helper for Side Dots ──
+function scrollToSection(targetId) {
+  const targetElement = document.querySelector(targetId);
+  if (targetElement) {
+    const offset = 60; // Fixed Header offset
+    const elementPosition = targetElement.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.scrollY - offset;
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const slides = document.querySelectorAll('.slide');
+  const ambientGlow = document.getElementById('ambientGlow');
+  const navLinks = document.querySelectorAll('.lp-nav-link');
+  const sideDots = document.querySelectorAll('.side-dot');
+  const scrollTopBtn = document.getElementById('scrollTopBtn');
+  const scrollProgressBar = document.getElementById('scrollProgressBar');
+  const customCursor = document.getElementById('customCursor');
+
+  // GSAP 動作確認
+  const isGsapAvailable = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
+
+  // ── 1. CUSTOM CURSOR HANDLING (MONOCHROMATIC SEAMLESS FOLLOWER) ──
+  let mouseX = 0, mouseY = 0;
+  let cursorX = 0, cursorY = 0;
+  const cursorSpeed = 0.12; 
+
+  if (window.innerWidth >= 1024) {
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    function updateCursor() {
+      const dx = mouseX - cursorX;
+      const dy = mouseY - cursorY;
+      cursorX += dx * cursorSpeed;
+      cursorY += dy * cursorSpeed;
+      if (customCursor) {
+        customCursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+      }
+      requestAnimationFrame(updateCursor);
+    }
+    updateCursor();
+
+    // Hover detection for interactive items
+    const hoverElements = 'a, button, .toc-item, .tile, .oem-card, .cool-btn';
+    document.addEventListener('mouseover', (e) => {
+      if (e.target.closest(hoverElements)) {
+        customCursor.classList.add('hovered');
+      }
+    });
+
+    document.addEventListener('mouseout', (e) => {
+      if (e.target.closest(hoverElements)) {
+        customCursor.classList.remove('hovered');
+      }
+    });
+
+    // Click trigger animation
+    document.addEventListener('mousedown', () => {
+      customCursor.classList.add('click-effect');
+    });
+    document.addEventListener('mouseup', () => {
+      customCursor.classList.remove('click-effect');
+    });
+  } else {
+    if (customCursor) customCursor.style.display = 'none';
+  }
+
+  // ── 2. DYNAMIC STAGGER REVEALS WITH AUTOMATIC REVERT (文字崩れを防ぐためアニメーション完了後にDOMを完全Revert修復する防弾仕様) ──
+  if (isGsapAvailable) {
+    document.documentElement.classList.add('gsap-loaded');
+    gsap.registerPlugin(ScrollTrigger);
+
+    const coverHeader = document.querySelector('.cover-h1');
+    if (coverHeader) {
+      // 1. オリジナルの無傷のHTMLを完全保持
+      const originalHTML = coverHeader.innerHTML;
+
+      // 2. 1文字ずつのスプリットDOMを動的生成
+      let newHTML = '';
+      coverHeader.childNodes.forEach(node => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const text = node.textContent;
+          for (let char of text) {
+            if (char.trim() === '') {
+              newHTML += ' ';
+            } else {
+              newHTML += `<span class="reveal-text-wrapper" style="perspective: 1000px; display: inline-block; overflow: visible;"><span class="reveal-text-char" style="display: inline-block; opacity: 0; transform-origin: 50% 100% -50px; transform: translate3d(0, 100px, -150px) rotateX(-90deg); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s;">${char}</span></span>`;
+            }
+          }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          if (node.tagName === 'BR') {
+            newHTML += '<br>';
+          } else if (node.classList.contains('cover-sub-title')) {
+            const subText = node.textContent;
+            let subHTML = `<span class="cover-sub-title" style="perspective: 1000px; display: block; overflow: visible;">`;
+            for (let char of subText) {
+              if (char.trim() === '') {
+                subHTML += ' ';
+              } else {
+                subHTML += `<span class="reveal-text-wrapper" style="display: inline-block; overflow: visible;"><span class="reveal-text-char" style="display: inline-block; opacity: 0; transform-origin: 50% 100% -50px; transform: translate3d(0, 80px, -120px) rotateX(-90deg); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s;">${char}</span></span>`;
+              }
+            }
+            subHTML += `</span>`;
+            newHTML += subHTML;
+          } else {
+            newHTML += node.outerHTML;
+          }
+        }
+      });
+      coverHeader.innerHTML = newHTML;
+
+      // 3. GSAP 3D Stagger アニメーション実行
+      const chars = coverHeader.querySelectorAll('.reveal-text-char');
+      gsap.to(chars, {
+        opacity: 1,
+        y: 0,
+        z: 0,
+        rotateX: 0,
+        stagger: 0.04,
+        duration: 0.8,
+        ease: "power3.out",
+        delay: 0.3,
+        onComplete: () => {
+          // 4. アニメーション完了後にオリジナルの無傷のHTMLに完全差し戻し（Revert）！
+          // これにより改行バグ、コピーバグ、解像度バグを永久根絶！
+          coverHeader.innerHTML = originalHTML;
+          console.log("Animation completed and DOM reverted to original text safely!");
+        }
+      });
+    }
+
+    // Content Block Floating Visual depth (Parallax stream blocks)
+    slides.forEach(slide => {
+      if (slide.classList.contains('title-slide')) return;
+
+      const body = slide.querySelector('.slide-body');
+      const rootsFull = slide.querySelector('.roots-full');
+
+      // Scroll-linked floating slide content up with dynamic scale/skew adjustments
+      if (rootsFull) {
+        gsap.fromTo(rootsFull, 
+          { opacity: 0, y: 120, scale: 0.95 },
+          { 
+            scrollTrigger: {
+              trigger: slide,
+              start: "top 85%",
+              end: "top 35%",
+              scrub: 1
+            },
+            opacity: 1, 
+            y: 0, 
+            scale: 1,
+            ease: "sine.out"
+          }
+        );
+      }
+      if (body) {
+        gsap.fromTo(body, 
+          { opacity: 0, y: 150, scale: 0.96 },
+          { 
+            scrollTrigger: {
+              trigger: slide,
+              start: "top 80%",
+              end: "top 30%",
+              scrub: 1
+            },
+            opacity: 1, 
+            y: 0, 
+            scale: 1,
+            ease: "sine.out"
+          }
+        );
+      }
+    });
+  } else {
+    // Fallback native Observer trigger with stagger timing
+    const observerOptions = {
+      root: null,
+      threshold: 0.15
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+          entry.target.querySelectorAll('.reveal-text-char').forEach((char, i) => {
+            setTimeout(() => {
+              char.style.opacity = '1';
+              char.style.transform = 'translate3d(0, 0, 0) rotateX(0deg)';
+            }, i * 25);
+          });
+        }
+      });
+    }, observerOptions);
+
+    slides.forEach(slide => observer.observe(slide));
+  }
+
+  // ── 4. MONO ORIGINAL NEON CATEGORY COLOR MAPS & DOT INDICATORS SYNC ──
+  // Using strictly ONLY the original category colors defined by the slides, absolutely no orange!
+  const colorMap = {
+    'title-slide': 'radial-gradient(circle at 50% 50%, #0c0c0c 0%, #050505 100%)',
+    'theme-ai': 'radial-gradient(circle at 50% 50%, #061930 0%, #020810 100%)',
+    'theme-web': 'radial-gradient(circle at 50% 50%, #051633 0%, #010614 100%)',
+    'theme-dir': 'radial-gradient(circle at 50% 50%, #290818 0%, #0f0208 100%)',
+    'theme-oem': 'radial-gradient(circle at 50% 50%, #26050b 0%, #0f0103 100%)',
+    'theme-dev': 'radial-gradient(circle at 50% 50%, #170526 0%, #080112 100%)',
+    'theme-ball': 'radial-gradient(circle at 50% 50%, #10151a 0%, #050709 100%)',
+    'theme-about': 'radial-gradient(circle at 50% 50%, #0c0c0c 0%, #050505 100%)'
+  };
+
+  const exactNeonColors = {
+    'ai': '#1A85FF',   // Original Slide 3-7 AI blue accent
+    'web': '#194AA3',  // Original Slide 8-9 Web dark blue
+    'dir': '#E61A7B',  // Original Slide 10-11 Direction Pink
+    'oem': '#DF1E43',  // Original Slide 12-13 OEM Red
+    'dev': '#8522C7',  // Original Slide 14-15 Dev Support Purple
+    'ball': '#5A6877', // Original Soccerball Slate
+    'about': '#FFFFFF',// Monochrome white
+    'cover': '#FFFFFF' // Monochrome white
+  };
+
+  const targetMap = {
+    'theme-ai': 'ai',
+    'theme-web': 'web',
+    'theme-dir': 'dir',
+    'theme-oem': 'oem',
+    'theme-dev': 'dev',
+    'theme-ball': 'ball',
+    'theme-about': 'about',
+    'title-slide': 'cover'
+  };
+
+  let lastScrollY = window.scrollY;
+  let scrollVelocity = 0;
+
+  function updateActiveThemeAndNav() {
+    const currentScrollY = window.scrollY;
+    scrollVelocity += (Math.abs(currentScrollY - lastScrollY) - scrollVelocity) * 0.15;
+    lastScrollY = currentScrollY;
+
+    // Scroll Progress bar color matches active neon theme color dynamically!
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollPercentage = (currentScrollY / (maxScroll || 1)) * 100;
+    if (scrollProgressBar) {
+      scrollProgressBar.style.width = `${scrollPercentage}%`;
+    }
+
+    // Synchronize Active Section
+    let currentActiveSection = null;
+    let maxVisibleHeight = 0;
+
+    slides.forEach(slide => {
+      const rect = slide.getBoundingClientRect();
+      const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
+      
+      if (visibleHeight > maxVisibleHeight) {
+        maxVisibleHeight = visibleHeight;
+        currentActiveSection = slide;
+      }
+    });
+
+    if (!currentActiveSection) return;
+
+    let themeClass = 'theme-about';
+    if (currentActiveSection.classList.contains('title-slide')) {
+      themeClass = 'title-slide';
+    } else {
+      const sBand = currentActiveSection.querySelector('.s-band');
+      if (sBand) {
+        if (sBand.classList.contains('theme-ai')) themeClass = 'theme-ai';
+        else if (sBand.classList.contains('theme-web')) themeClass = 'theme-web';
+        else if (sBand.classList.contains('theme-dir')) themeClass = 'theme-dir';
+        else if (sBand.classList.contains('theme-oem')) themeClass = 'theme-oem';
+        else if (sBand.classList.contains('theme-dev')) themeClass = 'theme-dev';
+        else if (sBand.classList.contains('theme-ball')) themeClass = 'theme-ball';
+      } else if (currentActiveSection.id === 'slide-17' || currentActiveSection.id === 'slide-18') {
+        themeClass = 'theme-about';
+      }
+    }
+
+    // 1. Ambient Glow Color Shift
+    if (ambientGlow) {
+      ambientGlow.style.background = colorMap[themeClass] || colorMap['theme-about'];
+    }
+
+    const currentTarget = targetMap[themeClass] || 'about';
+    const activeColor = exactNeonColors[currentTarget] || '#FFFFFF';
+
+    // Update Progress bar theme color dynamically
+    if (scrollProgressBar) {
+      scrollProgressBar.style.background = activeColor;
+    }
+
+    // 2. Synchronize Side Dot indicators using ONLY original theme colors!
+    sideDots.forEach(dot => {
+      const target = dot.getAttribute('data-target');
+      if (target === currentTarget) {
+        dot.classList.add('active');
+      } else {
+        dot.classList.remove('active');
+      }
+    });
+
+    // 3. Scroll to Top button toggle
+    if (currentScrollY > 300) {
+      scrollTopBtn.classList.add('visible');
+    } else {
+      scrollTopBtn.classList.remove('visible');
+    }
+  }
+
+  window.addEventListener('scroll', updateActiveThemeAndNav);
+  window.addEventListener('resize', updateActiveThemeAndNav);
+  updateActiveThemeAndNav();
+
+  // ── 5. SMOOTH SCROLL FOR TOC & BUTTONS ──
+  document.querySelectorAll('.toc-item').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = link.getAttribute('href');
+      scrollToSection(targetId);
+    });
+  });
+
+  scrollTopBtn.addEventListener('click', () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  });
+
+  window.getCurrentScrollVelocity = () => scrollVelocity;
+
+  initEscherConformalGrid();
+});
+
+// ── ESCHER CONFORMAL SPIRAL GRID (DROSTE EFFECT) ON 2D CANVAS ──
+function initEscherConformalGrid() {
+  const canvas = document.getElementById('escherCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  
+  let rotationOffset = 0;
+  let targetRotation = 0;
+  let scaleFactor = 1.0;
+  let targetScale = 1.0;
+  
+  function resizeCanvas() {
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  
+  const coverTop = document.querySelector('.cover-top');
+  if (coverTop) {
+    coverTop.addEventListener('mousemove', (e) => {
+      const rect = coverTop.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      
+      targetRotation = x * Math.PI * 0.75;
+      targetScale = 1.0 + y * 0.25;
+    });
+    
+    coverTop.addEventListener('mouseleave', () => {
+      targetRotation = 0;
+      targetScale = 1.0;
+    });
+  }
+  
+  let time = 0;
+  
+  function draw() {
+    time += 1.0;
+    
+    const scrollVel = typeof window.getCurrentScrollVelocity === 'function' ? window.getCurrentScrollVelocity() : 0;
+    
+    rotationOffset += (targetRotation + (scrollVel * 0.015) - rotationOffset) * 0.08;
+    scaleFactor += (targetScale + (scrollVel * 0.01) - scaleFactor) * 0.08;
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const cx = canvas.width - 150;
+    const cy = 150;
+    
+    const numSpirals = 22;
+    const p = 0.55; 
+    const q = 1.0 / p;
+    const maxRadius = Math.max(canvas.width, canvas.height) * 1.5;
+    
+    ctx.lineWidth = 1.5;
+    
+    const autoSpin = time * 0.002 + (scrollVel * 0.002);
+    const autoScale = 0.95 + Math.sin(time * 0.004) * 0.05 + (scrollVel * 0.005);
+    
+    for (let i = 0; i < numSpirals; i++) {
+      const startAngle = (i / numSpirals) * Math.PI * 2 + rotationOffset + autoSpin;
+      ctx.beginPath();
+      ctx.strokeStyle = `rgba(255, 255, 255, ${0.03 + (1 - i / numSpirals) * 0.16})`;
+      
+      for (let theta = 0; theta < 22; theta += 0.04) {
+        const r = 1.5 * Math.exp(p * theta) * scaleFactor * autoScale;
+        if (r > maxRadius) break;
+        const x = cx + r * Math.cos(theta + startAngle);
+        const y = cy + r * Math.sin(theta + startAngle);
+        if (theta === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    
+    for (let i = 0; i < numSpirals; i++) {
+      const startAngle = (i / numSpirals) * Math.PI * 2 - rotationOffset - autoSpin;
+      ctx.beginPath();
+      ctx.strokeStyle = `rgba(255, 255, 255, ${0.03 + (1 - i / numSpirals) * 0.16})`;
+      
+      for (let theta = 0; theta < 22; theta += 0.04) {
+        const r = 1.5 * Math.exp(q * theta) * scaleFactor * autoScale;
+        if (r > maxRadius) break;
+        const x = cx + r * Math.cos(-theta + startAngle);
+        const y = cy + r * Math.sin(-theta + startAngle);
+        if (theta === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    
+    requestAnimationFrame(draw);
+  }
+  
+  draw();
+}
+</script>
+
+</body>
+</html>
