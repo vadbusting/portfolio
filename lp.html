@@ -1348,7 +1348,7 @@ a:hover { color: #888; }
   }
   
   .slide-title {
-    font-size: 20px !important;
+    font-size: clamp(20px, 4vw, 32px) !important;
     padding-left: 12px !important;
   }
   
@@ -1529,15 +1529,17 @@ a:hover { color: #888; }
   }
   
   .graphics-panel img, .roots-right img {
-    max-height: 250px;
-    width: auto;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    object-fit: contain !important;
     margin: 0 auto;
     display: block;
   }
   
   /* Hero typography for SP - Complete wrap and fluid responsive scaling */
   .cover-top h1, .cover-h1 {
-    font-size: clamp(20px, 6.5vw, 26px) !important;
+    font-size: clamp(26px, 8vw, 56px) !important;
     word-break: break-word !important;
     white-space: normal !important;
     line-height: 1.4 !important;
@@ -1548,7 +1550,7 @@ a:hover { color: #888; }
   }
   
   .cover-top h1 .cover-sub-title, .cover-sub-title {
-    font-size: clamp(11px, 3.8vw, 13px) !important;
+    font-size: clamp(13px, 3.5vw, 24px) !important;
     margin-bottom: 12px !important;
     white-space: normal !important;
     word-break: break-word !important;
