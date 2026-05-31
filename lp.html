@@ -38,7 +38,7 @@ html, body {
   color: var(--t1);
   scroll-behavior: smooth;
   width: 100%;
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow-x: clip; /* Safely prevent horizontal scroll without breaking iOS vertical scroll */
 }
 
 /* ── LP HEADER ── */
@@ -1327,8 +1327,7 @@ a:hover { color: #888; }
   /* Removed html, body override to prevent scroll locking */
 
   .presentation-wrapper {
-    overflow-x: hidden !important;
-    overflow-y: visible !important;
+    overflow: visible !important;
     height: auto !important;
     min-height: auto !important;
     position: relative !important;
