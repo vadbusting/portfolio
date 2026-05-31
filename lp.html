@@ -1319,13 +1319,10 @@ a:hover { color: #888; }
 }
 
 /* ── RESPONSIVE MEDIA QUERIES ── */
-@media (max-width: 990px) {
+@media (max-width: 1023px) {
   .lp-nav {
     display: none; /* Hide header nav links on tablet/mobile */
   }
-}
-
-@media (max-width: 768px) {
   /* Removed html, body override to prevent scroll locking */
 
   .presentation-wrapper {
@@ -1868,7 +1865,7 @@ a:hover { color: #888; }
 
 
 /* Typography Overrides for Vettvangur Premium feel (Additional 1.4x Enlarge, total 1.96x scale!) (Desktop Only) */
-@media (min-width: 769px) {
+@media (min-width: 1024px) {
   .cover-h1 {
     font-size: 94px !important; /* 48pxの1.96倍 = 約94px */
     letter-spacing: 1px !important;
@@ -2563,7 +2560,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const customCursor = document.getElementById('customCursor');
 
   // GSAP 動作確認 (モバイル端末・タブレット・タッチ環境は完全除外して競合を根絶)
-  const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768 || ('ontouchstart' in window);
+  const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 1023 || ('ontouchstart' in window);
   const isGsapAvailable = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && !isMobileDevice;
 
   // Mobile: do NOT force scroll reset — that itself causes the bounce bug on iOS Safari
