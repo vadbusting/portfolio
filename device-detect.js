@@ -15,7 +15,10 @@
     console.warn('Unable to read view preference.', error);
   }
 
-  if (isAlreadyMobile || forcedDesktop) {
+  const currentPath = window.location.pathname || '';
+  const isExcludedPage = /lp\.html|presentation_mono\.html|other\.html/.test(currentPath);
+
+  if (isAlreadyMobile || forcedDesktop || isExcludedPage) {
     return;
   }
 
