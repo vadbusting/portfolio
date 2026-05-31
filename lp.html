@@ -1982,9 +1982,8 @@ a:hover { color: #888; }
 
 <!-- Luxury Side Accent Bar Navigation (見出し帯と同じアイコン帯デザイン) -->
 <div class="side-dots-nav">
-  <div class="side-dot active" data-target="cover" data-label="ホーム" onclick="scrollToSection('#slide-1')">
+  <div class="side-dot active" data-target="cover" onclick="scrollToSection('#slide-1')">
     <div class="side-icon-block"><i class="fa-solid fa-house"></i></div>
-    <span class="side-label">ホーム</span>
   </div>
   <div class="side-dot" data-target="ai" data-label="AI・セキュリティコンサル" onclick="scrollToSection('#slide-3')">
     <div class="side-icon-block"><i class="fa-solid fa-shield-halved"></i></div>
@@ -2929,8 +2928,9 @@ function initEscherConformalGrid() {
   let targetScale = 1.0;
   
   function resizeCanvas() {
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
+    // Use window dimensions so canvas always fills the full viewport on PC
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
   }
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
