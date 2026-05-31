@@ -10,13 +10,19 @@
   let forcedDesktop = false;
 
   try {
+    // もし直接アクセスか外部からの訪問（モバイル側からの「PC版で見る」クリック以外）であれば、
+    // 過去のデスクトップ表示 preference を強制クリアして、スマホ訪問者が確実にモバイル版へ飛ぶように防弾化
+    const referrer = document.referrer || '';
+    if (!referrer.includes('/mobile/')) {
+      localStorage.removeItem('portfolioViewMode');
+    }
     forcedDesktop = localStorage.getItem('portfolioViewMode') === 'desktop';
   } catch (error) {
     console.warn('Unable to read view preference.', error);
   }
 
   const currentPath = window.location.pathname || '';
-  const isExcludedPage = /lp\.html|presentation_mono\.html|other\.html/.test(currentPath);
+  const isExcludedPage = /lp\.html|presentation\.html|other\.html/.test(currentPath);
 
   if (isAlreadyMobile || forcedDesktop || isExcludedPage) {
     return;
