@@ -1330,9 +1330,10 @@ a:hover { color: #888; }
 @media (max-width: 768px) {
   html, body {
     scroll-behavior: auto !important;
-    overflow-x: visible !important;
-    overflow-y: visible !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
     height: auto !important;
+    min-height: 100% !important;
     -webkit-overflow-scrolling: touch !important;
   }
 
@@ -1674,7 +1675,7 @@ a:hover { color: #888; }
   /* Mobile-specific Hero / Cover layout fixes */
   .slide.title-slide {
     height: auto !important;
-    min-height: auto !important;
+    min-height: 85svh !important; /* Use svh (small viewport height) to avoid iOS address bar bounce */
     max-width: 100% !important;
     width: 100% !important;
     margin-top: 0 !important;
