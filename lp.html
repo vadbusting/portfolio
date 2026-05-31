@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SPECIALIST LP — 手島 崇 (Mono)</title>
+<title>LP | PORTFOLIO</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet"/>
@@ -1328,8 +1328,9 @@ a:hover { color: #888; }
 }
 
 @media (max-width: 768px) {
-  html, body {
+  html, body, .presentation-wrapper, .slide-deck {
     scroll-behavior: auto !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
   .presentation-wrapper {
@@ -1414,6 +1415,103 @@ a:hover { color: #888; }
     padding: 0 !important;
   }
   
+  /* Luxury Side Dots Indicator for Mobile - Horizontal Top Bar */
+  .side-dots-nav {
+    position: fixed !important;
+    top: 60px !important; /* Fixed header is 60px */
+    left: 0 !important;
+    right: 0 !important;
+    bottom: auto !important;
+    transform: none !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background: rgba(9, 9, 9, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    padding: 6px 6px !important;
+    gap: 4px !important;
+    z-index: 99999 !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  /* 非アクティブ時も含め、常にアイコン付シャープ角ボックスを表示 */
+  .side-dot {
+    height: 28px !important;
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    box-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    border-radius: 0px !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    background: rgba(16, 16, 16, 0.95) !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  
+  .side-icon-block {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 10px !important;
+    background: #2a2a2a !important;
+    color: #888888 !important; /* シックなグレー */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  /* アクティブ時のみピル型にスライド自動伸長 */
+  .side-dot.active {
+    height: 28px !important;
+    width: auto !important;
+    min-width: 28px !important;
+    max-width: 140px !important; /* iPhone SEでも押し潰されない安心の最大幅 */
+    border-radius: 0px !important; /* シャープ角統一 */
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    padding-right: 6px !important;
+    box-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important; /* 折り返しを防止してはみ出しを防ぐ */
+    flex-shrink: 0 !important;
+  }
+  
+  /* アクティブ時のテーマ色同期（アイコン白化） */
+  .side-dot.active .side-icon-block {
+    color: #FFFFFF !important;
+  }
+  .side-dot[data-target="ai"].active .side-icon-block { background: #0059B3 !important; }
+  .side-dot[data-target="web"].active .side-icon-block { background: #123575 !important; }
+  .side-dot[data-target="dir"].active .side-icon-block { background: #B30E5C !important; }
+  .side-dot[data-target="oem"].active .side-icon-block { background: #BD0F30 !important; }
+  .side-dot[data-target="dev"].active .side-icon-block { background: #661A99 !important; }
+  .side-dot[data-target="ball"].active .side-icon-block { background: #434E5C !important; }
+  .side-dot[data-target="about"].active .side-icon-block { background: #444444 !important; }
+  .side-dot[data-target="cover"].active .side-icon-block { background: #111111 !important; }
+
+  /* アクティブドット内のラベルを表示 */
+  .side-dot.active .side-label {
+    display: block !important;
+    opacity: 1 !important;
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    color: #FFFFFF !important;
+    white-space: nowrap !important;
+    padding: 0 2px 0 4px !important;
+  }
+  .side-dot:not(.active) .side-label {
+    display: none !important;
+  }
+  
   .graphics-panel, .roots-right {
     height: auto !important;
     margin-top: 15px;
@@ -1480,38 +1578,6 @@ a:hover { color: #888; }
     font-size: 16px !important;
   }
 
-  /* Luxury Side Dots Indicator for Mobile - Horizontal Top Bar */
-  .side-dots-nav {
-    position: fixed !important;
-    top: 60px !important; /* Fixed header is 60px */
-    left: 0 !important;
-    right: 0 !important;
-    bottom: auto !important;
-    transform: none !important;
-    flex-direction: row !important;
-    justify-content: center !important;
-    align-items: center !important;
-    background: rgba(9, 9, 9, 0.95) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-    padding: 8px 10px !important;
-    gap: 6px !important;
-    z-index: 99999 !important;
-    width: 100% !important;
-    height: auto !important;
-  }
-
-  /* 非アクティブ時は極小ドット表示 */
-  .side-dot:not(.active) {
-    height: 8px !important;
-    width: 8px !important;
-    min-width: 8px !important;
-    max-width: 8px !important;
-    border-radius: 50% !important;
-    background: rgba(255, 255, 255, 0.35) !important;
-    border: none !important;
-    box-shadow: none !important;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
@@ -2541,8 +2607,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const scrollProgressBar = document.getElementById('scrollProgressBar');
   const customCursor = document.getElementById('customCursor');
 
-  // GSAP 動作確認
-  const isGsapAvailable = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && window.innerWidth > 768;
+  // GSAP 動作確認 (モバイル端末・タブレット・タッチ環境は完全除外して競合を根絶)
+  const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768 || ('ontouchstart' in window);
+  const isGsapAvailable = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && !isMobileDevice;
+
+  if (isMobileDevice) {
+    // iOS Safari等のWebKitスクロール記憶バグによる起動時リサイズ跳ね返りを防ぐため、初期読込時に0,0へ強制リセット
+    window.scrollTo(0, 0);
+  }
 
   // ── 1. CUSTOM CURSOR HANDLING (MONOCHROMATIC SEAMLESS FOLLOWER) ──
   let mouseX = 0, mouseY = 0;
