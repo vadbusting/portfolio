@@ -1328,6 +1328,10 @@ a:hover { color: #888; }
 }
 
 @media (max-width: 768px) {
+  html, body {
+    scroll-behavior: auto !important;
+  }
+
   .presentation-wrapper {
     padding: 112px 10px 20px !important;
   }
@@ -1422,19 +1426,32 @@ a:hover { color: #888; }
     display: block;
   }
   
-  /* Hero typography for SP */
-  .cover-top h1 {
-    font-size: 28px !important;
+  /* Hero typography for SP - Complete wrap and fluid responsive scaling */
+  .cover-top h1, .cover-h1 {
+    font-size: clamp(20px, 6.5vw, 26px) !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+    line-height: 1.4 !important;
+    padding: 0 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    letter-spacing: 0px !important;
   }
   
-  .cover-top h1 .cover-sub-title {
-    font-size: 14px !important;
-    margin-bottom: 15px !important;
+  .cover-top h1 .cover-sub-title, .cover-sub-title {
+    font-size: clamp(11px, 3.8vw, 13px) !important;
+    margin-bottom: 12px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    line-height: 1.5 !important;
+    display: block !important;
+    padding: 0 10px !important;
+    letter-spacing: 0.5px !important;
   }
   
   .cover-bottom {
     height: auto !important;
-    padding: 30px 20px !important;
+    padding: 20px 10px !important;
     flex-direction: column !important;
     gap: 15px !important;
   }
@@ -1473,35 +1490,73 @@ a:hover { color: #888; }
     transform: none !important;
     flex-direction: row !important;
     justify-content: center !important;
+    align-items: center !important;
     background: rgba(9, 9, 9, 0.95) !important;
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-    padding: 6px 10px !important;
-    gap: 8px !important;
+    padding: 8px 10px !important;
+    gap: 6px !important;
     z-index: 99999 !important;
     width: 100% !important;
     height: auto !important;
   }
-  .side-dot {
-    height: 30px !important;
-    width: 30px !important;
-    min-width: 30px !important;
-    max-width: 30px !important;
+
+  /* 非アクティブ時は極小ドット表示 */
+  .side-dot:not(.active) {
+    height: 8px !important;
+    width: 8px !important;
+    min-width: 8px !important;
+    max-width: 8px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.35) !important;
+    border: none !important;
     box-shadow: none !important;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
-  .side-icon-block {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 11px !important;
-  }
-  .side-dot:hover {
-    width: 30px !important;
-    min-width: 30px !important;
-    max-width: 30px !important;
-  }
-  .side-label {
+  .side-dot:not(.active) .side-icon-block,
+  .side-dot:not(.active) .side-label {
     display: none !important;
+  }
+
+  /* アクティブ時のみピル型に自動伸長 */
+  .side-dot.active {
+    height: 28px !important;
+    width: auto !important;
+    min-width: 28px !important;
+    max-width: 220px !important;
+    border-radius: 14px !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    padding-right: 8px !important;
+    box-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  
+  .side-dot.active .side-icon-block {
+    display: flex !important;
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 10px !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    color: #FFFFFF !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .side-dot.active .side-label {
+    display: block !important;
+    opacity: 1 !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    color: #FFFFFF !important;
+    white-space: nowrap !important;
+    padding: 0 4px 0 2px !important;
   }
 
   /* Reduce huge spaces on SP */
@@ -1569,6 +1624,42 @@ a:hover { color: #888; }
   }
   .timeline-step .step-title {
     margin-bottom: 0 !important;
+  }
+
+  /* Mobile-specific Hero / Cover layout fixes to prevent 100vh WebKit dynamic bounce lockouts */
+  .slide.title-slide {
+    height: auto !important;
+    min-height: auto !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin-top: 0 !important;
+    margin-bottom: 40px !important;
+    padding: 100px 16px 40px 16px !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+  
+  .cover-top {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    padding: 20px 10px !important;
+    margin: 0 !important;
+    transform: none !important; /* Remove desktop translateY shift */
+  }
+
+  .cover-bottom {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 20px 10px !important;
+    background: transparent !important;
+    border-top: none !important;
+    margin-top: 20px !important;
   }
 }
 
@@ -1742,84 +1833,86 @@ a:hover { color: #888; }
 
 
 
-/* Typography Overrides for Vettvangur Premium feel (Additional 1.4x Enlarge, total 1.96x scale!) */
-.cover-h1 {
-  font-size: 94px !important; /* 48pxの1.96倍 = 約94px */
-  letter-spacing: 1px !important;
-  line-height: 1.35 !important;
-  font-weight: 700 !important;
-}
-.cover-sub-title {
-  font-size: 37px !important; /* 19pxの1.96倍 = 約37px */
-  letter-spacing: 0.5px !important;
-  color: #FFFFFF !important;
-  opacity: 0.85 !important;
-  font-weight: 500 !important;
-  margin-bottom: 24px !important;
-}
+/* Typography Overrides for Vettvangur Premium feel (Additional 1.4x Enlarge, total 1.96x scale!) (Desktop Only) */
+@media (min-width: 769px) {
+  .cover-h1 {
+    font-size: 94px !important; /* 48pxの1.96倍 = 約94px */
+    letter-spacing: 1px !important;
+    line-height: 1.35 !important;
+    font-weight: 700 !important;
+  }
+  .cover-sub-title {
+    font-size: 37px !important; /* 19pxの1.96倍 = 約37px */
+    letter-spacing: 0.5px !important;
+    color: #FFFFFF !important;
+    opacity: 0.85 !important;
+    font-weight: 500 !important;
+    margin-bottom: 24px !important;
+  }
 
-/* ============================================================
-   SLIDE 1 FULL BLEED HERO CANVAS VIEWPORT (上下左右全面・視覚いっぱいの解放)
-   ============================================================ */
-.slide.title-slide {
-  max-width: 100vw !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  min-height: 100vh !important;
-  position: relative !important;
-  overflow: hidden !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important; /* Text on top, Author at bottom */
-  align-items: center !important;
-  margin: 0 0 160px 0 !important;
-  padding: 100px 0 60px 0 !important;
-  background: transparent !important; /* 完全に透過して背景の模様を見せる！ */
-  border-radius: 0px !important;
-  border: none !important;
-  box-shadow: none !important;
-}
+  /* ============================================================
+     SLIDE 1 FULL BLEED HERO CANVAS VIEWPORT (上下左右全面・視覚いっぱいの解放)
+     ============================================================ */
+  .slide.title-slide {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    position: relative !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important; /* Text on top, Author at bottom */
+    align-items: center !important;
+    margin: 0 0 160px 0 !important;
+    padding: 100px 0 60px 0 !important;
+    background: transparent !important; /* 完全に透過して背景の模様を見せる！ */
+    border-radius: 0px !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
 
-#escherCanvas {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  display: block !important;
-  z-index: 1 !important;
-  pointer-events: none;
-}
+  #escherCanvas {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    display: block !important;
+    z-index: 1 !important;
+    pointer-events: none;
+  }
 
-.cover-top {
-  position: relative !important;
-  width: 100% !important;
-  max-width: 1200px !important;
-  height: auto !important;
-  min-height: auto !important;
-  padding: 0 40px !important;
-  margin: auto 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  align-items: center !important;
-  text-align: center !important;
-  z-index: 2 !important;
-  background: transparent !important;
-  transform: translateY(-55px) !important; /* タイトル文字位置を少し上にシフト */
-}
+  .cover-top {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 1200px !important;
+    height: auto !important;
+    min-height: auto !important;
+    padding: 0 40px !important;
+    margin: auto 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    z-index: 2 !important;
+    background: transparent !important;
+    transform: translateY(-55px) !important; /* タイトル文字位置を少し上にシフト */
+  }
 
-.cover-bottom {
-  position: relative !important;
-  width: 100% !important;
-  height: auto !important;
-  padding: 20px 40px !important;
-  background: transparent !important;
-  border-top: none !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  z-index: 2 !important;
+  .cover-bottom {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 20px 40px !important;
+    background: transparent !important;
+    border-top: none !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    z-index: 2 !important;
+  }
 }
 
 /* Hide native cursor for a clean premium custom cursor feel (Desktop only) */
