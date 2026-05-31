@@ -1381,6 +1381,25 @@ a:hover { color: #888; }
     padding: 24px 16px !important;
   }
 
+  /* Fix Slide 17 overlapping and collapse on mobile */
+  .roots-full {
+    position: relative !important;
+    height: auto !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .roots-left {
+    padding: 0 !important;
+    width: 100% !important;
+  }
+  .roots-right {
+    position: relative !important;
+    width: 100% !important;
+    height: 250px !important;
+    margin-top: 20px !important;
+  }
+
   /* Hide background Escher Conformal Grid canvas on mobile to resolve iOS scroll locks and bouncing glitches */
   #escherCanvas {
     display: none !important;
