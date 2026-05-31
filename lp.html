@@ -1329,7 +1329,7 @@ a:hover { color: #888; }
 
 @media (max-width: 768px) {
   .presentation-wrapper {
-    padding: 70px 10px 20px;
+    padding: 112px 10px 20px !important;
   }
   
   .slide {
@@ -1412,9 +1412,116 @@ a:hover { color: #888; }
     padding: 10px 15px !important;
   }
   
-  
   .s-title {
     font-size: 16px !important;
+  }
+
+  /* Luxury Side Dots Indicator for Mobile - Horizontal Top Bar */
+  .side-dots-nav {
+    position: fixed !important;
+    top: 60px !important; /* Fixed header is 60px */
+    left: 0 !important;
+    right: 0 !important;
+    bottom: auto !important;
+    transform: none !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    background: rgba(9, 9, 9, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    padding: 6px 10px !important;
+    gap: 8px !important;
+    z-index: 99999 !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+  .side-dot {
+    height: 30px !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    box-shadow: none !important;
+  }
+  .side-icon-block {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 11px !important;
+  }
+  .side-dot:hover {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+  }
+  .side-label {
+    display: none !important;
+  }
+
+  /* Reduce huge spaces on SP */
+  .s-band {
+    margin-top: 60px !important;
+    margin-bottom: 40px !important;
+  }
+
+  #slide-4, #slide-5, #slide-6, #slide-7, #slide-9, #slide-11, #slide-13, #slide-15, #slide-17, #slide-18 {
+    padding-top: 60px !important;
+  }
+
+  #slide-3, #slide-4, #slide-5, #slide-6, #slide-7, #slide-8, #slide-9, #slide-10, #slide-11, #slide-12, #slide-13, #slide-14, #slide-15, #slide-16, #slide-17, #slide-18 {
+    scroll-margin-top: 112px !important;
+  }
+
+  /* BEFORE / AFTER Flow cards: stack vertically on mobile */
+  .flow-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+  }
+  .flow-card {
+    padding: 20px !important;
+  }
+
+  /* OEM Grid: stack vertically on mobile */
+  .oem-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .oem-card {
+    padding: 16px !important;
+  }
+
+  /* 5 steps timeline: stack vertically on mobile */
+  .timeline-box {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 24px !important;
+    padding-left: 20px !important;
+  }
+  .timeline-line-bg {
+    left: 27px !important;
+    top: 10px !important;
+    bottom: 10px !important;
+    width: 2px !important;
+    height: auto !important;
+  }
+  .timeline-step {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    text-align: left !important;
+    gap: 16px !important;
+  }
+  .timeline-node {
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+  }
+  .timeline-step h4 {
+    margin-bottom: 0 !important;
+    min-width: 60px !important;
+  }
+  .timeline-step .step-title {
+    margin-bottom: 0 !important;
   }
 }
 
