@@ -1328,15 +1328,28 @@ a:hover { color: #888; }
 }
 
 @media (max-width: 768px) {
-  html, body, .presentation-wrapper, .slide-deck {
+  html, body {
     scroll-behavior: auto !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    height: auto !important;
     -webkit-overflow-scrolling: touch !important;
   }
 
   .presentation-wrapper {
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+    position: relative !important;
     padding: 112px 10px 20px !important;
   }
-  
+
+  .slide-deck {
+    overflow: visible !important;
+    height: auto !important;
+  }
+
   .slide {
     min-height: auto;
     margin-bottom: 25px;
@@ -1415,7 +1428,7 @@ a:hover { color: #888; }
     padding: 0 !important;
   }
   
-  /* Luxury Side Dots Indicator for Mobile - Horizontal Top Bar */
+  /* Horizontal Scrollable Premium Category Tab Bar for Mobile */
   .side-dots-nav {
     position: fixed !important;
     top: 60px !important; /* Fixed header is 60px */
@@ -1423,69 +1436,81 @@ a:hover { color: #888; }
     right: 0 !important;
     bottom: auto !important;
     transform: none !important;
+    display: flex !important;
     flex-direction: row !important;
-    justify-content: center !important;
+    justify-content: flex-start !important; /* Align to start for natural scrolling */
     align-items: center !important;
-    background: rgba(9, 9, 9, 0.95) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-    padding: 6px 6px !important;
-    gap: 4px !important;
+    background: rgba(9, 9, 9, 0.96) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding: 8px 12px !important;
+    gap: 8px !important;
     z-index: 99999 !important;
     width: 100% !important;
     height: auto !important;
+    overflow-x: auto !important; /* Enable horizontal scrolling */
+    scroll-behavior: smooth !important;
+    -webkit-overflow-scrolling: touch !important; /* Smooth momentum scroll on iOS */
   }
 
-  /* 非アクティブ時も含め、常にアイコン付シャープ角ボックスを表示 */
+  /* Hide native scrollbar for a clean touch tab bar look */
+  .side-dots-nav::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* Compact square containing the icon */
   .side-dot {
-    height: 28px !important;
-    width: 28px !important;
-    min-width: 28px !important;
-    max-width: 28px !important;
+    height: 32px !important;
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
     box-shadow: none !important;
     display: flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    border-radius: 0px !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    background: rgba(16, 16, 16, 0.95) !important;
+    border-radius: 4px !important; /* Premium rounded corner */
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: rgba(20, 20, 20, 0.95) !important;
     overflow: hidden !important;
     flex-shrink: 0 !important;
+    cursor: pointer;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
   
   .side-icon-block {
-    width: 26px !important;
-    height: 26px !important;
-    font-size: 10px !important;
-    background: #2a2a2a !important;
-    color: #888888 !important; /* シックなグレー */
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 11px !important;
+    background: transparent !important; /* Seamless background */
+    color: rgba(255, 255, 255, 0.4) !important; /* Elegant gray icon */
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     flex-shrink: 0 !important;
-    transition: background 0.3s, color 0.3s;
+    transition: color 0.3s;
   }
 
-  /* アクティブ時のみピル型にスライド自動伸長 */
+  /* Expand the active pill to show the full label */
   .side-dot.active {
-    height: 28px !important;
+    height: 32px !important;
     width: auto !important;
-    min-width: 28px !important;
-    max-width: 140px !important; /* iPhone SEでも押し潰されない安心の最大幅 */
-    border-radius: 0px !important; /* シャープ角統一 */
-    background: rgba(255, 255, 255, 0.05) !important;
-    border-color: rgba(255, 255, 255, 0.4) !important;
-    padding-right: 6px !important;
+    min-width: 32px !important;
+    max-width: 240px !important; /* Allow plenty of space for long labels */
+    border-radius: 4px !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.35) !important;
+    padding-right: 10px !important;
     box-shadow: none !important;
     display: flex !important;
     align-items: center !important;
-    flex-wrap: nowrap !important; /* 折り返しを防止してはみ出しを防ぐ */
+    flex-wrap: nowrap !important; /* Prevent text wrapping */
     flex-shrink: 0 !important;
   }
   
-  /* アクティブ時のテーマ色同期（アイコン白化） */
+  /* Active theme color sync (icon white) */
   .side-dot.active .side-icon-block {
     color: #FFFFFF !important;
   }
@@ -1498,15 +1523,16 @@ a:hover { color: #888; }
   .side-dot[data-target="about"].active .side-icon-block { background: #444444 !important; }
   .side-dot[data-target="cover"].active .side-icon-block { background: #111111 !important; }
 
-  /* アクティブドット内のラベルを表示 */
+  /* Active Label Text (visible and white) */
   .side-dot.active .side-label {
     display: block !important;
     opacity: 1 !important;
-    font-size: 9px !important;
+    font-size: 10.5px !important;
     font-weight: 700 !important;
     color: #FFFFFF !important;
     white-space: nowrap !important;
-    padding: 0 2px 0 4px !important;
+    padding-left: 4px !important;
+    letter-spacing: 0.02em !important;
   }
   .side-dot:not(.active) .side-label {
     display: none !important;
@@ -1576,53 +1602,6 @@ a:hover { color: #888; }
   
   .s-title {
     font-size: 16px !important;
-  }
-
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  }
-  .side-dot:not(.active) .side-icon-block,
-  .side-dot:not(.active) .side-label {
-    display: none !important;
-  }
-
-  /* アクティブ時のみピル型に自動伸長 */
-  .side-dot.active {
-    height: 28px !important;
-    width: auto !important;
-    min-width: 28px !important;
-    max-width: 220px !important;
-    border-radius: 14px !important;
-    background: rgba(255, 255, 255, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.4) !important;
-    padding-right: 8px !important;
-    box-shadow: none !important;
-    display: flex !important;
-    align-items: center !important;
-    flex-shrink: 0 !important;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  }
-  
-  .side-dot.active .side-icon-block {
-    display: flex !important;
-    width: 24px !important;
-    height: 24px !important;
-    font-size: 10px !important;
-    border-radius: 50% !important;
-    background: transparent !important;
-    color: #FFFFFF !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-
-  .side-dot.active .side-label {
-    display: block !important;
-    opacity: 1 !important;
-    font-size: 10px !important;
-    font-weight: 700 !important;
-    color: #FFFFFF !important;
-    white-space: nowrap !important;
-    padding: 0 4px 0 2px !important;
   }
 
   /* Reduce huge spaces on SP */
@@ -2896,6 +2875,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const target = dot.getAttribute('data-target');
       if (target === currentTarget) {
         dot.classList.add('active');
+        // Bring the active pill into view smoothly in the scrollable tab bar on mobile
+        if (isMobileDevice && dot.scrollIntoView) {
+          dot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
       } else {
         dot.classList.remove('active');
       }

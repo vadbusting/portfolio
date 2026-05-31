@@ -38,7 +38,14 @@
       mobileTarget = 'mobile/about.html';
     }
 
-    const basePath = currentPath.replace(/[^/]*$/, '');
+    let basePath = currentPath;
+    if (!basePath.endsWith('/')) {
+      if (basePath.includes('.')) {
+        basePath = basePath.replace(/[^/]*$/, '');
+      } else {
+        basePath += '/';
+      }
+    }
     const targetUrl = `${window.location.origin}${basePath}${mobileTarget}`;
     window.location.replace(targetUrl);
   }
