@@ -1352,10 +1352,15 @@ a:hover { color: #888; }
   }
   
   /* Stagger grid systems to 1 column on SP */
-  .grid-2col, .about-grid, .roots-full, .toc-grid, .tiles-container {
+  .grid-2col, .grid-2col-equal, .about-grid, .roots-full, .toc-grid, .tiles-container {
     display: flex !important;
     flex-direction: column !important;
     gap: 20px !important;
+  }
+
+  /* Enforce normal padding for full-bleed slides on mobile to avoid extremely thin text paragraphs */
+  .slide.is-full-bleed .text-side {
+    padding: 24px 20px !important;
   }
   
   .text-side, .graphics-panel, .roots-left, .roots-right {
@@ -2402,7 +2407,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const customCursor = document.getElementById('customCursor');
 
   // GSAP 動作確認
-  const isGsapAvailable = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
+  const isGsapAvailable = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && window.innerWidth > 768;
 
   // ── 1. CUSTOM CURSOR HANDLING (MONOCHROMATIC SEAMLESS FOLLOWER) ──
   let mouseX = 0, mouseY = 0;
