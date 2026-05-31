@@ -1358,9 +1358,32 @@ a:hover { color: #888; }
     gap: 20px !important;
   }
 
+  /* Optimize element paddings & margins on mobile to completely prevent text clipping */
+  .slide {
+    padding: 0 16px !important;
+  }
+  .slide-header {
+    padding: 24px 0 0 !important;
+  }
+  .slide-title {
+    padding-left: 0 !important;
+    font-size: 20px !important;
+  }
+  .slide-body {
+    padding: 20px 0 !important;
+  }
+  .text-side {
+    padding: 24px 16px !important;
+  }
+
   /* Enforce normal padding for full-bleed slides on mobile to avoid extremely thin text paragraphs */
   .slide.is-full-bleed .text-side {
-    padding: 24px 20px !important;
+    padding: 24px 16px !important;
+  }
+
+  /* Hide background Escher Conformal Grid canvas on mobile to resolve iOS scroll locks and bouncing glitches */
+  #escherCanvas {
+    display: none !important;
   }
   
   .text-side, .graphics-panel, .roots-left, .roots-right {
