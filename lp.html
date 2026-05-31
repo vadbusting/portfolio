@@ -37,7 +37,8 @@ html, body {
   font-family: 'Noto Sans JP', sans-serif;
   color: var(--t1);
   scroll-behavior: smooth;
-  /* Removed overflow properties from html, body to prevent iOS Safari scroll lock/bounce */
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 /* ── LP HEADER ── */
@@ -1950,6 +1951,44 @@ a:hover { color: #888; }
 @media (min-width: 1025px), (max-width: 1024px) and (orientation: landscape) {
   html, body, a, button, .toc-item, .tile, .oem-card {
     cursor: none !important;
+  }
+}
+/* ============================================================
+   SMARTPHONE / SMALL TABLET LANDSCAPE ADJUSTMENTS
+   Keep the PC structural layout, but scale fonts/margins so it doesn't overflow!
+   ============================================================ */
+@media (max-width: 1024px) and (orientation: landscape) {
+  .cover-h1 {
+    font-size: clamp(32px, 6vw, 64px) !important;
+  }
+  .cover-sub-title {
+    font-size: clamp(14px, 2.5vw, 24px) !important;
+  }
+  .slide.title-slide {
+    padding: 60px 0 40px 0 !important;
+  }
+  .cover-top {
+    padding: 0 16px !important;
+    transform: translateY(-20px) !important;
+  }
+  .side-dots-nav {
+    right: 16px !important;
+    transform: translateY(-50%) scale(0.85) !important;
+    transform-origin: right center !important;
+  }
+  .slide {
+    padding: 0 20px !important;
+    margin: 0 auto 80px auto !important;
+  }
+  .slide-header {
+    margin-bottom: 24px !important;
+  }
+  .slide-title {
+    font-size: 24px !important;
+  }
+  /* Ensure the grid doesn't break off the screen */
+  .presentation-wrapper {
+    padding-right: 60px !important; /* Leave room for the side dock */
   }
 }
 </style>
