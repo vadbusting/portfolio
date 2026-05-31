@@ -1674,7 +1674,7 @@ a:hover { color: #888; }
   /* Mobile-specific Hero / Cover layout fixes */
   .slide.title-slide {
     height: auto !important;
-    min-height: 70vh !important;
+    min-height: auto !important;
     max-width: 100% !important;
     width: 100% !important;
     margin-top: 0 !important;
@@ -1685,35 +1685,11 @@ a:hover { color: #888; }
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    /* Static radial spiral gradient as canvas substitute on mobile */
-    background: radial-gradient(ellipse at 70% 20%, rgba(40,40,55,0.95) 0%, rgba(8,8,12,1) 60%) !important;
-    overflow: hidden !important;
+    background: transparent !important;
   }
 
-  /* Decorative spiral lines via CSS pseudo-element on mobile cover */
-  .slide.title-slide::before {
-    content: '' !important;
-    position: absolute !important;
-    inset: 0 !important;
-    background:
-      repeating-conic-gradient(
-        from 0deg at 80% 15%,
-        transparent 0deg,
-        rgba(255,255,255,0.03) 1deg,
-        transparent 3deg
-      ) !important;
-    pointer-events: none !important;
-    z-index: 0 !important;
-  }
-
-  .cover-top, .cover-bottom {
-    position: relative !important;
-    z-index: 1 !important;
-  }
-  
   .cover-top {
     position: relative !important;
-    z-index: 1 !important;
     width: 100% !important;
     height: auto !important;
     min-height: auto !important;
@@ -1724,7 +1700,6 @@ a:hover { color: #888; }
 
   .cover-bottom {
     position: relative !important;
-    z-index: 1 !important;
     width: 100% !important;
     height: auto !important;
     padding: 20px 10px !important;
@@ -2008,9 +1983,6 @@ a:hover { color: #888; }
 
 <!-- Luxury Side Accent Bar Navigation (見出し帯と同じアイコン帯デザイン) -->
 <div class="side-dots-nav">
-  <div class="side-dot active" data-target="cover" onclick="scrollToSection('#slide-1')">
-    <div class="side-icon-block"><i class="fa-solid fa-house"></i></div>
-  </div>
   <div class="side-dot" data-target="ai" data-label="AI・セキュリティコンサル" onclick="scrollToSection('#slide-3')">
     <div class="side-icon-block"><i class="fa-solid fa-shield-halved"></i></div>
     <span class="side-label">AI・セキュリティコンサル</span>
@@ -2897,9 +2869,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const target = dot.getAttribute('data-target');
       if (target === currentTarget) {
         dot.classList.add('active');
-        // Bring the active pill into view smoothly in the scrollable tab bar on mobile
-        if (isMobileDevice && dot.scrollIntoView) {
-          dot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        // Scroll the indicator bar to center the active dot — do NOT use scrollIntoView
+        // because it causes iOS Safari to reset the page scroll position (bounce bug)
+        if (isMobileDevice) {
+          const nav = dot.closest('.side-dots-nav');
+          if (nav) {
+            const navRect = nav.getBoundingClientRect();
+            const dotRect = dot.getBoundingClientRect();
+            const dotCenter = dotRect.left - navRect.left + dotRect.width / 2;
+            const navCenter = navRect.width / 2;
+            nav.scrollLeft += dotCenter - navCenter;
+          }
         }
       } else {
         dot.classList.remove('active');
