@@ -725,13 +725,9 @@ body.menu-active .cursor-dot, body.menu-active .cursor-outline { opacity: 0 !imp
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) perspective(400px) rotateX(60deg);
     width: 80px;
     height: 80px;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -739,31 +735,31 @@ body.menu-active .cursor-dot, body.menu-active .cursor-outline { opacity: 0 !imp
     z-index: 100;
     opacity: 1;
     transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-    animation: bounce-arrow 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    animation: bounce-arrow-3d 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
     color: #ffffff;
 }
 
 .scroll-guide svg {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     fill: currentColor;
-    margin-top: 4px;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
 }
 
 .scroll-guide.is-hidden {
     opacity: 0;
-    transform: translate(-50%, calc(-50% + 20px));
+    transform: translate(-50%, calc(-50% + 20px)) perspective(400px) rotateX(60deg);
     animation: none;
 }
 
-@keyframes bounce-arrow {
+@keyframes bounce-arrow-3d {
     0%, 20%, 50%, 80%, 100% {
-        transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%) perspective(400px) rotateX(60deg);
     }
     40% {
-        transform: translate(-50%, calc(-50% - 25px));
+        transform: translate(-50%, calc(-50% - 25px)) perspective(400px) rotateX(60deg);
     }
     60% {
-        transform: translate(-50%, calc(-50% - 12px));
+        transform: translate(-50%, calc(-50% - 12px)) perspective(400px) rotateX(60deg);
     }
 }
