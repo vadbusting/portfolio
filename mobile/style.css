@@ -333,6 +333,14 @@ body.m-home {
     margin-top: 4px;
 }
 
+.m-drawer__qr {
+    width: 100px;
+    height: 100px;
+    margin-top: 24px;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
 .m-drawer__close {
     position: absolute;
     top: 18px;
