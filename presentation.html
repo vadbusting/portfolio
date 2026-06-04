@@ -40,6 +40,7 @@ html, body {
   align-items: center;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  overscroll-behavior: none;
 }
 
 .presentation-wrapper {
@@ -1621,7 +1622,9 @@ document.addEventListener('keydown', e => {
 
 function scale() {
   const deck = document.getElementById('slideDeck');
-  const s = Math.max(0.3, Math.min(window.innerWidth / 1280, (window.innerHeight - 40) / 720, 1));
+  const w = document.documentElement.clientWidth || window.innerWidth;
+  const h = document.documentElement.clientHeight || window.innerHeight;
+  const s = Math.max(0.3, Math.min(w / 1280, (h - 40) / 720, 1));
   deck.style.transform = `scale(${s})`;
 }
 
