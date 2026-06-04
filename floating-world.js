@@ -33,9 +33,7 @@ const detectIPad = () => {
 
 const isIPad = detectIPad();
 
-const applyIPadThinning = (list) => (
-  Array.isArray(list) && isIPad ? list.filter((_, index) => index % 2 === 0) : list
-);
+const applyIPadThinning = (list) => list;
 
 window.scrollTo(0, 0);
 document.documentElement.scrollTop = 0;
@@ -427,7 +425,6 @@ const isMonochromeImage = (image) => {
   });
 
   (() => {
-    const isMobile = window.innerWidth <= 768;
     const normalizedSources = applyIPadThinning(
       (window.PORTFOLIO_IMAGES || [])
         .map(normalizeAssetPath)
@@ -461,10 +458,10 @@ const isMonochromeImage = (image) => {
     sources.forEach((src) => {
       loadTexture(src)
         .then(({ texture, isMonochrome }) => {
-          if (isMobile && !isMonochrome) return;
           const image = texture.image;
           const ratio = image && image.width && image.height ? image.width / image.height : 0.75;
-          const planeHeight = 3.35;
+          const scaleFactor = window.innerWidth < 768 ? 0.65 : (window.innerWidth < 1024 ? 0.85 : 1.0);
+          const planeHeight = 3.35 * scaleFactor;
           const planeWidth = planeHeight * ratio;
           const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight, 1, 1);
           const material = new THREE.MeshBasicMaterial({ map: texture, transparent: false, depthWrite: true });
@@ -472,7 +469,7 @@ const isMonochromeImage = (image) => {
           const idx = stackGroup.children.length;
           mesh.position.z = -idx * spacing;
           const angle = idx * 2.399963229728653;
-          const radialSpread = 0.32 + Math.pow(idx + 1, 0.5) * 0.42;
+          const radialSpread = (0.32 + Math.pow(idx + 1, 0.5) * 0.42) * scaleFactor;
           mesh.position.x = Math.cos(angle) * radialSpread + (Math.random() - 0.5) * 0.1;
           mesh.position.y = Math.sin(angle) * radialSpread * 1.05 + (Math.random() - 0.5) * 0.1;
           if (src.includes('9092-350501_230602_numazukanuki_300x250_320x50_320×50')) mesh.scale.multiplyScalar(0.25);
