@@ -323,6 +323,7 @@ body.m-home {
     font-family: 'Shippori Mincho', serif;
     font-size: 1.3rem; /* Modest size */
     letter-spacing: -0.06em;
+    white-space: nowrap;
 }
 
 .m-drawer__mail {
@@ -339,8 +340,8 @@ body.m-home {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    width: 240px;
-    max-width: 80vw;
+    width: max-content;
+    max-width: 90vw;
 }
 
 .m-drawer__text-info {
