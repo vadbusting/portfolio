@@ -310,10 +310,18 @@ body.m-home {
     gap: 8px;
 }
 
+.m-drawer__photo {
+    width: 240px;
+    max-width: 80vw;
+    height: auto;
+    object-fit: cover;
+    margin-bottom: 32px; /* Increased gap */
+}
+
 .m-drawer__name {
     margin: 0;
     font-family: 'Shippori Mincho', serif;
-    font-size: 1.4rem;
+    font-size: 1.3rem; /* Modest size */
     letter-spacing: -0.06em;
 }
 
@@ -321,7 +329,8 @@ body.m-home {
     color: var(--text-color);
     text-decoration: none;
     letter-spacing: 0.06em;
-    font-size: 0.95rem;
+    font-size: 0.9rem; /* Modest size */
+    margin-top: 4px;
 }
 
 .m-drawer__close {
