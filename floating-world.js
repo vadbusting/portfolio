@@ -196,9 +196,11 @@ const isMonochromeImage = (image) => {
       mesh.position.y = Math.sin(angle) * radialSpread * 1.05 + jitterY;
 
       if (src.includes('sub_banner_')) {
-        mesh.scale.multiplyScalar(0.4);
-        mesh.position.x *= 1.3;
-        mesh.position.y *= 1.3;
+        mesh.scale.multiplyScalar(0.55);
+        const signX = mesh.position.x >= 0 ? 1 : -1;
+        const signY = mesh.position.y >= 0 ? 1 : -1;
+        mesh.position.x = (Math.abs(mesh.position.x) + 0.8) * signX * 1.8;
+        mesh.position.y = (Math.abs(mesh.position.y) + 0.8) * signY * 1.8;
       } else if (src.includes('9092-350501_230602_numazukanuki_300x250_320x50_320×50_1') || src.includes('9092-350501_230602_numazukanuki_300x250_320x50_320×50_2')) {
         mesh.scale.multiplyScalar(0.25);
       }
@@ -475,7 +477,7 @@ const isMonochromeImage = (image) => {
           const isSubBanner = src.includes('sub_banner_');
           let currentZIndex;
           if (isSubBanner) {
-            currentZIndex = Math.max(0, mainImageCount - 0.5 - Math.random() * 2.0);
+            currentZIndex = Math.max(0, mainImageCount - Math.random() * 2.5);
           } else {
             currentZIndex = mainImageCount++;
           }
@@ -485,9 +487,11 @@ const isMonochromeImage = (image) => {
           mesh.position.x = Math.cos(angle) * radialSpread + (Math.random() - 0.5) * 0.1;
           mesh.position.y = Math.sin(angle) * radialSpread * 1.05 + (Math.random() - 0.5) * 0.1;
           if (src.includes('sub_banner_')) {
-            mesh.scale.multiplyScalar(0.4);
-            mesh.position.x *= 1.3;
-            mesh.position.y *= 1.3;
+            mesh.scale.multiplyScalar(0.55);
+            const signX = mesh.position.x >= 0 ? 1 : -1;
+            const signY = mesh.position.y >= 0 ? 1 : -1;
+            mesh.position.x = (Math.abs(mesh.position.x) + 0.8) * signX * 1.8;
+            mesh.position.y = (Math.abs(mesh.position.y) + 0.8) * signY * 1.8;
           } else if (src.includes('9092-350501_230602_numazukanuki_300x250_320x50_320×50')) {
             mesh.scale.multiplyScalar(0.25);
           } else if (src.includes('9092-350501_230602_numazukanuki_300x250_320x50-')) {
