@@ -33,7 +33,8 @@
     let mobileTarget = 'mobile/index.html';
 
     if (currentPath.includes('works.html')) {
-      mobileTarget = 'mobile/works.html';
+      window.location.replace('/other.html');
+      return;
     } else if (currentPath.includes('about.html')) {
       mobileTarget = 'mobile/about.html';
     }
