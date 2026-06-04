@@ -281,6 +281,15 @@ const isMonochromeImage = (image) => {
   };
 
   const onScroll = () => {
+    const scrollGuide = document.querySelector('.scroll-guide');
+    if (scrollGuide) {
+      if (window.scrollY > 10) {
+        scrollGuide.classList.add('is-hidden');
+      } else {
+        scrollGuide.classList.remove('is-hidden');
+      }
+    }
+    
     const progress = THREE.MathUtils.clamp(
       (window.scrollY - stageMetrics.top) / stageMetrics.maxScroll,
       0,
