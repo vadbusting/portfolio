@@ -44,21 +44,17 @@
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" as="font" type="font/woff2" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Shippori+Mincho:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="device-detect.js?v=5"></script>
 </head>
-<body class="floating-world-page is-loading">
+<body class="floating-world-page">
   <header class="main-header">
     <div class="header-item"><a href="index.html" style="text-decoration: none; color: inherit;">PORTFOLIO</a></div>
     <div class="header-item menu-btn">CONTACT</div>
   </header>
 
-  <div id="floating-loader" class="floating-loader" role="status" aria-live="polite">
-    <div class="floating-loader__inner">
-      <span class="floating-loader__label">Loading</span>
-      <span class="floating-loader__progress" data-progress>0%</span>
-    </div>
-  </div>
 
   <div id="app" data-page="floating-world">
     <main id="main" class="floating-main">
@@ -96,7 +92,7 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
-  <script type="module" src="floating-world.js"></script>
+  <script src="script.js?v=22" defer></script>
+  <script src="floating-world.js?v=24" defer></script>
 </body>
 </html>

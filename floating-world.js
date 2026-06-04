@@ -1,4 +1,5 @@
-import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+(() => {
+// THREE is loaded globally via a separate script tag in HTML
 
 THREE.Cache.enabled = true;
 
@@ -51,18 +52,6 @@ if (!stage || !canvas) {
   document.body.classList.remove('is-loading');
 } else {
   const loadingManager = new THREE.LoadingManager();
-  loadingManager.onStart = () => {
-    window.showPortfolioLoader?.();
-    window.updatePortfolioLoaderProgress?.(40, { force: true });
-  };
-  loadingManager.onProgress = (_url, loaded, total) => {
-    if (!total) return;
-    const percent = 40 + (loaded / total) * 55;
-    window.updatePortfolioLoaderProgress?.(percent);
-  };
-  loadingManager.onLoad = () => {
-    window.updatePortfolioLoaderProgress?.(95);
-  };
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -146,8 +135,10 @@ const isMonochromeImage = (image) => {
 
   const loadTexture = (src) =>
     new Promise((resolve, reject) => {
+      // Encode URL properly (don't encode slashes)
+      const encodedSrc = src.split('/').map(encodeURIComponent).join('/');
       textureLoader.load(
-        src,
+        encodedSrc,
         (texture) => {
           if (texture && texture.colorSpace !== undefined) {
             texture.colorSpace = THREE.SRGBColorSpace;
@@ -435,31 +426,71 @@ const isMonochromeImage = (image) => {
     }
   });
 
-  (async () => {
+  (() => {
     const isMobile = window.innerWidth <= 768;
     const normalizedSources = applyIPadThinning(
       (window.PORTFOLIO_IMAGES || [])
         .map(normalizeAssetPath)
         .filter(Boolean)
     );
+    const sources = normalizedSources.length > 0 ? normalizedSources : fallbackSources;
 
-    const initialSources =
-      normalizedSources.length > 0 ? normalizedSources : fallbackSources;
-    
-    const allItems = await Promise.all(initialSources.map(loadTexture)).catch((err) => {
-      console.error("Error loading initial textures:", err);
-      return [];
+    // Hide loader immediately — no waiting
+    revealScene(true);
+
+    // Start the animation loop right away (empty scene is fine)
+    resizeRenderer();
+    computeStageMetrics();
+    onScroll();
+    animate();
+    window.resetPortfolioScrollTop?.();
+
+    // Set up scroll length for expected image count
+    totalDepth = spacing * Math.max(0, sources.length - 1) + 6;
+    const baseStageMinHeight = Math.max(
+      window.innerHeight * 1.2,
+      Math.min(window.innerHeight * 1.6, window.innerHeight + totalDepth * 22)
+    );
+    stage.style.minHeight = `${baseStageMinHeight * STAGE_SCROLL_LENGTH_SCALE}px`;
+    const spacer = stage.querySelector('.floating-scroll-spacer');
+    if (spacer) spacer.style.height = `${Math.max(window.innerHeight * 0.25, baseStageMinHeight * 0.2) * STAGE_SCROLL_LENGTH_SCALE}px`;
+    computeStageMetrics();
+
+    // Load images one by one and add to scene as they arrive
+    let loadedCount = 0;
+    sources.forEach((src) => {
+      loadTexture(src)
+        .then(({ texture, isMonochrome }) => {
+          if (isMobile && !isMonochrome) return;
+          const image = texture.image;
+          const ratio = image && image.width && image.height ? image.width / image.height : 0.75;
+          const planeHeight = 3.35;
+          const planeWidth = planeHeight * ratio;
+          const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight, 1, 1);
+          const material = new THREE.MeshBasicMaterial({ map: texture, transparent: false, depthWrite: true });
+          const mesh = new THREE.Mesh(geometry, material);
+          const idx = stackGroup.children.length;
+          mesh.position.z = -idx * spacing;
+          const angle = idx * 2.399963229728653;
+          const radialSpread = 0.32 + Math.pow(idx + 1, 0.5) * 0.42;
+          mesh.position.x = Math.cos(angle) * radialSpread + (Math.random() - 0.5) * 0.1;
+          mesh.position.y = Math.sin(angle) * radialSpread * 1.05 + (Math.random() - 0.5) * 0.1;
+          if (src.includes('9092-350501_230602_numazukanuki_300x250_320x50_320×50')) mesh.scale.multiplyScalar(0.25);
+          else if (src.includes('9092-350501_230602_numazukanuki_300x250_320x50-')) mesh.scale.multiplyScalar(0.5);
+          mesh.userData.baseX = mesh.position.x;
+          mesh.userData.baseY = mesh.position.y;
+          mesh.userData.baseZ = mesh.position.z;
+          mesh.userData.baseScaleX = mesh.scale.x;
+          mesh.userData.baseScaleY = mesh.scale.y;
+          mesh.userData.src = src;
+          stackGroup.add(mesh);
+          loadedCount++;
+          layoutMetrics.maxExtent = Math.max(1, layoutMetrics.maxExtent);
+          updateCameraForExtent();
+        })
+        .catch(() => {}); // silently skip failed images
     });
-    
-    const displayItems = isMobile 
-      ? allItems.filter(item => item.isMonochrome).slice(0, 30)
-      : allItems;
-
-    if (displayItems.length > 0) {
-      prepareScene(displayItems);
-    } else {
-      window.updatePortfolioLoaderProgress?.(100, { force: true });
-      revealScene(true);
-    }
   })();
 }
+
+})();
