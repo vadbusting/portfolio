@@ -195,10 +195,14 @@ const isMonochromeImage = (image) => {
       mesh.position.x = Math.cos(angle) * radialSpread + jitterX;
       mesh.position.y = Math.sin(angle) * radialSpread * 1.05 + jitterY;
 
-      if (src.includes('9092-350501_230602_numazukanuki_300x250_320x50_320×50_1') || src.includes('9092-350501_230602_numazukanuki_300x250_320x50_320×50_2')) {
+      if (src.includes('sub_banner_')) {
+        mesh.scale.multiplyScalar(0.4);
+        mesh.position.x *= 1.3;
+        mesh.position.y *= 1.3;
+      } else if (src.includes('9092-350501_230602_numazukanuki_300x250_320x50_320×50_1') || src.includes('9092-350501_230602_numazukanuki_300x250_320x50_320×50_2')) {
         mesh.scale.multiplyScalar(0.25);
       }
-      if (src.includes('9092-350501_230602_numazukanuki_300x250_320x50-1') || src.includes('9092-350501_230602_numazukanuki_300x250_320x50-2')) {
+      else if (src.includes('9092-350501_230602_numazukanuki_300x250_320x50-1') || src.includes('9092-350501_230602_numazukanuki_300x250_320x50-2')) {
         mesh.scale.multiplyScalar(0.5);
       }
 
@@ -472,8 +476,15 @@ const isMonochromeImage = (image) => {
           const radialSpread = (0.32 + Math.pow(idx + 1, 0.5) * 0.42) * scaleFactor;
           mesh.position.x = Math.cos(angle) * radialSpread + (Math.random() - 0.5) * 0.1;
           mesh.position.y = Math.sin(angle) * radialSpread * 1.05 + (Math.random() - 0.5) * 0.1;
-          if (src.includes('9092-350501_230602_numazukanuki_300x250_320x50_320×50')) mesh.scale.multiplyScalar(0.25);
-          else if (src.includes('9092-350501_230602_numazukanuki_300x250_320x50-')) mesh.scale.multiplyScalar(0.5);
+          if (src.includes('sub_banner_')) {
+            mesh.scale.multiplyScalar(0.4);
+            mesh.position.x *= 1.3;
+            mesh.position.y *= 1.3;
+          } else if (src.includes('9092-350501_230602_numazukanuki_300x250_320x50_320×50')) {
+            mesh.scale.multiplyScalar(0.25);
+          } else if (src.includes('9092-350501_230602_numazukanuki_300x250_320x50-')) {
+            mesh.scale.multiplyScalar(0.5);
+          }
           mesh.userData.baseX = mesh.position.x;
           mesh.userData.baseY = mesh.position.y;
           mesh.userData.baseZ = mesh.position.z;
