@@ -159,7 +159,7 @@ const rawImages = [
         'image/9092-350501_230602_numazukanuki_300x250_320x50_320×50_1.webp',
         'image/sub_banner_manual.png',
         'image/sub_banner_golf3.jpg',
-        'image/9092-350501_230602_numazukanuki_300x250_320x50_320×50_2.webp'
+        'image/9092-350501_230602_numazukanuki_300x250_320x50_320×50_2.webp',
         'image/sub_banner_banner.png',
         'image/sub_banner_kogaisp.jpg',
         'image/sub_banner_banner2.jpg',
