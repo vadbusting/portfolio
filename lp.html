@@ -452,7 +452,6 @@ img { max-width: 100%; }
   height: 100%;
   object-fit: contain;
   object-position: center;
-  filter: grayscale(100%) contrast(1.1); /* Enforce mono styling */
   transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -743,7 +742,6 @@ img { max-width: 100%; }
   height: 100%;
   object-fit: cover;
   display: block;
-  filter: grayscale(100%); /* Mono mode */
   transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -1278,7 +1276,6 @@ a:hover { color: #888; }
   border: none !important; /* Remove borders */
   box-shadow: none !important; /* Remove shadows */
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  filter: grayscale(100%) contrast(1.1); /* Enforce mono styling strictly */
 }
 
 .graphics-panel:hover img, .roots-right:hover img {

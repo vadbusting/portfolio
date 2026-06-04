@@ -377,7 +377,6 @@ body.floating-world-page .main-header {
     height: 250px;
     object-fit: contain; /* Prevent cropping */
     transform: translate(-50%, -50%) scale(0.8);
-    filter: grayscale(100%);
 }
 
 /* --- Menu Overlay --- */
