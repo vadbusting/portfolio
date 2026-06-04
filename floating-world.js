@@ -447,7 +447,8 @@ const isMonochromeImage = (image) => {
     window.resetPortfolioScrollTop?.();
 
     // Set up scroll length for expected image count
-    totalDepth = spacing * Math.max(0, sources.length - 1) + 6;
+    const mainSourcesCount = sources.filter(s => !s.includes('sub_banner_')).length;
+    totalDepth = spacing * Math.max(0, mainSourcesCount - 1) + 6;
     const baseStageMinHeight = Math.max(
       window.innerHeight * 1.2,
       Math.min(window.innerHeight * 1.6, window.innerHeight + totalDepth * 22)
@@ -459,6 +460,7 @@ const isMonochromeImage = (image) => {
 
     // Load images one by one and add to scene as they arrive
     let loadedCount = 0;
+    let mainImageCount = 0;
     sources.forEach((src) => {
       loadTexture(src)
         .then(({ texture, isMonochrome }) => {
@@ -470,10 +472,16 @@ const isMonochromeImage = (image) => {
           const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight, 1, 1);
           const material = new THREE.MeshBasicMaterial({ map: texture, transparent: false, depthWrite: true });
           const mesh = new THREE.Mesh(geometry, material);
-          const idx = stackGroup.children.length;
-          mesh.position.z = -idx * spacing;
-          const angle = idx * 2.399963229728653;
-          const radialSpread = (0.32 + Math.pow(idx + 1, 0.5) * 0.42) * scaleFactor;
+          const isSubBanner = src.includes('sub_banner_');
+          let currentZIndex;
+          if (isSubBanner) {
+            currentZIndex = Math.max(0, mainImageCount - 0.5 - Math.random() * 2.0);
+          } else {
+            currentZIndex = mainImageCount++;
+          }
+          mesh.position.z = -currentZIndex * spacing;
+          const angle = currentZIndex * 2.399963229728653;
+          const radialSpread = (0.32 + Math.pow(currentZIndex + 1, 0.5) * 0.42) * scaleFactor;
           mesh.position.x = Math.cos(angle) * radialSpread + (Math.random() - 0.5) * 0.1;
           mesh.position.y = Math.sin(angle) * radialSpread * 1.05 + (Math.random() - 0.5) * 0.1;
           if (src.includes('sub_banner_')) {
