@@ -173,13 +173,13 @@ html, body {
   font-size: clamp(3.4rem, 15.5vw, 14.5rem);
   line-height: 0.85;
   letter-spacing: -0.06em;
-  color: #ffffff;
-  -webkit-text-stroke: 3px #000000;
+  color: #000000;
+  -webkit-text-stroke: 3.5px #ffffff;
   paint-order: stroke fill;
   text-transform: uppercase;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 8px rgba(0, 0, 0, 0.9));
+  filter: none;
   white-space: nowrap;
 }
 .cenotaph__for {
@@ -189,33 +189,47 @@ html, body {
   font-size: clamp(1.2rem, 3.2vw, 2.7rem);
   font-weight: 400;
   letter-spacing: 0.05em;
-  color: rgba(255, 255, 255, 0.92);
-  margin-top: clamp(-0.35rem, -0.6vw, 0.05rem);
-  transform: translateY(-4px);
-  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.9);
+  color: #ffffff;
+  margin-top: clamp(0.75rem, 1.8vw, 1.8rem);
+  transform: none;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
 }
 
-.cenotaph__cue {
+/* --- 画面最下段の SCROLL Cue --- */
+.scrollCue {
+  position: absolute;
+  bottom: clamp(24px, 4vh, 44px);
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  margin-top: clamp(1.5rem, 3.8vw, 3.2rem);
   font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: clamp(9px, 1.1vw, 11px);
   font-weight: 600;
   letter-spacing: 0.28em;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.75);
+  pointer-events: none;
+  z-index: 20;
   animation: cueBounce 2.4s ease-in-out infinite;
+  transition: opacity 0.6s ease;
+  opacity: 0;
 }
-.cenotaph__cue svg {
+.scrollCue svg {
   width: 18px;
   height: 18px;
-  opacity: 0.75;
+  opacity: 0.8;
 }
 @keyframes cueBounce {
-  0%, 100% { transform: translateY(0); opacity: 0.65; }
-  50% { transform: translateY(6px); opacity: 1; }
+  0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.75; }
+  50% { transform: translateX(-50%) translateY(6px); opacity: 1; }
+}
+.stage[data-state=hero] .scrollCue {
+  opacity: 1;
+}
+.stage:not([data-state=hero]) .scrollCue {
+  opacity: 0;
 }
 
 .stage[data-state=hero] .cenotaph {
