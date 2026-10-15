@@ -170,9 +170,9 @@ html, body {
   padding: 0;
   font-family: "Impact", "Inter", "Arial Black", "Arial", sans-serif;
   font-weight: 900;
-  font-size: clamp(3.4rem, 15.5vw, 14.5rem);
+  font-size: clamp(4.2rem, 19vw, 18.5rem);
   line-height: 0.85;
-  letter-spacing: -0.06em;
+  letter-spacing: -0.015em;
   color: #000000;
   -webkit-text-stroke: 3.5px #ffffff;
   paint-order: stroke fill;
@@ -186,11 +186,11 @@ html, body {
   display: block;
   font-family: "Georgia", "Times New Roman", "Baskerville", serif;
   font-style: italic;
-  font-size: clamp(1.2rem, 3.2vw, 2.7rem);
+  font-size: clamp(1.3rem, 3.5vw, 3rem);
   font-weight: 400;
   letter-spacing: 0.05em;
   color: #ffffff;
-  margin-top: clamp(0.75rem, 1.8vw, 1.8rem);
+  margin-top: clamp(0.2rem, 0.6vw, 0.7rem);
   transform: none;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
 }
