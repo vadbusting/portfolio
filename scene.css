@@ -172,9 +172,9 @@ html, body {
   font-weight: 900;
   font-size: clamp(4.2rem, 19vw, 18.5rem);
   line-height: 0.85;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.038em;
   color: #000000;
-  -webkit-text-stroke: 3.5px #ffffff;
+  -webkit-text-stroke: 5px #ffffff;
   paint-order: stroke fill;
   text-transform: uppercase;
   text-rendering: optimizeLegibility;
@@ -184,14 +184,14 @@ html, body {
 }
 .cenotaph__for {
   display: block;
-  font-family: "Georgia", "Times New Roman", "Baskerville", serif;
+  font-family: "Alex Brush", "Italianno", "Allura", "Great Vibes", "Snell Roundhand", cursive;
   font-style: italic;
-  font-size: clamp(1.3rem, 3.5vw, 3rem);
-  font-weight: 400;
-  letter-spacing: 0.05em;
+  font-size: clamp(2.2rem, 5.2vw, 5rem);
+  font-weight: 300;
+  letter-spacing: 0.04em;
   color: #ffffff;
-  margin-top: clamp(0.2rem, 0.6vw, 0.7rem);
-  transform: none;
+  margin-top: clamp(-0.4rem, -0.8vw, 0rem);
+  transform: translateY(-2px);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
 }
 
@@ -299,10 +299,12 @@ html, body {
   }
   .cenotaph__title {
     font-size: clamp(3rem, 16vw, 6.5rem);
-    letter-spacing: -0.05em;
+    letter-spacing: -0.038em;
+    -webkit-text-stroke: 3.2px #ffffff;
   }
   .cenotaph__for {
-    font-size: 1.3rem;
+    font-size: clamp(1.8rem, 5.5vw, 2.4rem);
+    margin-top: -0.3rem;
   }
   
   /* Floating pill dock for mobile rail */
