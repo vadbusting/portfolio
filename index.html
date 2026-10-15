@@ -3,57 +3,75 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#242321"><title>PORTFOLIO</title>
-<script type="importmap">{"imports":{"three":"./assets/vendor/three/three.module.js","three/addons/":"./assets/vendor/three/"}}</script>
-<link rel="stylesheet" href="hero-v13.css?v=13">
-<link rel="stylesheet" href="scene.css?v=4">
+<meta name="theme-color" content="#12141a">
+<title>CENOTAPH for — PORTFOLIO</title>
+<link rel="stylesheet" href="hero-v13.css?v=25">
+<link rel="stylesheet" href="scene.css?v=25">
 </head>
 <body>
-<main class="stage" id="stage" data-state="exterior" aria-label="Portfolio">
+<main class="stage" id="stage" data-state="hero" aria-label="Portfolio">
 
-  <!-- 背景レイヤー（下から: 外観3D → ロビー写真 → フロア静止画 → フロア動画 → エレベーター → 暗転） -->
-  <div class="layer layer--ext" id="extLayer"><canvas id="labCanvas" aria-label="3Dの都市から各階を巡る研究所"></canvas><div class="extGrade" aria-hidden="true"></div></div>
+  <!-- 背景レイヤー（HERO実写映像 → ロビー連番 → フロア静止画 → 各階ドリー動画 → 場面転換ディップ） -->
+  <div class="layer layer--hero" id="heroLayer">
+    <video id="heroVideo" muted playsinline loop autoplay poster="assets/scenes/hero_start.webp" aria-hidden="true">
+      <source src="assets/video/hero_entrance.mp4" type="video/mp4">
+    </video>
+    <div class="heroOverlay" aria-hidden="true"></div>
+  </div>
   <div class="layer layer--seq" id="seqLayer"><canvas id="seq" aria-hidden="true"></canvas><i class="seqScrim" aria-hidden="true"></i></div>
   <div class="layer layer--plate" id="plate"><img id="plateImg" alt="" decoding="async"></div>
   <div class="layer layer--video" id="dollyLayer"><video id="dolly" muted playsinline preload="none" disablepictureinpicture aria-hidden="true"></video></div>
-
-  <!-- エレベーター（カゴの中から扉を見る視点。扉が開くと背後のフロア動画が見える） -->
-  <div class="layer layer--elevator" id="elevatorLayer" aria-hidden="true">
-    <div class="cab" id="cab">
-      <div class="cab__room">
-        <div class="cab__ceil"></div>
-        <div class="cab__floor"><i class="cab__spill"></i></div>
-        <div class="cab__wall cab__wall--l"></div>
-        <div class="cab__wall cab__wall--r"></div>
-        <div class="cab__back">
-          <div class="cab__side cab__side--l"></div>
-          <div class="cab__side cab__side--r"></div>
-          <div class="cab__head"><span id="cabDigits">00</span></div>
-          <div class="cab__doors"><div class="door door--l"></div><div class="door door--r"></div></div>
-        </div>
-      </div>
-      <div class="cab__vignette"></div>
-    </div>
-  </div>
   <div class="layer layer--dip" id="dip"></div>
 
-  <!-- 元サイトのUIをそのまま流用 -->
+  <!-- UIオーバーレイ -->
   <div class="lab" id="lab" data-stage="0">
-    <header class="lab__header"><a class="lab__brand" href="#top" id="brand">PORTFOLIO</a><button class="lab__contact" type="button" data-contact>CONTACT</button></header>
-    <div class="lab__copy" aria-label="Introduction"><p>同じ条件を異なる結果へ</p><h1><span>その差は</span><strong>ディレクション</strong></h1><em>Form follows function</em></div>
+    <header class="lab__header">
+      <a class="lab__brand" href="#top" id="brand">PORTFOLIO</a>
+      <button class="lab__contact" type="button" data-contact>CONTACT</button>
+    </header>
+    
+    <!-- 映画風メインタイトル: CENOTAPH for （ベタヅメ・超極太白ブロック体） -->
+    <div class="cenotaph" id="cenotaph" aria-label="CENOTAPH for">
+      <h1 class="cenotaph__title">CENOTAPH</h1>
+      <span class="cenotaph__for">for</span>
+      <div class="cenotaph__cue" aria-hidden="true">
+        <span>SCROLL TO ENTER</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 10l5 5 5-5"/></svg>
+      </div>
+    </div>
+
+    <!-- フロア選択レール（右側: 01〜05 + 最下層 B???F RESTRICTED） -->
     <nav class="lab__rail" id="rail" aria-label="研究所の各階">
       <button type="button" data-stage-jump="1"><span>01</span><b>ABOUT</b></button>
       <button type="button" data-stage-jump="2"><span>02</span><b>PRESENTATION</b></button>
       <button type="button" data-stage-jump="3"><span>03</span><b>LP</b></button>
       <button type="button" data-stage-jump="4"><span>04</span><b>WEB</b></button>
       <button type="button" data-stage-jump="5"><span>05</span><b>DIRECTION</b></button>
-      <button type="button" data-stage-jump="6"><span>06</span><b>OTHER</b></button>
+      <button type="button" data-stage-jump="6" class="rail__btn--secret">
+        <span>B???F</span>
+        <b>OTHER</b>
+        <em class="rail__tag">RESTRICTED</em>
+      </button>
     </nav>
-    <aside class="lab__portal" id="portal" aria-hidden="true"><h2 id="portalTitle">ABOUT</h2><a id="portalLink" href="about.html" tabindex="-1">OPEN PAGE</a></aside>
-    <div class="lab__loader" id="loader" role="status"><span id="loaderText" class="lab__loaderText">LOADING 3D</span><i><b id="loaderBar"></b></i></div>
-    <div class="contactLayer" id="contactLayer" hidden><button class="contactClose" type="button" data-contact-close>CLOSE</button><div class="contactInner"><img class="portrait" src="image/teshima_takashi_portrait.png" alt="TESHIMA TAKASHI"><p>TESHIMA TAKASHI</p><a href="mailto:vadbusting@gmail.com">vadbusting@gmail.com</a><img class="qr" src="image/portfolio_qr.png" alt="Portfolio QR Code"></div></div>
+
+    <!-- 各階ポータル（作品リンク） -->
+    <aside class="lab__portal" id="portal" aria-hidden="true">
+      <h2 id="portalTitle">ABOUT</h2>
+      <a id="portalLink" href="about.html" tabindex="-1">OPEN PAGE</a>
+    </aside>
+
+    <!-- コンタクトモーダル -->
+    <div class="contactLayer" id="contactLayer" hidden>
+      <button class="contactClose" type="button" data-contact-close>CLOSE</button>
+      <div class="contactInner">
+        <img class="portrait" src="image/teshima_takashi_portrait.png" alt="TESHIMA TAKASHI">
+        <p>TESHIMA TAKASHI</p>
+        <a href="mailto:vadbusting@gmail.com">vadbusting@gmail.com</a>
+        <img class="qr" src="image/portfolio_qr.png" alt="Portfolio QR Code">
+      </div>
+    </div>
   </div>
 </main>
-<script src="scene.js?v=4"></script>
+<script src="scene.js?v=25"></script>
 </body>
 </html>

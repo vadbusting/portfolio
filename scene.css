@@ -1,82 +1,334 @@
-/* TESHIMA LAB portfolio v17 — layers + elevator. UI text/styling comes from hero-v13.css (original site). */
-html,body{height:100%;overflow:hidden;background:#1c1b1a;overscroll-behavior:none}
-.stage{position:fixed;inset:0;height:100dvh;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;background:#0a0d14}
+/* TESHIMA LAB portfolio — CENOTAPH for & Scene Architecture */
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: #0d0f14;
+  overscroll-behavior: none;
+}
 
-/* ---------- layers ---------- */
-.layer{position:absolute;inset:0;opacity:0;pointer-events:none}
-.layer img,.layer video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--pos,50% 50%)}
-.layer--ext{background:#070a11;transition:opacity .3s ease}
-.layer--ext canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
-.extGrade{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,transparent 60%,rgba(18,17,16,.42) 100%),linear-gradient(180deg,rgba(20,19,18,.35) 0%,transparent 18%,transparent 82%,rgba(20,19,18,.45) 100%);transition:opacity .6s ease}
-.layer--seq{transition:opacity .5s ease;background:#0b0907}
-.layer--seq canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.seqScrim{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .8s ease;background:linear-gradient(90deg,rgba(8,6,5,.78) 0%,rgba(8,6,5,.55) 22%,rgba(8,6,5,0) 46%)}
-.layer--plate,.layer--video{transition:opacity .6s var(--ease,ease)}
-.layer--dip{background:#050403;transition:opacity .35s ease}
-.layer--dip.is-on{opacity:1}
+.stage {
+  position: fixed;
+  inset: 0;
+  height: 100dvh;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  background: #08090d;
+}
 
-.stage[data-state=exterior] .layer--ext{opacity:1}
-.stage[data-state=lobby] .layer--ext{opacity:0;transition:opacity .2s ease 1.1s}
-.stage[data-state=lobby] .layer--seq,.stage[data-state=floor][data-floor="0"] .layer--seq{opacity:1}
-.stage[data-state=lobby] .layer--seq{transition:opacity 1s ease}
-.stage[data-state=floor][data-floor="0"] .seqScrim{opacity:1}
-.stage[data-state=elevator] .layer--plate,.stage[data-state=floor]:not([data-floor="0"]) .layer--plate{opacity:1}
-.stage[data-state=elevator] .layer--video.is-on,.stage[data-state=floor]:not([data-floor="0"]) .layer--video.is-on{opacity:1}
-.stage[data-state=elevator] .layer--elevator{opacity:1}
-.layer--elevator{transition:opacity .3s ease}
-.layer--plate img.b{opacity:0;transition:opacity 1.5s ease}
-.layer--plate.is-end img.b{opacity:1}
-.layer--plate.no-fade img.b{transition:none}
+/* ==========================================================================
+   Background Layers
+   ========================================================================== */
+.layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s var(--ease, ease);
+}
+.layer img, .layer video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--pos, 50% 50%);
+}
 
-/* ---------- original UI overlay (hero-v13.css) adapted to this stage ---------- */
-.stage .lab{position:absolute;inset:0;width:auto;height:100%;min-height:0!important;background:none;pointer-events:none;z-index:10;isolation:auto}
-.stage .lab button,.stage .lab a,.stage .lab__portal.is-visible,.stage .contactLayer{pointer-events:auto}
-.lab__portal[aria-hidden=true] a{pointer-events:none}
-/* floor-select rail only appears at the end of the lobby sequence and on floors */
-.lab__rail{opacity:0;pointer-events:none;transition:opacity .6s ease}
-.stage[data-state=floor] .lab__rail{opacity:1}
-.stage .lab .lab__rail button{pointer-events:none}
-.stage[data-state=floor] .lab .lab__rail button{pointer-events:auto}
-.stage[data-state=elevator] .lab__portal{opacity:0;pointer-events:none}
+/* --- Hero entrance layer --- */
+.layer--hero {
+  background: #07090e;
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1;
+}
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.76) 100%),
+    linear-gradient(180deg, rgba(8, 10, 14, 0.72) 0%, transparent 22%, transparent 72%, rgba(8, 10, 14, 0.88) 100%);
+}
 
-/* ---------- elevator: view from inside the cab, doors open onto the floor footage ---------- */
-.cab{position:absolute;inset:0;--u:min(100vh,100vw);--cw:max(calc(var(--u) * .78),56vw);--ch:calc(var(--u) * .62);--dz:calc(var(--u) * .55);
-  perspective:calc(var(--u) * 1.2);perspective-origin:50% 50%;overflow:hidden;transform-origin:50% 54%;background:transparent}
-.cab__room{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}
-.cab.is-riding .cab__room{animation:ride .26s linear infinite}
-@keyframes ride{0%{transform:translate3d(0,0,0)}20%{transform:translate3d(.5px,-.8px,0)}45%{transform:translate3d(-.4px,.6px,0)}70%{transform:translate3d(.3px,-.4px,0)}100%{transform:translate3d(0,0,0)}}
-.cab__ceil,.cab__floor,.cab__wall,.cab__back{position:absolute;backface-visibility:visible}
-.cab__ceil{left:calc(var(--cw) * -1);top:calc(var(--ch) * -1);width:calc(var(--cw) * 2);height:var(--dz);transform-origin:50% 0;transform:rotateX(-90deg);background:url(assets/elevator/ceil.jpg) center/100% 100%}
-.cab__floor{left:calc(var(--cw) * -1);top:calc(var(--ch) - var(--dz));width:calc(var(--cw) * 2);height:var(--dz);transform-origin:50% 100%;transform:rotateX(90deg);
-  background:linear-gradient(0deg,rgba(0,0,0,.7),rgba(0,0,0,.1)),url(assets/elevator/floor.jpg) center/60% auto}
-.cab__spill{position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 0%,rgba(255,214,160,.62),rgba(255,190,120,.18) 55%,transparent 80%);opacity:0;transition:opacity 1.6s ease .1s;mix-blend-mode:screen}
-.cab.is-open .cab__spill{opacity:1}
-.cab__wall{top:calc(var(--ch) * -1);width:var(--dz);height:calc(var(--ch) * 2);background:url(assets/elevator/wall.jpg) center/100% 100%}
-.cab__wall::before{content:"";position:absolute;inset:0}
-.cab__wall::after{content:"";position:absolute;left:0;right:0;top:56%;height:calc(var(--u) * .012);background:linear-gradient(180deg,#d9d6d0,#6d6a66 45%,#2a2927);box-shadow:0 6px 10px rgba(0,0,0,.55)}
-.cab__wall--l{left:calc(var(--cw) * -1);transform-origin:0 50%;transform:rotateY(90deg)}
-.cab__wall--l::before{background:linear-gradient(90deg,rgba(0,0,0,.72),rgba(0,0,0,.12))}
-.cab__wall--r{left:calc(var(--cw) - var(--dz));transform-origin:100% 50%;transform:rotateY(-90deg)}
-.cab__wall--r::before{background:linear-gradient(270deg,rgba(0,0,0,.72),rgba(0,0,0,.12))}
-.cab__back{left:calc(var(--cw) * -1);top:calc(var(--ch) * -1);width:calc(var(--cw) * 2);height:calc(var(--ch) * 2);transform:translateZ(calc(var(--dz) * -1));transform-style:preserve-3d}
-.cab__side{position:absolute;top:0;height:100%;width:calc(var(--cw) - var(--u) * .5);background:linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.5)),url(assets/elevator/wall.jpg) center/calc(var(--u) * .7) auto;transform:translateZ(2px);box-shadow:inset 0 0 40px rgba(0,0,0,.6)}
-.cab__side--l{left:0;border-right:calc(var(--u) * .008) solid #55524d}
-.cab__side--r{right:0;border-left:calc(var(--u) * .008) solid #55524d}
-.cab__head{position:absolute;left:calc(var(--cw) - var(--u) * .5);top:0;width:var(--u);height:calc(var(--u) * .16);display:grid;place-items:center;transform:translateZ(2px);
-  background:linear-gradient(180deg,#1b1a19,#0c0c0b);border-bottom:calc(var(--u) * .006) solid #4a4743;box-shadow:inset 0 -10px 24px rgba(0,0,0,.6)}
-.cab__head span{font:300 calc(var(--u) * .055)/1 "Inter","Helvetica Neue",Arial,sans-serif;letter-spacing:.28em;padding-left:.28em;color:#ffb24a;text-shadow:0 0 12px rgba(255,170,60,.85),0 0 32px rgba(255,150,40,.45);transition:filter .2s}
-.cab.is-arrived .cab__head span{animation:ding .5s ease 2}
-@keyframes ding{50%{filter:brightness(1.9);text-shadow:0 0 18px rgba(255,200,110,1),0 0 44px rgba(255,170,60,.8)}}
-.cab__doors{position:absolute;left:calc(var(--cw) - var(--u) * .5);top:calc(var(--u) * .16);width:var(--u);height:calc(var(--u) * 1.08)}
-.door{position:absolute;top:0;width:50%;height:100%;background:url(assets/elevator/door.jpg) center/100% 100%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.7),inset 3px 0 6px rgba(255,255,255,.05),inset -3px 0 6px rgba(0,0,0,.4);transition:transform 1.5s cubic-bezier(.62,0,.2,1)}
-.door--l{left:0}.door--r{left:50%}
-.cab.is-open .door--l{transform:translateX(-99%)}
-.cab.is-open .door--r{transform:translateX(99%)}
-.cab__vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 46%,transparent 36%,rgba(0,0,0,.6) 100%)}
-.cab.is-leaving{transform:scale(2.6);opacity:0;transition:transform 1.15s cubic-bezier(.55,0,.75,.35),opacity .8s ease .3s}
+/* --- Lobby frame sequence (Canvas) --- */
+.layer--seq {
+  background: #0a0807;
+  transition: opacity 0.8s ease;
+  z-index: 2;
+}
+.layer--seq canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.seqScrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  background: linear-gradient(90deg, rgba(8, 6, 5, 0.82) 0%, rgba(8, 6, 5, 0.55) 24%, rgba(8, 6, 5, 0) 48%);
+}
 
-/* ---------- misc ---------- */
-@media (prefers-reduced-motion:reduce){
-  .cab.is-riding .cab__room{animation:none}
-  *{transition-duration:.01ms !important}
+/* --- Floor plates & Dolly videos --- */
+.layer--plate {
+  z-index: 3;
+}
+.layer--plate img.b {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.layer--plate.is-end img.b {
+  opacity: 1;
+}
+.layer--plate.no-fade img.b {
+  transition: none;
+}
+.layer--video {
+  z-index: 4;
+}
+
+/* --- Dip to black for instant transitions --- */
+.layer--dip {
+  background: #050608;
+  transition: opacity 0.28s ease;
+  z-index: 8;
+}
+.layer--dip.is-on {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Layer State Control
+   ========================================================================== */
+.stage[data-state=hero] .layer--hero {
+  opacity: 1;
+  pointer-events: auto;
+}
+.stage[data-state=lobby] .layer--hero {
+  opacity: 0;
+  pointer-events: none;
+}
+.stage[data-state=lobby] .layer--seq,
+.stage[data-state=floor][data-floor="0"] .layer--seq {
+  opacity: 1;
+}
+.stage[data-state=floor][data-floor="0"] .seqScrim {
+  opacity: 1;
+}
+.stage[data-state=floor]:not([data-floor="0"]) .layer--plate {
+  opacity: 1;
+}
+.stage[data-state=floor]:not([data-floor="0"]) .layer--video.is-on {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   UI Overlays
+   ========================================================================== */
+.stage .lab {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: 100%;
+  min-height: 0 !important;
+  background: none;
+  pointer-events: none;
+  z-index: 10;
+  isolation: auto;
+}
+.stage .lab button,
+.stage .lab a,
+.stage .lab__portal.is-visible,
+.stage .contactLayer {
+  pointer-events: auto;
+}
+
+/* --- CENOTAPH for Cinematic Typography (LA HAINE aesthetic) --- */
+.cenotaph {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.97);
+  width: 94vw;
+  max-width: 1440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+  z-index: 15;
+  opacity: 0;
+  transition: opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1), transform 2.2s cubic-bezier(0.16, 1, 0.3, 1), filter 1.4s ease;
+}
+.cenotaph__title {
+  margin: 0;
+  padding: 0;
+  font-family: "Impact", "Inter", "Arial Black", "Arial", sans-serif;
+  font-weight: 900;
+  font-size: clamp(3.4rem, 15.5vw, 14.5rem);
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  color: #ffffff;
+  text-transform: uppercase;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.85)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.95));
+  white-space: nowrap;
+}
+.cenotaph__for {
+  display: block;
+  font-family: "Georgia", "Times New Roman", "Baskerville", serif;
+  font-style: italic;
+  font-size: clamp(1.2rem, 3.2vw, 2.7rem);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.92);
+  margin-top: clamp(0.5rem, 1.4vw, 1.3rem);
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.9);
+}
+
+.cenotaph__cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: clamp(1.5rem, 3.8vw, 3.2rem);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(9px, 1.1vw, 11px);
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  color: rgba(255, 255, 255, 0.65);
+  animation: cueBounce 2.4s ease-in-out infinite;
+}
+.cenotaph__cue svg {
+  width: 18px;
+  height: 18px;
+  opacity: 0.75;
+}
+@keyframes cueBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.65; }
+  50% { transform: translateY(6px); opacity: 1; }
+}
+
+.stage[data-state=hero] .cenotaph {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  filter: blur(0);
+}
+.stage[data-state=lobby] .cenotaph {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(1.08);
+  filter: blur(8px);
+}
+.stage[data-state=floor] .cenotaph {
+  display: none;
+}
+
+/* ==========================================================================
+   Floor Select Rail (Right)
+   ========================================================================== */
+.lab__rail {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+.stage[data-state=floor] .lab__rail {
+  opacity: 1;
+}
+.stage[data-state=floor] .lab .lab__rail button {
+  pointer-events: auto;
+}
+
+/* --- Secret Basement Floor: B???F OTHER [RESTRICTED] --- */
+.rail__btn--secret {
+  margin-top: 8px !important;
+  padding-top: 10px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.16) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+}
+.rail__btn--secret span {
+  color: #f59e0b !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+}
+.rail__tag {
+  display: inline-block;
+  font-size: 7px;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.14);
+  border: 1px solid rgba(255, 77, 79, 0.38);
+  padding: 1px 5px;
+  border-radius: 2px;
+  margin-top: 3px;
+  line-height: 1.2;
+}
+
+/* ==========================================================================
+   Mobile & Tablet Responsive Adjustments
+   ========================================================================== */
+@media (max-width: 780px) {
+  .cenotaph {
+    width: 96vw;
+  }
+  .cenotaph__title {
+    font-size: clamp(3rem, 16vw, 6.5rem);
+    letter-spacing: -0.05em;
+  }
+  .cenotaph__for {
+    font-size: 1.3rem;
+  }
+  
+  /* Floating pill dock for mobile rail */
+  .lab__rail {
+    right: 8px !important;
+    top: auto !important;
+    bottom: 16px !important;
+    transform: none !important;
+    padding: 6px 4px !important;
+    background: rgba(12, 14, 20, 0.82) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65) !important;
+  }
+  .lab__rail button {
+    padding: 6px 8px !important;
+    min-height: 34px !important;
+  }
+  .lab__rail button span {
+    font-size: 10px !important;
+  }
+  .lab__rail button b {
+    font-size: 9px !important;
+  }
+  .rail__btn--secret {
+    margin-top: 4px !important;
+    padding-top: 6px !important;
+  }
+  
+  .lab__portal {
+    left: 18px !important;
+    bottom: 24px !important;
+  }
+  .lab__portal h2 {
+    font-size: clamp(2rem, 7.5vw, 3rem) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
