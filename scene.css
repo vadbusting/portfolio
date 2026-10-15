@@ -250,6 +250,9 @@ html, body {
    Floor Select Rail (Right)
    ========================================================================== */
 .lab__rail {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.6s ease;
@@ -261,33 +264,198 @@ html, body {
   pointer-events: auto;
 }
 
-/* --- Secret Basement Floor: B???F OTHER [RESTRICTED] --- */
-.rail__btn--secret {
-  margin-top: 8px !important;
-  padding-top: 10px !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.16) !important;
+/* OPEN PAGE スタイルの色付きフロアボタン */
+.lab__rail button {
+  background: rgba(18, 20, 28, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  padding: 8px 14px !important;
+  border-radius: 4px !important;
   display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-end !important;
+  align-items: center !important;
+  gap: 12px !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  cursor: pointer !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  color: #fff !important;
 }
-.rail__btn--secret span {
-  color: #f59e0b !important;
+.lab__rail button span {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace !important;
+  font-size: 11px !important;
   font-weight: 700 !important;
-  letter-spacing: 0.06em !important;
+  letter-spacing: 0.1em !important;
+  padding: 2px 6px !important;
+  border-radius: 3px !important;
 }
-.rail__tag {
-  display: inline-block;
-  font-size: 7px;
-  font-style: normal;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  color: #ff4d4f;
-  background: rgba(255, 77, 79, 0.14);
-  border: 1px solid rgba(255, 77, 79, 0.38);
-  padding: 1px 5px;
-  border-radius: 2px;
-  margin-top: 3px;
-  line-height: 1.2;
+.lab__rail button b {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.14em !important;
+  color: #ffffff !important;
+}
+
+/* フロア別カラーアクセント（OPEN PAGE風イルミネーション） */
+.rail__btn--1f span { color: #34d399 !important; background: rgba(52, 211, 153, 0.14) !important; }
+.rail__btn--1f:hover, .rail__btn--1f.is-active { border-color: #34d399 !important; box-shadow: 0 0 16px rgba(52, 211, 153, 0.35) !important; }
+
+.rail__btn--2f span { color: #c084fc !important; background: rgba(192, 132, 252, 0.14) !important; }
+.rail__btn--2f:hover, .rail__btn--2f.is-active { border-color: #c084fc !important; box-shadow: 0 0 16px rgba(192, 132, 252, 0.35) !important; }
+
+.rail__btn--3f span { color: #fbbf24 !important; background: rgba(251, 191, 36, 0.14) !important; }
+.rail__btn--3f:hover, .rail__btn--3f.is-active { border-color: #fbbf24 !important; box-shadow: 0 0 16px rgba(251, 191, 36, 0.35) !important; }
+
+.rail__btn--4f span { color: #60a5fa !important; background: rgba(96, 165, 250, 0.14) !important; }
+.rail__btn--4f:hover, .rail__btn--4f.is-active { border-color: #60a5fa !important; box-shadow: 0 0 16px rgba(96, 165, 250, 0.35) !important; }
+
+.rail__btn--5f span { color: #f472b6 !important; background: rgba(244, 114, 182, 0.14) !important; }
+.rail__btn--5f:hover, .rail__btn--5f.is-active { border-color: #f472b6 !important; box-shadow: 0 0 16px rgba(244, 114, 182, 0.35) !important; }
+
+.rail__btn--b1f span { color: #f87171 !important; background: rgba(248, 113, 113, 0.14) !important; }
+.rail__btn--b1f:hover, .rail__btn--b1f.is-active { border-color: #f87171 !important; box-shadow: 0 0 16px rgba(248, 113, 113, 0.35) !important; }
+
+.lab__rail button.is-active {
+  transform: translateX(-8px) !important;
+  background: rgba(36, 42, 54, 0.9) !important;
+}
+
+/* サムネイル領域の直押し遷移カーソル */
+.stage[data-state=floor] .layer--plate.is-end,
+.stage[data-state=floor] .layer--seq {
+  cursor: pointer;
+}
+
+/* --- B1F 暗号認証モーダル --- */
+.cipherModal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(6, 8, 12, 0.85);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: cipherFadeIn 0.25s ease-out;
+}
+.cipherModal[hidden] {
+  display: none !important;
+}
+@keyframes cipherFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+.cipherBox {
+  width: min(440px, 92vw);
+  background: #11141c;
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  border-radius: 8px;
+  padding: 28px 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(248, 113, 113, 0.15);
+  color: #fff;
+  text-align: center;
+}
+.cipherBadge {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: #f87171;
+  margin-bottom: 10px;
+}
+.cipherTitle {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin: 0 0 8px;
+}
+.cipherDesc {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+.cipherInput {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  color: #fff;
+  font-family: ui-monospace, monospace;
+  font-size: 15px;
+  padding: 12px 14px;
+  text-align: center;
+  letter-spacing: 0.12em;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.cipherInput:focus {
+  border-color: #f87171;
+  box-shadow: 0 0 12px rgba(248, 113, 113, 0.4);
+}
+.cipherInput.is-error {
+  border-color: #ef4444;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.7);
+  animation: cipherShake 0.4s ease;
+}
+@keyframes cipherShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+.cipherActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.cipherBtn {
+  flex: 1;
+  min-width: 100px;
+  padding: 10px 12px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.cipherBtn--submit {
+  background: #f87171;
+  color: #000;
+  font-weight: 700;
+}
+.cipherBtn--submit:hover {
+  background: #ef4444;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.6);
+}
+.cipherBtn--bypass {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+.cipherBtn--bypass:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+.cipherBtn--cancel {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.6);
+}
+.cipherBtn--cancel:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+.cipherHint {
+  margin-top: 14px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+}
+.cipherHint code {
+  color: #f87171;
+  font-family: ui-monospace, monospace;
 }
 
 /* ==========================================================================

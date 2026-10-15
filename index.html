@@ -44,19 +44,33 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 10l5 5 5-5"/></svg>
     </div>
 
-    <!-- フロア選択レール（右側: 01〜05 + 最下層 B???F RESTRICTED） -->
+    <!-- フロア選択レール（右側: 1F〜5F + 最下層 B1F） -->
     <nav class="lab__rail" id="rail" aria-label="研究所の各階">
-      <button type="button" data-stage-jump="1"><span>01</span><b>ABOUT</b></button>
-      <button type="button" data-stage-jump="2"><span>02</span><b>PRESENTATION</b></button>
-      <button type="button" data-stage-jump="3"><span>03</span><b>LP</b></button>
-      <button type="button" data-stage-jump="4"><span>04</span><b>WEB</b></button>
-      <button type="button" data-stage-jump="5"><span>05</span><b>DIRECTION</b></button>
-      <button type="button" data-stage-jump="6" class="rail__btn--secret">
-        <span>B???F</span>
-        <b>OTHER</b>
-        <em class="rail__tag">RESTRICTED</em>
-      </button>
+      <button type="button" class="rail__btn rail__btn--1f" data-stage-jump="1"><span>1F</span><b>ABOUT</b></button>
+      <button type="button" class="rail__btn rail__btn--2f" data-stage-jump="2"><span>2F</span><b>PRESENTATION</b></button>
+      <button type="button" class="rail__btn rail__btn--3f" data-stage-jump="3"><span>3F</span><b>LP</b></button>
+      <button type="button" class="rail__btn rail__btn--4f" data-stage-jump="4"><span>4F</span><b>WEB</b></button>
+      <button type="button" class="rail__btn rail__btn--5f" data-stage-jump="5"><span>5F</span><b>DIRECTION</b></button>
+      <button type="button" class="rail__btn rail__btn--b1f" data-stage-jump="6"><span>B1F</span><b>OTHER</b></button>
     </nav>
+
+    <!-- B1F 暗号式アクセス認証モーダル -->
+    <div class="cipherModal" id="cipherModal" hidden aria-modal="true" role="dialog">
+      <div class="cipherBox">
+        <div class="cipherBadge">SECURITY ACCESS CLEARANCE</div>
+        <h3 class="cipherTitle">B1F RESTRICTED ARCHIVE</h3>
+        <p class="cipherDesc">最下層アーカイブへのアクセスには合言葉（パスコード）が必要です。</p>
+        <form class="cipherForm" id="cipherForm" onsubmit="return false;">
+          <input type="text" class="cipherInput" id="cipherInput" placeholder="合言葉を入力 (例: CENOTAPH)" autocomplete="off" spellcheck="false">
+          <div class="cipherActions">
+            <button type="submit" class="cipherBtn cipherBtn--submit" id="cipherSubmit">認証実行</button>
+            <button type="button" class="cipherBtn cipherBtn--bypass" id="cipherBypass">即時解錠 (BYPASS)</button>
+            <button type="button" class="cipherBtn cipherBtn--cancel" id="cipherCancel">閉じる</button>
+          </div>
+        </form>
+        <div class="cipherHint">HINT: 最上層のモニュメント名（合言葉: <code>CENOTAPH</code>）</div>
+      </div>
+    </div>
 
     <!-- 各階ポータル（作品リンク） -->
     <aside class="lab__portal" id="portal" aria-hidden="true">
@@ -76,6 +90,6 @@
     </div>
   </div>
 </main>
-<script src="scene.js?v=25"></script>
+<script src="scene.js?v=26"></script>
 </body>
 </html>

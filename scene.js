@@ -11,12 +11,12 @@
 
   /* ---------------- Configuration ---------------- */
   const FLOORS = [
-    { key: 'about',        no: '01',    name: 'ABOUT',        href: 'about.html',            lobby: true },
-    { key: 'presentation', no: '02',    name: 'PRESENTATION', href: 'presentation.html?v=5', pos: '50% 50%' },
-    { key: 'lp',           no: '03',    name: 'LP',           href: 'lp.html?v=5',           pos: '50% 50%' },
-    { key: 'web',          no: '04',    name: 'WEB',          href: 'https://www.originalsoccerball.com/', external: true, pos: '50% 50%' },
-    { key: 'direction',    no: '05',    name: 'DIRECTION',    href: 'https://new.express.adobe.com/webpage/XRy2MzIpmkxug', external: true, pos: '50% 50%' },
-    { key: 'other',        no: 'B???F', name: 'OTHER',        href: 'other.html',            pos: '50% 50%', secret: true }
+    { key: 'about',        no: '1F',    name: 'ABOUT',        href: 'about.html',            lobby: true },
+    { key: 'presentation', no: '2F',    name: 'PRESENTATION', href: 'presentation.html?v=5', pos: '50% 50%' },
+    { key: 'lp',           no: '3F',    name: 'LP',           href: 'lp.html?v=5',           pos: '50% 50%' },
+    { key: 'web',          no: '4F',    name: 'WEB',          href: 'https://www.originalsoccerball.com/', external: true, pos: '50% 50%' },
+    { key: 'direction',    no: '5F',    name: 'DIRECTION',    href: 'https://new.express.adobe.com/webpage/XRy2MzIpmkxug', external: true, pos: '50% 50%' },
+    { key: 'other',        no: 'B1F',   name: 'OTHER',        href: 'other.html',            pos: '50% 50%', secret: true }
   ];
 
   const PATH = {
@@ -460,11 +460,21 @@
     goFloor(i, { force: true });
   }
 
-  // Click background to instantly jump to end of video
+  // Click background to instantly jump to end of video, or navigate to floor page if already on end frame
   stage.addEventListener('click', e => {
-    if (state === 'floor' && !e.target.closest('button,a,.contactLayer')) {
+    if (state === 'floor' && !e.target.closest('button,a,.contactLayer,.cipherModal')) {
       if (dolly && !dolly.paused) {
         try { dolly.currentTime = dolly.duration || 999; } catch (e) {}
+      } else {
+        // Video has finished or settled on end frame: direct click navigates to floor destination
+        const f = FLOORS[cur];
+        if (f && f.href) {
+          if (f.external) {
+            window.open(f.href, '_blank', 'noopener');
+          } else {
+            location.href = f.href;
+          }
+        }
       }
     }
   });
@@ -549,9 +559,73 @@
 
   window.addEventListener('pointerdown', () => { usedKeyboard = false; }, { passive: true });
 
+  /* ---------------- B1F Cipher Modal ---------------- */
+  let unlockedSecret = false;
+  const cipherModal = document.getElementById('cipherModal');
+  const cipherInput = document.getElementById('cipherInput');
+  const cipherForm = document.getElementById('cipherForm');
+  const cipherBypass = document.getElementById('cipherBypass');
+  const cipherCancel = document.getElementById('cipherCancel');
+
+  function openCipherModal() {
+    if (!cipherModal) return;
+    cipherModal.hidden = false;
+    if (cipherInput) {
+      cipherInput.value = '';
+      cipherInput.classList.remove('is-error');
+      setTimeout(() => cipherInput.focus(), 60);
+    }
+  }
+
+  function closeCipherModal() {
+    if (!cipherModal) return;
+    cipherModal.hidden = true;
+  }
+
+  function handleCipherUnlock() {
+    unlockedSecret = true;
+    closeCipherModal();
+    jump(5); // Jump to B1F (index 5)
+  }
+
+  if (cipherForm) {
+    cipherForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const val = (cipherInput.value || '').trim().toLowerCase();
+      if (val === 'cenotaph' || val === 'セノタフ' || val === 'teshima' || val === 'lab') {
+        handleCipherUnlock();
+      } else {
+        cipherInput.classList.add('is-error');
+        setTimeout(() => cipherInput.classList.remove('is-error'), 450);
+      }
+    });
+  }
+
+  if (cipherBypass) {
+    cipherBypass.addEventListener('click', () => {
+      handleCipherUnlock();
+    });
+  }
+
+  if (cipherCancel) {
+    cipherCancel.addEventListener('click', closeCipherModal);
+  }
+
+  if (cipherModal) {
+    cipherModal.addEventListener('click', e => {
+      if (e.target === cipherModal) closeCipherModal();
+    });
+  }
+
   rail.addEventListener('click', e => {
     const b = e.target.closest('button');
-    if (b) jump(+b.dataset.stageJump - 1);
+    if (!b) return;
+    const targetIdx = +b.dataset.stageJump - 1;
+    if (targetIdx === 5 && !unlockedSecret) {
+      openCipherModal();
+      return;
+    }
+    jump(targetIdx);
   });
 
   $('brand').addEventListener('click', e => {
