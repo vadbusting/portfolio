@@ -174,10 +174,12 @@ html, body {
   line-height: 0.85;
   letter-spacing: -0.06em;
   color: #ffffff;
+  -webkit-text-stroke: 3px #000000;
+  paint-order: stroke fill;
   text-transform: uppercase;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.85)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.95));
+  filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 8px rgba(0, 0, 0, 0.9));
   white-space: nowrap;
 }
 .cenotaph__for {
@@ -188,7 +190,8 @@ html, body {
   font-weight: 400;
   letter-spacing: 0.05em;
   color: rgba(255, 255, 255, 0.92);
-  margin-top: clamp(0.5rem, 1.4vw, 1.3rem);
+  margin-top: clamp(-0.35rem, -0.6vw, 0.05rem);
+  transform: translateY(-4px);
   text-shadow: 0 4px 18px rgba(0, 0, 0, 0.9);
 }
 

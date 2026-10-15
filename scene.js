@@ -570,9 +570,13 @@
     contact.hidden = true;
     if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
   }
-  document.querySelector('[data-contact]').addEventListener('click', openContact);
-  contact.querySelector('[data-contact-close]').addEventListener('click', closeContact);
-  contact.addEventListener('click', e => { if (e.target === contact) closeContact(); });
+  const btnContact = document.querySelector('[data-contact]');
+  if (btnContact) btnContact.addEventListener('click', openContact);
+  if (contact) {
+    const btnClose = contact.querySelector('[data-contact-close]');
+    if (btnClose) btnClose.addEventListener('click', closeContact);
+    contact.addEventListener('click', e => { if (e.target === contact) closeContact(); });
+  }
 
   /* ---------------- Initialization ---------------- */
   const hash = location.hash.replace('#', '');
