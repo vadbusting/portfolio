@@ -168,13 +168,13 @@ html, body {
 .cenotaph__title {
   margin: 0;
   padding: 0;
-  font-family: "Impact", "Inter", "Arial Black", "Arial", sans-serif;
+  font-family: "Futura", "Montserrat", "Archivo Black", sans-serif;
   font-weight: 900;
-  font-size: clamp(4.2rem, 19vw, 18.5rem);
-  line-height: 0.85;
-  letter-spacing: -0.038em;
+  font-size: clamp(3.5rem, 13vw, 13rem);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
   color: #000000;
-  -webkit-text-stroke: 7px #ffffff;
+  -webkit-text-stroke: 9px #ffffff;
   paint-order: stroke fill;
   text-transform: uppercase;
   text-rendering: optimizeLegibility;
@@ -298,9 +298,9 @@ html, body {
     width: 96vw;
   }
   .cenotaph__title {
-    font-size: clamp(3rem, 16vw, 6.5rem);
-    letter-spacing: -0.038em;
-    -webkit-text-stroke: 4.5px #ffffff;
+    font-size: clamp(2.4rem, 11.5vw, 4.8rem);
+    letter-spacing: -0.02em;
+    -webkit-text-stroke: 5px #ffffff;
   }
   .cenotaph__for {
     font-size: clamp(1.4rem, 4.5vw, 2rem);
