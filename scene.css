@@ -289,59 +289,59 @@ html, body {
   pointer-events: auto;
 }
 
-/* OPEN PAGE スタイルの色付きフロアボタン */
+/* OPEN PAGE と完全に同質のシックなボタン（カラフル排除・モノトーン世界観統一） */
 .lab__rail button {
-  background: rgba(18, 20, 28, 0.75) !important;
-  border: 1px solid rgba(255, 255, 255, 0.25) !important;
-  padding: 8px 14px !important;
-  border-radius: 4px !important;
+  background: rgba(30, 27, 24, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  padding: 9px 16px !important;
+  border-radius: 0 !important;
   display: flex !important;
   align-items: center !important;
   gap: 12px !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   cursor: pointer !important;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
-  color: #fff !important;
+  transition: background 0.25s, border-color 0.25s, transform 0.25s !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+  color: #ffffff !important;
 }
 .lab__rail button span {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace !important;
   font-size: 11px !important;
   font-weight: 700 !important;
-  letter-spacing: 0.1em !important;
-  padding: 2px 6px !important;
-  border-radius: 3px !important;
+  letter-spacing: 0.12em !important;
+  padding: 3px 6px !important;
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 0 !important;
 }
 .lab__rail button b {
   font-size: 11px !important;
   font-weight: 500 !important;
-  letter-spacing: 0.14em !important;
+  letter-spacing: 0.16em !important;
   color: #ffffff !important;
+  text-transform: uppercase;
 }
 
-/* フロア別カラーアクセント（OPEN PAGE風イルミネーション） */
-.rail__btn--1f span { color: #34d399 !important; background: rgba(52, 211, 153, 0.14) !important; }
-.rail__btn--1f:hover, .rail__btn--1f.is-active { border-color: #34d399 !important; box-shadow: 0 0 16px rgba(52, 211, 153, 0.35) !important; }
+/* Hover: OPEN PAGE と同じウォームダークトーン＆白縁強調 */
+.lab__rail button:hover {
+  background: rgba(60, 48, 38, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.85) !important;
+  transform: translateX(-4px) !important;
+}
 
-.rail__btn--2f span { color: #c084fc !important; background: rgba(192, 132, 252, 0.14) !important; }
-.rail__btn--2f:hover, .rail__btn--2f.is-active { border-color: #c084fc !important; box-shadow: 0 0 16px rgba(192, 132, 252, 0.35) !important; }
-
-.rail__btn--3f span { color: #fbbf24 !important; background: rgba(251, 191, 36, 0.14) !important; }
-.rail__btn--3f:hover, .rail__btn--3f.is-active { border-color: #fbbf24 !important; box-shadow: 0 0 16px rgba(251, 191, 36, 0.35) !important; }
-
-.rail__btn--4f span { color: #60a5fa !important; background: rgba(96, 165, 250, 0.14) !important; }
-.rail__btn--4f:hover, .rail__btn--4f.is-active { border-color: #60a5fa !important; box-shadow: 0 0 16px rgba(96, 165, 250, 0.35) !important; }
-
-.rail__btn--5f span { color: #f472b6 !important; background: rgba(244, 114, 182, 0.14) !important; }
-.rail__btn--5f:hover, .rail__btn--5f.is-active { border-color: #f472b6 !important; box-shadow: 0 0 16px rgba(244, 114, 182, 0.35) !important; }
-
-.rail__btn--b1f span { color: #f87171 !important; background: rgba(248, 113, 113, 0.14) !important; }
-.rail__btn--b1f:hover, .rail__btn--b1f.is-active { border-color: #f87171 !important; box-shadow: 0 0 16px rgba(248, 113, 113, 0.35) !important; }
-
+/* Active State */
 .lab__rail button.is-active {
+  background: rgba(60, 48, 38, 0.95) !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2) !important;
   transform: translateX(-8px) !important;
-  background: rgba(36, 42, 54, 0.9) !important;
+}
+.lab__rail button.is-active span {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border-color: #ffffff !important;
 }
 
 /* サムネイル領域の直押し遷移カーソル */

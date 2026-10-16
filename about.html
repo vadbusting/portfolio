@@ -1,95 +1,446 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABOUT</title>
-    <script>
-        (function () {
-            var baseEl = document.querySelector('base[data-auto-base]');
-            if (!baseEl) {
-                var href = window.location.href.split('#')[0].split('?')[0];
-                if (!href.endsWith('/')) {
-                    if (href.includes('.')) {
-                        href = href.replace(/[^/]*$/, '');
-                    } else {
-                        href += '/';
-                    }
-                }
-                baseEl = document.createElement('base');
-                baseEl.setAttribute('data-auto-base', 'true');
-                baseEl.href = href;
-                document.head.appendChild(baseEl);
-            }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>1F ABOUT — CENOTAPH</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cormorant+Garamond:ital,wght@1,300;1,400&family=Inter:wght@300;400;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="subpage-common.css?v=2">
+  <style>
+    /* ── 1F ABOUT BESPOKE STYLES ── */
+    body {
+      background: #08090d;
+      color: #e2e8f0;
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-            var applyNormalizedSources = function () {
-                var nodes = document.querySelectorAll('[data-normalize-src]');
-                nodes.forEach(function (node) {
-                    var raw = node.getAttribute('data-normalize-src');
-                    if (typeof raw !== 'string' || !raw) return;
-                    var normalized = typeof raw.normalize === 'function' ? raw.normalize('NFC') : raw;
-                    if (node.getAttribute('src') !== normalized) {
-                        node.setAttribute('src', normalized);
-                    }
-                });
-            };
+    /* Background Ambient Glow */
+    .about-ambient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: radial-gradient(circle at 50% 15%, rgba(30, 41, 59, 0.45) 0%, rgba(8, 9, 13, 0.95) 75%);
+    }
 
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', applyNormalizedSources, { once: true });
-            } else {
-                applyNormalizedSources();
-            }
-        })();
-    </script>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Shippori+Mincho:wght@400;700&display=swap" rel="stylesheet">
-    <script src="device-detect.js?v=5"></script>
+    .about-container {
+      position: relative;
+      z-index: 1;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: calc(var(--sp-nav-height) + 40px) 24px 80px;
+    }
+
+    /* Hero Header */
+    .about-hero {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .about-hero__sub {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.25em;
+      color: #94a3b8;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      margin-bottom: 16px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .about-hero__title {
+      font-family: 'Archivo Black', 'Inter', sans-serif;
+      font-size: clamp(38px, 6vw, 64px);
+      letter-spacing: 0.04em;
+      color: #ffffff;
+      margin: 0 0 10px 0;
+      text-shadow: 0 4px 30px rgba(255, 255, 255, 0.15);
+    }
+
+    .about-hero__desc {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(16px, 2.4vw, 20px);
+      color: #cbd5e1;
+      letter-spacing: 0.08em;
+      margin: 0;
+    }
+
+    /* Section Cards */
+    .about-section {
+      background: rgba(18, 21, 30, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: clamp(24px, 4vw, 40px);
+      margin-bottom: 32px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      transition: border-color 0.3s ease;
+    }
+
+    .about-section:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 14px;
+    }
+
+    .section-header__tag {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      color: #64748b;
+    }
+
+    .section-header__title {
+      font-size: clamp(18px, 2.5vw, 22px);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      padding-left: 28px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 100%);
+    }
+
+    .timeline__item {
+      position: relative;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 14px;
+    }
+
+    .timeline__item:last-child {
+      margin-bottom: 0;
+    }
+
+    .timeline__item::before {
+      content: '';
+      position: absolute;
+      left: -28px;
+      top: 5px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #08090d;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .timeline__year {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 3px 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-family: 'Inter', sans-serif;
+      flex-shrink: 0;
+    }
+
+    .timeline__desc {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #cbd5e1;
+      font-weight: 400;
+      margin: 0;
+    }
+
+    /* Skillset Chips */
+    .skills-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .skill-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: #f1f5f9;
+      transition: all 0.25s ease;
+    }
+
+    .skill-chip:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    /* Stance Grid */
+    .stance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .stance-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 22px;
+      transition: all 0.25s ease;
+    }
+
+    .stance-card:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.16);
+      transform: translateY(-2px);
+    }
+
+    .stance-card__num {
+      font-size: 12px;
+      font-weight: 800;
+      color: #64748b;
+      letter-spacing: 0.15em;
+      margin-bottom: 8px;
+    }
+
+    .stance-card__title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0 0 10px 0;
+      letter-spacing: 0.04em;
+    }
+
+    .stance-card__desc {
+      font-size: 13px;
+      line-height: 1.7;
+      color: #94a3b8;
+      margin: 0;
+    }
+
+    /* Return Footer Bar */
+    .about-footer {
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    .about-footer__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      transition: all 0.3s ease;
+    }
+
+    .about-footer__btn:hover {
+      background: #ffffff;
+      color: #08090d;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 640px) {
+      .timeline__item {
+        flex-direction: column;
+        gap: 6px;
+      }
+      .stance-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-<body>
+<body class="subpage-body">
 
-    <header class="main-header">
-        <div class="header-item"><a href="index.html" style="text-decoration: none; color: inherit;">PORTFOLIO</a></div>
-        <div class="header-item menu-btn">CONTACT</div>
-    </header>
+  <div class="about-ambient" aria-hidden="true"></div>
 
-    <main class="main-content">
-        <div class="hero-content">
-            <h1 class="hero-title">ABOUT</h1>
-            <div class="about-text">
-                <p><strong>経歴</strong></p>
-                <p><strong>2000年</strong> 広告デザイン専門学校コピーライティングコース 卒業</p>
-                <p><strong>2000年</strong> 出版社にて編集・ライター業務に従事</p>
-                <p><strong>2000年</strong> SP会社にてDTPデザイナーとして従事</p>
-                <p><strong>2002年</strong> デザイン事務所にてグラフィックデザイナーとして従事</p>
-                <p><strong>2006年</strong> 個人事業開業 ディレクター（ナショナルクライアント案件等）</p>
-                <p><strong>2021年</strong> 広告代理店にてディレクター（ローカルエリア）として従事</p>
-                <p><strong>2026年</strong> Web制作会社にてディレクターとして進行管理</p>
+  <!-- Unified Top Navigation Bar -->
+  <header class="cenotaph-nav">
+    <a href="index.html#about" class="cenotaph-nav__back" aria-label="CENOTAPHへ戻る">
+      <svg class="cenotaph-nav__back-arrow" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      <span>RETURN TO CENOTAPH</span>
+    </a>
 
-                <p style="margin-top: 2rem;"><strong>スキルセット</strong></p>
-                <p>プロジェクトマネジメント ／ 企画・コンセプト ／ 進行管理・品質管理 ／ 印刷知識・校正 ／ クリエイティブディレクション ／ コミュニケーション・調整力 ／ ドキュメンテーション</p>
-
-                <p style="margin-top: 2rem;"><strong>スタンス</strong></p>
-                <p><strong>本質を追求する:</strong> 無駄を排除し、本当に必要な価値に集中します。</p>
-                <p><strong>明確なコミュニケーション:</strong> 情報を分かりやすく伝え、関係者全員が同じ方向を向けるよう努めます。</p>
-                <p><strong>誠実な進行:</strong> 常に正直であり、透明性の高いプロジェクト進行を心がけます。</p>
-                <p><strong>細部へのこだわり:</strong> 全体像だけでなく、細部の品質にも徹底的にこだわります。</p>
-                <p><strong>持続可能な成果:</strong> 長期的に価値を生み出す成果を目指します。</p>
-            </div>
-        </div>
-    </main>
-
-    <div class="menu-overlay">
-        <button type="button" class="menu-close close-btn" aria-label="閉じる">CLOSE</button>
-        <div class="menu-content">
-            <img src="image/teshima_takashi_portrait.png" alt="TESHIMA TAKASHI" class="menu-contact__photo">
-            <p class="menu-contact__name">TESHIMA TAKASHI</p>
-            <a href="mailto:vadbusting@gmail.com">vadbusting@gmail.com</a>
-            <img src="image/portfolio_qr.png" alt="Portfolio QR Code" class="menu-qr">
-        </div>
+    <div class="cenotaph-nav__floor">
+      <div class="cenotaph-nav__pill">
+        <span class="cenotaph-nav__dot"></span>
+        <span>1F</span>
+      </div>
+      <span class="cenotaph-nav__floor-name">ABOUT</span>
     </div>
 
-    <script src="script.js"></script>
+    <div class="cenotaph-nav__right">
+      <button type="button" class="cenotaph-nav__contact-btn" data-contact-open>CONTACT</button>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="about-container">
+    <div class="about-hero">
+      <span class="about-hero__sub">1F // EXHIBITION ARCHIVE</span>
+      <h1 class="about-hero__title">ABOUT</h1>
+      <p class="about-hero__desc">Directorial Philosophy & Professional Background</p>
+    </div>
+
+    <!-- Section 1: Biography / Timeline -->
+    <section class="about-section">
+      <div class="section-header">
+        <span class="section-header__tag">01</span>
+        <h2 class="section-header__title">経歴</h2>
+      </div>
+      <div class="timeline">
+        <div class="timeline__item">
+          <span class="timeline__year">2000年</span>
+          <p class="timeline__desc">広告デザイン専門学校コピーライティングコース 卒業</p>
+        </div>
+        <div class="timeline__item">
+          <span class="timeline__year">2000年</span>
+          <p class="timeline__desc">出版社にて編集・ライター業務に従事</p>
+        </div>
+        <div class="timeline__item">
+          <span class="timeline__year">2000年</span>
+          <p class="timeline__desc">SP会社にてDTPデザイナーとして従事</p>
+        </div>
+        <div class="timeline__item">
+          <span class="timeline__year">2002年</span>
+          <p class="timeline__desc">デザイン事務所にてグラフィックデザイナーとして従事</p>
+        </div>
+        <div class="timeline__item">
+          <span class="timeline__year">2006年</span>
+          <p class="timeline__desc">個人事業開業 ディレクター（ナショナルクライアント案件等）</p>
+        </div>
+        <div class="timeline__item">
+          <span class="timeline__year">2021年</span>
+          <p class="timeline__desc">広告代理店にてディレクター（ローカルエリア）として従事</p>
+        </div>
+        <div class="timeline__item">
+          <span class="timeline__year">2026年</span>
+          <p class="timeline__desc">Web制作会社にてディレクターとして進行管理</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Skillset -->
+    <section class="about-section">
+      <div class="section-header">
+        <span class="section-header__tag">02</span>
+        <h2 class="section-header__title">スキルセット</h2>
+      </div>
+      <div class="skills-grid">
+        <div class="skill-chip">プロジェクトマネジメント</div>
+        <div class="skill-chip">企画・コンセプト構築</div>
+        <div class="skill-chip">進行管理・品質管理</div>
+        <div class="skill-chip">印刷知識・校正・DTP</div>
+        <div class="skill-chip">クリエイティブディレクション</div>
+        <div class="skill-chip">ステークホルダー調整・コミュニケーション</div>
+        <div class="skill-chip">ドキュメンテーション・要件定義</div>
+        <div class="skill-chip">セキュアAI実務フロー構築</div>
+      </div>
+    </section>
+
+    <!-- Section 3: Stance / Philosophy -->
+    <section class="about-section">
+      <div class="section-header">
+        <span class="section-header__tag">03</span>
+        <h2 class="section-header__title">スタンス</h2>
+      </div>
+      <div class="stance-grid">
+        <div class="stance-card">
+          <div class="stance-card__num">PRINCIPLE 01</div>
+          <h3 class="stance-card__title">本質を追求する</h3>
+          <p class="stance-card__desc">表面的な装飾や無駄を排除し、本当に現場で機能する実務価値に集中します。</p>
+        </div>
+        <div class="stance-card">
+          <div class="stance-card__num">PRINCIPLE 02</div>
+          <h3 class="stance-card__title">明確なコミュニケーション</h3>
+          <p class="stance-card__desc">情報を論理的かつ分かりやすく整理し、チーム全体が迷わず同じ方向へ前進できるよう導きます。</p>
+        </div>
+        <div class="stance-card">
+          <div class="stance-card__num">PRINCIPLE 03</div>
+          <h3 class="stance-card__title">誠実な進行管理</h3>
+          <p class="stance-card__desc">リスクを隠さず早期共有し、徹底した透明性と誠意をもってプロジェクトを完遂させます。</p>
+        </div>
+        <div class="stance-card">
+          <div class="stance-card__num">PRINCIPLE 04</div>
+          <h3 class="stance-card__title">細部への徹底的なこだわり</h3>
+          <p class="stance-card__desc">全体構造の整合性だけでなく、タイポグラフィやコードの1px・1行の品質にまで責任を持ちます。</p>
+        </div>
+        <div class="stance-card">
+          <div class="stance-card__num">PRINCIPLE 05</div>
+          <h3 class="stance-card__title">持続可能な実務成果</h3>
+          <p class="stance-card__desc">一過性の納品にとどまらず、運用や将来的な拡張にも耐えうる堅牢な成果を目指します。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom Return Action -->
+    <div class="about-footer">
+      <a href="index.html#about" class="about-footer__btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>RETURN TO 1F CENOTAPH DOME</span>
+      </a>
+    </div>
+  </main>
+
+  <!-- Unified Contact Modal -->
+  <div class="cenotaph-modal" id="cenotaphModal" aria-hidden="true" role="dialog">
+    <div class="cenotaph-modal__dialog">
+      <button type="button" class="cenotaph-modal__close" data-contact-close aria-label="閉じる">×</button>
+      <img src="image/teshima_takashi_portrait.png" alt="TESHIMA TAKASHI" class="cenotaph-modal__portrait">
+      <h3 class="cenotaph-modal__title">TESHIMA TAKASHI</h3>
+      <a href="mailto:vadbusting@gmail.com" class="cenotaph-modal__email">vadbusting@gmail.com</a>
+      <div class="cenotaph-modal__qr-wrap">
+        <img src="image/portfolio_qr.png" alt="Portfolio QR Code" class="cenotaph-modal__qr">
+      </div>
+      <p class="cenotaph-modal__hint">Scan to connect / Email inquiry</p>
+    </div>
+  </div>
+
+  <script src="subpage-common.js?v=2"></script>
 </body>
 </html>
