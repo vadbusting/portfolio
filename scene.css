@@ -289,10 +289,12 @@ html, body {
   pointer-events: auto;
 }
 
-/* OPEN PAGE と完全に同質のシックなボタン（内枠完全排除・シングルボックス・ホバー移動ゼロ） */
+/* OPEN PAGE & フロア選択レール: 白縁（四角の枠線）を完全排除、同一のシックな背景 */
+.lab__portal a,
 .lab__rail button {
-  background: rgba(30, 27, 24, 0.65) !important;
-  border: 1px solid rgba(255, 255, 255, 0.55) !important;
+  background: rgba(30, 27, 24, 0.72) !important;
+  border: none !important;
+  outline: none !important;
   padding: 8px 14px !important;
   border-radius: 0 !important;
   display: flex !important;
@@ -301,7 +303,7 @@ html, body {
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   cursor: pointer !important;
-  transition: background 0.25s, border-color 0.25s !important;
+  transition: background 0.25s !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
   color: #ffffff !important;
   transform: none !important;
@@ -329,18 +331,19 @@ html, body {
   text-transform: uppercase;
 }
 
-/* Hover: OPEN PAGE と完全に同じ（位置は一切動かさない） */
+/* Hover: 白縁なし、背景のみ変化（位置は一切動かさない） */
+.lab__portal a:hover,
 .lab__rail button:hover {
-  background: rgba(60, 48, 38, 0.85) !important;
-  border-color: rgba(255, 255, 255, 0.85) !important;
+  background: rgba(65, 52, 42, 0.9) !important;
+  border: none !important;
   transform: none !important;
 }
 
-/* Active State: ハイライトのみ（位置は一切動かさない） */
+/* Active State: ハイライトのみ、白縁なし（位置は一切動かさない） */
 .lab__rail button.is-active {
-  background: rgba(60, 48, 38, 0.95) !important;
-  border-color: #ffffff !important;
-  box-shadow: 0 0 16px rgba(255, 255, 255, 0.2) !important;
+  background: rgba(85, 62, 45, 0.95) !important;
+  border: none !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8) !important;
   transform: none !important;
 }
 .lab__rail button.is-active:before {
@@ -371,14 +374,104 @@ body.cipher-locked canvas {
   user-select: none !important;
 }
 
-/* --- 暗号式Passロック解除モーダル (サイト内アプリUI / ref: pin.it/1pHr4ikHh & pin.it/1yQaf6x8L) --- */
+/* --- 3F アトム人形 & ボブルヘッド吹き出し演出 --- */
+.atomLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+}
+.atomLayer[hidden] {
+  display: none !important;
+}
+.atomDollWrap {
+  position: absolute;
+  left: var(--atom-left, 64.8%);
+  top: var(--atom-top, 56.3%);
+  width: var(--atom-width, 4.85%);
+  height: var(--atom-height, 18.05%);
+  pointer-events: auto;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.atomDoll {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  transform-origin: 50% 90%;
+  transition: filter 0.2s ease;
+}
+.atomDollWrap:hover .atomDoll {
+  filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.7));
+}
+.atomDoll.is-bobbling {
+  animation: atomBobble 0.85s cubic-bezier(0.25, 1, 0.5, 1);
+}
+@keyframes atomBobble {
+  0% { transform: rotate(0deg) scale(1); }
+  15% { transform: rotate(-15deg) scale(1.05); }
+  30% { transform: rotate(14deg) scale(1.03); }
+  45% { transform: rotate(-10deg) scale(1.02); }
+  60% { transform: rotate(7deg) scale(1.01); }
+  75% { transform: rotate(-4deg) scale(1); }
+  90% { transform: rotate(2deg) scale(1); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+/* 吹き出し: keyword: ハングリーアート */
+.atomBubble {
+  position: absolute;
+  bottom: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #000000;
+  border: 1px solid #ef4444;
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 0;
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.55), 0 8px 24px rgba(0, 0, 0, 0.9);
+  pointer-events: auto;
+  animation: atomBubblePop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 20;
+}
+.atomBubble[hidden] {
+  display: none !important;
+}
+.atomBubbleArrow {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 7px solid #ef4444;
+}
+@keyframes atomBubbleFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* --- 暗号式Passロック解除モーダル (角R全廃・赤テーマ・リファレンス3D回転アニメ) --- */
 .cipherModal {
   position: fixed !important;
   inset: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
   z-index: 100000 !important;
-  background: rgba(0, 0, 0, 0.92) !important;
+  background: rgba(0, 0, 0, 0.94) !important;
   backdrop-filter: blur(28px) !important;
   -webkit-backdrop-filter: blur(28px) !important;
   display: flex !important;
@@ -398,13 +491,13 @@ body.cipher-locked canvas {
 }
 
 .cipherApp {
-  width: min(350px, 88vw);
-  max-width: 350px;
+  width: min(360px, 92vw);
+  max-width: 360px;
   background: #000000;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 36px;
-  padding: 32px 26px 26px;
-  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.98), 0 0 50px rgba(255, 255, 255, 0.04);
+  border: 1px solid #ef4444;
+  border-radius: 0 !important;
+  padding: 28px 24px 22px;
+  box-shadow: 0 0 50px rgba(239, 68, 68, 0.25), 0 30px 100px rgba(0, 0, 0, 0.98);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -419,13 +512,13 @@ body.cipher-locked canvas {
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* ヘキサゴンドットマトリクス演出 (ref_pin2) */
+/* 3D回転パーティクル演出 (ref: https://pin.it/1yQaf6x8L) */
 .cipherHexWrap {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
   width: 100%;
 }
 #cipherHexCanvas {
@@ -433,81 +526,66 @@ body.cipher-locked canvas {
   height: 160px;
   display: block;
 }
-.cipherStatus {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  color: rgba(255, 255, 255, 0.55);
-  margin-top: 6px;
-  text-transform: uppercase;
-  transition: all 0.3s ease;
-}
-.cipherStatus.is-unlocked {
-  color: #22c55e !important;
-  text-shadow: 0 0 14px rgba(34, 197, 94, 0.7);
-}
-.cipherStatus.is-denied {
-  color: #ef4444 !important;
-  text-shadow: 0 0 14px rgba(239, 68, 68, 0.7);
-}
 
-/* フォーム構造 (Keyword:, 認証, 戻る, ヒント のみ) */
+/* フォーム構造 (Keyword:, 認証, ヒント, 戻る) */
 .cipherForm {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 .cipherField {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  text-align: left;
+  text-align: center;
   width: 100%;
 }
 .cipherLabel {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.14em;
-  color: #ffffff;
+  letter-spacing: 0.18em;
+  color: #ef4444;
   text-transform: uppercase;
   font-family: 'Inter', sans-serif;
-  margin-left: 4px;
+  text-align: center !important;
+  display: block !important;
+  width: 100% !important;
+  margin: 0 auto !important;
 }
 .cipherInput {
   width: 100%;
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 999px;
-  height: 46px;
-  padding: 0 16px;
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 0 !important;
+  height: 44px;
+  padding: 0 14px;
   color: #ffffff;
   font-family: ui-monospace, monospace;
   font-size: 14px;
   text-align: center;
-  letter-spacing: 0.25em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   outline: none;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 .cipherInput:focus {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: #ffffff;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
+  background: rgba(239, 68, 68, 0.12);
+  border-color: #ef4444;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
 }
 .cipherInput.is-error {
   border-color: #ef4444 !important;
   color: #ef4444 !important;
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.5) !important;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.7) !important;
   animation: cipherShake 0.4s ease;
 }
 .cipherInput.is-unlocked {
-  border-color: #22c55e !important;
-  color: #22c55e !important;
-  background: rgba(34, 197, 94, 0.1) !important;
-  box-shadow: 0 0 24px rgba(34, 197, 94, 0.5) !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+  background: rgba(239, 68, 68, 0.2) !important;
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.8) !important;
 }
 @keyframes cipherShake {
   0%, 100% { transform: translateX(0); }
@@ -518,19 +596,19 @@ body.cipher-locked canvas {
 .cipherActions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   margin-top: 4px;
 }
 .cipherBtn--auth {
-  background: #ffffff;
-  color: #000000;
+  background: #ef4444;
+  color: #ffffff;
   font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  height: 46px;
-  border-radius: 999px;
+  letter-spacing: 0.14em;
+  height: 44px;
+  border-radius: 0 !important;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -540,25 +618,47 @@ body.cipher-locked canvas {
   justify-content: center;
 }
 .cipherBtn--auth:hover {
-  opacity: 0.9;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
+  background: #dc2626;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
 }
 .cipherBtn--auth.is-unlocked {
-  background: #22c55e !important;
+  background: #b91c1c !important;
   color: #ffffff !important;
-  box-shadow: 0 0 24px rgba(34, 197, 94, 0.6) !important;
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.9) !important;
 }
 
-.cipherBtn--back {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.85);
+.cipherBtn--hint {
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
   font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.12em;
-  height: 42px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  height: 38px;
+  border-radius: 0 !important;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cipherBtn--hint:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: #ef4444;
+}
+
+.cipherBtn--back {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  height: 36px;
+  border-radius: 0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
   transition: all 0.2s ease;
   width: 100%;
@@ -567,21 +667,36 @@ body.cipher-locked canvas {
   justify-content: center;
 }
 .cipherBtn--back:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
 }
 
-.cipherHint {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.38);
-  letter-spacing: 0.08em;
-  margin-top: 18px;
-  font-family: 'Inter', sans-serif;
+.cipherHintBox {
+  margin-top: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 12px 14px;
+  text-align: left;
+  border-radius: 0 !important;
+  animation: cipherFadeIn 0.25s ease;
 }
-.cipherHint code {
-  color: #f87171;
-  font-family: ui-monospace, monospace;
+.cipherHintBox[hidden] {
+  display: none !important;
+}
+.cipherHintList {
+  margin: 0;
+  padding: 0 0 0 16px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 11px;
+  line-height: 1.8;
+  letter-spacing: 0.06em;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.cipherHintList li::marker {
+  color: #ef4444;
 }
 
 /* ==========================================================================
@@ -608,6 +723,20 @@ body.cipher-locked canvas {
     -webkit-text-stroke: 5.5px #ffffff;
   }
   
+  /* 3F アトム吹き出しの画面端はみ出し防止 */
+  .atomBubble {
+    left: auto !important;
+    right: 0 !important;
+    transform: none !important;
+    font-size: 11px !important;
+    padding: 6px 10px !important;
+  }
+  .atomBubbleArrow {
+    left: auto !important;
+    right: 18px !important;
+    transform: none !important;
+  }
+
   /* Mobile rail (枠の二重化を完全排除、ボタン単体の枠のみ) */
   .lab__rail {
     right: 8px !important;

@@ -62,6 +62,7 @@
     stage.dataset.state = s;
     stage.dataset.floor = String(cur);
     lab.dataset.stage = s === 'hero' ? '0' : (s === 'floor' ? String(cur + 1) : 'L');
+    if (typeof updateAtomVisibility === 'function') updateAtomVisibility();
   }
 
   const setDip = on => dip.classList.toggle('is-on', on);
@@ -97,7 +98,11 @@
     try { await img.decode(); } catch (e) { /* ignore */ }
   }
 
-  const setPos = f => [plate, dollyLayer].forEach(l => l.style.setProperty('--pos', f.pos || '50% 50%'));
+  const getFloorPos = f => {
+    if (f.key === 'lp' && window.innerWidth <= 768) return '66% 50%';
+    return f.pos || '50% 50%';
+  };
+  const setPos = f => [plate, dollyLayer].forEach(l => l.style.setProperty('--pos', getFloorPos(f)));
 
   /* ---------------- Lobby Sequence (Canvas Scrubbing) ---------------- */
   const seq = { imgs: new Array(SEQ_COUNT), ok: new Array(SEQ_COUNT).fill(false), end: new Image(), endOk: false, q: 0, qt: 0, started: false, auto: false, raf: 0, last: 0, dirty: true };
@@ -402,6 +407,7 @@
       plate.classList.remove('is-end');
       clearClip(dolly);
       dollyLayer.classList.remove('is-on');
+      updateAtomVisibility();
     };
 
     const loadPlates = () => Promise.all([
@@ -449,6 +455,7 @@
     showPortal(i);
     setRail(i);
     busy = false;
+    updateAtomVisibility();
     if (usedKeyboard) setTimeout(() => portalLink.focus({ preventScroll: true }), 400);
   }
 
@@ -462,7 +469,7 @@
 
   // Click background to instantly jump to end of video, or navigate to floor page if already on end frame
   stage.addEventListener('click', e => {
-    if (state === 'floor' && !e.target.closest('button,a,.contactLayer,.cipherModal')) {
+    if (state === 'floor' && !e.target.closest('button,a,.contactLayer,.cipherModal,.atomDollWrap')) {
       if (dolly && !dolly.paused) {
         try { dolly.currentTime = dolly.duration || 999; } catch (e) {}
       } else {
@@ -559,18 +566,93 @@
 
   window.addEventListener('pointerdown', () => { usedKeyboard = false; }, { passive: true });
 
-  /* ---------------- B???F Cipher Modal (Passロック認証アプリ) ---------------- */
+  /* ---------------- 3F アトム人形インタラクション (ボブルヘッド & keyword表示) ---------------- */
+  const atomLayer = document.getElementById('atomLayer');
+  const atomDollWrap = document.getElementById('atomDollWrap');
+  const atomDoll = document.getElementById('atomDoll');
+  const atomBubble = document.getElementById('atomBubble');
+
+  function updateAtomDollPosition() {
+    if (!atomDollWrap) return;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const imgRatio = 1920 / 1080;
+    const screenRatio = vw / vh;
+    const posX = (vw <= 768) ? 0.66 : 0.50;
+    const posY = 0.50;
+    let renderW, renderH, offsetX, offsetY;
+
+    if (screenRatio > imgRatio) {
+      renderW = vw;
+      renderH = vw / imgRatio;
+      offsetX = 0;
+      offsetY = (vh - renderH) * posY;
+    } else {
+      renderH = vh;
+      renderW = vh * imgRatio;
+      offsetX = (vw - renderW) * posX;
+      offsetY = 0;
+    }
+
+    // Atom doll exact coordinates in 1920x1080 plate: left=1246, top=608, width=89, height=152
+    const dollLeft = offsetX + (1246 + 89 / 2) / 1920 * renderW;
+    const dollTop = offsetY + (608 + 152 / 2) / 1080 * renderH;
+    const dollW = (89 / 1920) * renderW;
+    const dollH = (152 / 1080) * renderH;
+
+    atomDollWrap.style.left = `${dollLeft}px`;
+    atomDollWrap.style.top = `${dollTop}px`;
+    atomDollWrap.style.width = `${dollW}px`;
+    atomDollWrap.style.height = `${dollH}px`;
+  }
+
+  function updateAtomVisibility() {
+    if (!atomLayer) return;
+    // 3F (LP floor) is cur === 2, only visible when arrived at the desk end plate
+    if (state === 'floor' && cur === 2 && plate && plate.classList.contains('is-end')) {
+      atomLayer.hidden = false;
+      updateAtomDollPosition();
+    } else {
+      atomLayer.hidden = true;
+      if (atomBubble) atomBubble.hidden = true;
+    }
+  }
+
+  if (atomDollWrap) {
+    atomDollWrap.addEventListener('click', e => {
+      e.stopPropagation(); // MUST NOT navigate away to LP link
+      if (atomDoll) {
+        atomDoll.classList.remove('is-bobbling');
+        void atomDoll.offsetWidth;
+        atomDoll.classList.add('is-bobbling');
+      }
+      if (atomBubble) {
+        atomBubble.hidden = false;
+      }
+    });
+  }
+
+  window.addEventListener('resize', () => {
+    if (state === 'floor') {
+      const f = FLOORS[cur];
+      if (f) setPos(f);
+      if (cur === 2) updateAtomDollPosition();
+    }
+  }, { passive: true });
+
+  /* ---------------- B???F Cipher Modal (Passロック認証アプリ / 赤・角R全廃・3D回転パーティクル) ---------------- */
   let unlockedSecret = false;
   const cipherModal = document.getElementById('cipherModal');
   const cipherApp = document.getElementById('cipherApp');
   const cipherInput = document.getElementById('cipherInput');
   const cipherForm = document.getElementById('cipherForm');
   const cipherSubmit = document.getElementById('cipherSubmit');
+  const cipherHintBtn = document.getElementById('cipherHintBtn');
+  const cipherHintBox = document.getElementById('cipherHintBox');
   const cipherCancel = document.getElementById('cipherCancel');
-  const cipherStatus = document.getElementById('cipherStatus');
   const hexCanvas = document.getElementById('cipherHexCanvas');
 
-  // Hexagonal Dot Matrix Visual Engine (ref: Pinterest ref_pin2)
+  // 3D Rotating Particle Matrix Engine (ref: https://pin.it/1yQaf6x8L)
   let hexAnimId = null;
   let hexState = 'idle'; // 'idle' | 'error' | 'unlock'
   let unlockStartTime = 0;
@@ -590,91 +672,104 @@
 
     const cx = w / 2;
     const cy = h / 2;
-    const spacing = 14;
-    const hexR = 4;
-    const dots = [];
 
-    for (let q = -hexR; q <= hexR; q++) {
-      const r1 = Math.max(-hexR, -q - hexR);
-      const r2 = Math.min(hexR, -q + hexR);
-      for (let r = r1; r <= r2; r++) {
-        const x = cx + spacing * (Math.sqrt(3) * q + (Math.sqrt(3) / 2) * r);
-        const y = cy + spacing * (1.5 * r);
-        const dist = Math.hypot(x - cx, y - cy);
-        dots.push({ x, y, dist, q, r });
+    // Generate 3D isometric particle cube/lattice (5x5x5 dots in 3D space)
+    const points = [];
+    const span = 2;
+    const step = 15;
+    for (let x = -span; x <= span; x++) {
+      for (let y = -span; y <= span; y++) {
+        for (let z = -span; z <= span; z++) {
+          const dist = Math.hypot(x, y, z);
+          // Keep spherical bounds to match Pinterest galaxy/spherical dot lattice
+          if (dist <= span + 0.4) {
+            points.push({
+              x: x * step,
+              y: y * step,
+              z: z * step,
+              dist: dist * step
+            });
+          }
+        }
       }
     }
+
+    let yaw = 0;
 
     function render(time) {
       ctx.clearRect(0, 0, w, h);
 
-      // Draw subtle lattice lines between immediate neighbors
-      ctx.lineWidth = 0.75;
-      for (let i = 0; i < dots.length; i++) {
-        const p1 = dots[i];
-        for (let j = i + 1; j < dots.length; j++) {
-          const p2 = dots[j];
-          const d = Math.hypot(p1.x - p2.x, p1.y - p2.y);
-          if (d > spacing * 0.9 && d < spacing * 1.15) {
-            let lineAlpha = 0.08;
-            if (hexState === 'error') {
-              ctx.strokeStyle = 'rgba(239, 68, 68, 0.2)';
-            } else if (hexState === 'unlock') {
-              ctx.strokeStyle = 'rgba(34, 197, 94, 0.25)';
-            } else {
-              ctx.strokeStyle = `rgba(255, 255, 255, ${lineAlpha})`;
-            }
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.stroke();
-          }
-        }
-      }
+      yaw += 0.016;
+      const pitch = 0.52 + 0.16 * Math.sin(time * 0.0012);
+      const cosY = Math.cos(yaw), sinY = Math.sin(yaw);
+      const cosP = Math.cos(pitch), sinP = Math.sin(pitch);
 
-      // Render dots
+      // Transform & project points with 3D rotation
+      const projected = [];
       const elapsedUnlock = hexState === 'unlock' ? (time - unlockStartTime) : 0;
-      const shockwaveR = elapsedUnlock * 0.16;
+      const shockwaveR = elapsedUnlock * 0.22;
 
-      dots.forEach(d => {
-        let alpha = 0.35 + 0.25 * Math.sin(time * 0.003 - d.dist * 0.04);
-        let dotR = 2.0;
-        let color = 'rgba(255, 255, 255, ';
+      for (let i = 0; i < points.length; i++) {
+        const p = points[i];
+        // Rotate around Y
+        const x1 = p.x * cosY + p.z * sinY;
+        const z1 = -p.x * sinY + p.z * cosY;
+        // Rotate around X (pitch)
+        const y1 = p.y * cosP - z1 * sinP;
+        const z2 = p.y * sinP + z1 * cosP;
 
+        // Perspective projection
+        const fov = 190;
+        const scale = fov / (fov + z2 + 75);
+        let px = cx + x1 * scale;
+        let py = cy + y1 * scale;
+
+        // Jitter on error
         if (hexState === 'error') {
           const errElapsed = time - errorStartTime;
           if (errElapsed < 600) {
-            color = 'rgba(239, 68, 68, ';
-            alpha = 0.6 + 0.3 * Math.sin(time * 0.02);
-            dotR = 2.4;
+            px += (Math.random() - 0.5) * 4;
+            py += (Math.random() - 0.5) * 4;
           } else {
             hexState = 'idle';
           }
-        } else if (hexState === 'unlock') {
+        }
+
+        projected.push({
+          px,
+          py,
+          z: z2,
+          scale,
+          dist: p.dist
+        });
+      }
+
+      // Depth sort for authentic 3D occlusion
+      projected.sort((a, b) => a.z - b.z);
+
+      // Render dots in sharp red
+      projected.forEach(d => {
+        let alpha = Math.max(0.18, Math.min(1.0, (d.z + 55) / 100));
+        let dotR = Math.max(1.1, 2.2 * d.scale);
+        let color = 'rgba(239, 68, 68, ';
+
+        if (hexState === 'unlock') {
           const waveDist = Math.abs(d.dist - shockwaveR);
           if (waveDist < 20) {
             const glow = 1 - waveDist / 20;
-            color = 'rgba(34, 197, 94, ';
-            alpha = Math.min(1, 0.4 + glow * 0.6);
-            dotR = 2.0 + glow * 2.2;
+            color = 'rgba(255, 255, 255, ';
+            alpha = Math.min(1, 0.6 + glow * 0.4);
+            dotR = dotR * (1.2 + glow * 1.5);
           } else if (d.dist < shockwaveR) {
-            color = 'rgba(74, 222, 128, ';
-            alpha = 0.85;
-            dotR = 2.2;
+            color = 'rgba(239, 68, 68, ';
+            alpha = 0.9;
           }
         }
 
         ctx.fillStyle = `${color}${alpha})`;
         ctx.beginPath();
-        ctx.arc(d.x, d.y, dotR, 0, Math.PI * 2);
+        ctx.arc(d.px, d.py, dotR, 0, Math.PI * 2);
         ctx.fill();
-
-        if (dotR > 2.8) {
-          ctx.fillStyle = `${color}${alpha * 0.35})`;
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, dotR * 1.8, 0, Math.PI * 2);
-          ctx.fill();
-        }
       });
 
       if (!cipherModal.hidden) {
@@ -703,10 +798,7 @@
     cipherModal.hidden = false;
     cipherModal.style.opacity = '1';
     hexState = 'idle';
-    if (cipherStatus) {
-      cipherStatus.textContent = 'KEYWORD REQUIRED';
-      cipherStatus.className = 'cipherStatus';
-    }
+    if (cipherHintBox) cipherHintBox.hidden = true;
     if (cipherSubmit) {
       cipherSubmit.textContent = '認証';
       cipherSubmit.className = 'cipherBtn cipherBtn--auth';
@@ -734,10 +826,6 @@
     hexState = 'unlock';
     unlockStartTime = performance.now();
 
-    if (cipherStatus) {
-      cipherStatus.textContent = 'ACCESS GRANTED / 解除完了';
-      cipherStatus.className = 'cipherStatus is-unlocked';
-    }
     if (cipherSubmit) {
       cipherSubmit.textContent = '解除完了 ✓';
       cipherSubmit.className = 'cipherBtn cipherBtn--auth is-unlocked';
@@ -748,7 +836,7 @@
       cipherInput.disabled = true;
     }
 
-    // Authentic App Unlock completion display (850ms pause to clearly show success state)
+    // Authentic App Unlock completion display (850ms pause to show red shockwave and success)
     setTimeout(() => {
       cipherModal.style.transition = 'opacity 0.35s ease';
       cipherModal.style.opacity = '0';
@@ -762,18 +850,10 @@
   function handleCipherError() {
     hexState = 'error';
     errorStartTime = performance.now();
-    if (cipherStatus) {
-      cipherStatus.textContent = 'ACCESS DENIED';
-      cipherStatus.className = 'cipherStatus is-denied';
-    }
     if (cipherInput) {
       cipherInput.classList.add('is-error');
       setTimeout(() => {
         cipherInput.classList.remove('is-error');
-        if (cipherStatus && hexState !== 'unlock') {
-          cipherStatus.textContent = 'KEYWORD REQUIRED';
-          cipherStatus.className = 'cipherStatus';
-        }
       }, 750);
     }
   }
@@ -781,12 +861,19 @@
   if (cipherForm) {
     cipherForm.addEventListener('submit', e => {
       e.preventDefault();
-      const val = (cipherInput.value || '').trim().toLowerCase();
-      if (val === 'cenotaph' || val === 'セノタフ' || val === 'teshima' || val === 'lab') {
+      const val = (cipherInput.value || '').trim().replace(/\s+/g, '').toLowerCase();
+      // Correct password: ハングリーアート
+      if (val === 'ハングリーアート' || val === 'hungryart' || val === 'hungry-art' || val === 'hungry_art') {
         handleCipherUnlock();
       } else {
         handleCipherError();
       }
+    });
+  }
+
+  if (cipherHintBtn && cipherHintBox) {
+    cipherHintBtn.addEventListener('click', () => {
+      cipherHintBox.hidden = !cipherHintBox.hidden;
     });
   }
 
@@ -796,13 +883,13 @@
 
   // Intercept background interaction completely during modal display
   if (cipherModal) {
-    cipherModal.addEventListener('click', e => {
-      if (e.target === cipherModal) closeCipherModal();
-    });
-
-    ['wheel', 'touchmove', 'pointerdown'].forEach(ev => {
+    // Backdrop clicks do NOT close modal; outside modal is completely inert
+    ['wheel', 'touchmove', 'pointerdown', 'click'].forEach(ev => {
       cipherModal.addEventListener(ev, e => {
-        e.stopPropagation();
+        if (e.target === cipherModal) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
       }, { passive: false });
     });
   }
