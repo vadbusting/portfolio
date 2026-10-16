@@ -559,33 +559,223 @@
 
   window.addEventListener('pointerdown', () => { usedKeyboard = false; }, { passive: true });
 
-  /* ---------------- B1F Cipher Modal ---------------- */
+  /* ---------------- B???F Cipher Modal (Passロック認証アプリ) ---------------- */
   let unlockedSecret = false;
   const cipherModal = document.getElementById('cipherModal');
+  const cipherApp = document.getElementById('cipherApp');
   const cipherInput = document.getElementById('cipherInput');
   const cipherForm = document.getElementById('cipherForm');
-  const cipherBypass = document.getElementById('cipherBypass');
+  const cipherSubmit = document.getElementById('cipherSubmit');
   const cipherCancel = document.getElementById('cipherCancel');
+  const cipherStatus = document.getElementById('cipherStatus');
+  const hexCanvas = document.getElementById('cipherHexCanvas');
+
+  // Hexagonal Dot Matrix Visual Engine (ref: Pinterest ref_pin2)
+  let hexAnimId = null;
+  let hexState = 'idle'; // 'idle' | 'error' | 'unlock'
+  let unlockStartTime = 0;
+  let errorStartTime = 0;
+
+  function initHexCanvas() {
+    if (!hexCanvas) return;
+    const ctx = hexCanvas.getContext('2d');
+    if (!ctx) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = 180;
+    const h = 180;
+    hexCanvas.width = w * dpr;
+    hexCanvas.height = h * dpr;
+    ctx.scale(dpr, dpr);
+
+    const cx = w / 2;
+    const cy = h / 2;
+    const spacing = 14;
+    const hexR = 4;
+    const dots = [];
+
+    for (let q = -hexR; q <= hexR; q++) {
+      const r1 = Math.max(-hexR, -q - hexR);
+      const r2 = Math.min(hexR, -q + hexR);
+      for (let r = r1; r <= r2; r++) {
+        const x = cx + spacing * (Math.sqrt(3) * q + (Math.sqrt(3) / 2) * r);
+        const y = cy + spacing * (1.5 * r);
+        const dist = Math.hypot(x - cx, y - cy);
+        dots.push({ x, y, dist, q, r });
+      }
+    }
+
+    function render(time) {
+      ctx.clearRect(0, 0, w, h);
+
+      // Draw subtle lattice lines between immediate neighbors
+      ctx.lineWidth = 0.75;
+      for (let i = 0; i < dots.length; i++) {
+        const p1 = dots[i];
+        for (let j = i + 1; j < dots.length; j++) {
+          const p2 = dots[j];
+          const d = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+          if (d > spacing * 0.9 && d < spacing * 1.15) {
+            let lineAlpha = 0.08;
+            if (hexState === 'error') {
+              ctx.strokeStyle = 'rgba(239, 68, 68, 0.2)';
+            } else if (hexState === 'unlock') {
+              ctx.strokeStyle = 'rgba(34, 197, 94, 0.25)';
+            } else {
+              ctx.strokeStyle = `rgba(255, 255, 255, ${lineAlpha})`;
+            }
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Render dots
+      const elapsedUnlock = hexState === 'unlock' ? (time - unlockStartTime) : 0;
+      const shockwaveR = elapsedUnlock * 0.16;
+
+      dots.forEach(d => {
+        let alpha = 0.35 + 0.25 * Math.sin(time * 0.003 - d.dist * 0.04);
+        let dotR = 2.0;
+        let color = 'rgba(255, 255, 255, ';
+
+        if (hexState === 'error') {
+          const errElapsed = time - errorStartTime;
+          if (errElapsed < 600) {
+            color = 'rgba(239, 68, 68, ';
+            alpha = 0.6 + 0.3 * Math.sin(time * 0.02);
+            dotR = 2.4;
+          } else {
+            hexState = 'idle';
+          }
+        } else if (hexState === 'unlock') {
+          const waveDist = Math.abs(d.dist - shockwaveR);
+          if (waveDist < 20) {
+            const glow = 1 - waveDist / 20;
+            color = 'rgba(34, 197, 94, ';
+            alpha = Math.min(1, 0.4 + glow * 0.6);
+            dotR = 2.0 + glow * 2.2;
+          } else if (d.dist < shockwaveR) {
+            color = 'rgba(74, 222, 128, ';
+            alpha = 0.85;
+            dotR = 2.2;
+          }
+        }
+
+        ctx.fillStyle = `${color}${alpha})`;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, dotR, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (dotR > 2.8) {
+          ctx.fillStyle = `${color}${alpha * 0.35})`;
+          ctx.beginPath();
+          ctx.arc(d.x, d.y, dotR * 1.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      if (!cipherModal.hidden) {
+        hexAnimId = requestAnimationFrame(render);
+      }
+    }
+
+    if (hexAnimId) cancelAnimationFrame(hexAnimId);
+    hexAnimId = requestAnimationFrame(render);
+  }
+
+  function startHexAnim() {
+    initHexCanvas();
+  }
+
+  function stopHexAnim() {
+    if (hexAnimId) {
+      cancelAnimationFrame(hexAnimId);
+      hexAnimId = null;
+    }
+  }
 
   function openCipherModal() {
     if (!cipherModal) return;
+    document.body.classList.add('cipher-locked');
     cipherModal.hidden = false;
+    cipherModal.style.opacity = '1';
+    hexState = 'idle';
+    if (cipherStatus) {
+      cipherStatus.textContent = 'KEYWORD REQUIRED';
+      cipherStatus.className = 'cipherStatus';
+    }
+    if (cipherSubmit) {
+      cipherSubmit.textContent = '認証';
+      cipherSubmit.className = 'cipherBtn cipherBtn--auth';
+      cipherSubmit.disabled = false;
+    }
     if (cipherInput) {
       cipherInput.value = '';
-      cipherInput.classList.remove('is-error');
-      setTimeout(() => cipherInput.focus(), 60);
+      cipherInput.className = 'cipherInput';
+      cipherInput.disabled = false;
+      setTimeout(() => cipherInput.focus(), 80);
     }
+    startHexAnim();
   }
 
   function closeCipherModal() {
     if (!cipherModal) return;
+    document.body.classList.remove('cipher-locked');
     cipherModal.hidden = true;
+    cipherModal.style.opacity = '';
+    stopHexAnim();
   }
 
   function handleCipherUnlock() {
     unlockedSecret = true;
-    closeCipherModal();
-    jump(5); // Jump to B1F (index 5)
+    hexState = 'unlock';
+    unlockStartTime = performance.now();
+
+    if (cipherStatus) {
+      cipherStatus.textContent = 'ACCESS GRANTED / 解除完了';
+      cipherStatus.className = 'cipherStatus is-unlocked';
+    }
+    if (cipherSubmit) {
+      cipherSubmit.textContent = '解除完了 ✓';
+      cipherSubmit.className = 'cipherBtn cipherBtn--auth is-unlocked';
+      cipherSubmit.disabled = true;
+    }
+    if (cipherInput) {
+      cipherInput.className = 'cipherInput is-unlocked';
+      cipherInput.disabled = true;
+    }
+
+    // Authentic App Unlock completion display (850ms pause to clearly show success state)
+    setTimeout(() => {
+      cipherModal.style.transition = 'opacity 0.35s ease';
+      cipherModal.style.opacity = '0';
+      setTimeout(() => {
+        closeCipherModal();
+        jump(5); // Transition to B???F (Floor index 5)
+      }, 350);
+    }, 850);
+  }
+
+  function handleCipherError() {
+    hexState = 'error';
+    errorStartTime = performance.now();
+    if (cipherStatus) {
+      cipherStatus.textContent = 'ACCESS DENIED';
+      cipherStatus.className = 'cipherStatus is-denied';
+    }
+    if (cipherInput) {
+      cipherInput.classList.add('is-error');
+      setTimeout(() => {
+        cipherInput.classList.remove('is-error');
+        if (cipherStatus && hexState !== 'unlock') {
+          cipherStatus.textContent = 'KEYWORD REQUIRED';
+          cipherStatus.className = 'cipherStatus';
+        }
+      }, 750);
+    }
   }
 
   if (cipherForm) {
@@ -595,15 +785,8 @@
       if (val === 'cenotaph' || val === 'セノタフ' || val === 'teshima' || val === 'lab') {
         handleCipherUnlock();
       } else {
-        cipherInput.classList.add('is-error');
-        setTimeout(() => cipherInput.classList.remove('is-error'), 450);
+        handleCipherError();
       }
-    });
-  }
-
-  if (cipherBypass) {
-    cipherBypass.addEventListener('click', () => {
-      handleCipherUnlock();
     });
   }
 
@@ -611,11 +794,24 @@
     cipherCancel.addEventListener('click', closeCipherModal);
   }
 
+  // Intercept background interaction completely during modal display
   if (cipherModal) {
     cipherModal.addEventListener('click', e => {
       if (e.target === cipherModal) closeCipherModal();
     });
+
+    ['wheel', 'touchmove', 'pointerdown'].forEach(ev => {
+      cipherModal.addEventListener(ev, e => {
+        e.stopPropagation();
+      }, { passive: false });
+    });
   }
+
+  window.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && cipherModal && !cipherModal.hidden) {
+      closeCipherModal();
+    }
+  });
 
   rail.addEventListener('click', e => {
     const b = e.target.closest('button');

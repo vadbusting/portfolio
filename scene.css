@@ -289,11 +289,11 @@ html, body {
   pointer-events: auto;
 }
 
-/* OPEN PAGE と完全に同質のシックなボタン（カラフル排除・モノトーン世界観統一） */
+/* OPEN PAGE と完全に同質のシックなボタン（内枠完全排除・シングルボックス・ホバー移動ゼロ） */
 .lab__rail button {
   background: rgba(30, 27, 24, 0.65) !important;
-  border: 1px solid rgba(255, 255, 255, 0.45) !important;
-  padding: 9px 16px !important;
+  border: 1px solid rgba(255, 255, 255, 0.55) !important;
+  padding: 8px 14px !important;
   border-radius: 0 !important;
   display: flex !important;
   align-items: center !important;
@@ -301,47 +301,53 @@ html, body {
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   cursor: pointer !important;
-  transition: background 0.25s, border-color 0.25s, transform 0.25s !important;
+  transition: background 0.25s, border-color 0.25s !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
   color: #ffffff !important;
+  transform: none !important;
+}
+.lab__rail button:before {
+  display: none !important;
+  content: none !important;
 }
 .lab__rail button span {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace !important;
   font-size: 11px !important;
   font-weight: 700 !important;
-  letter-spacing: 0.12em !important;
-  padding: 3px 6px !important;
+  letter-spacing: 0.1em !important;
+  padding: 0 !important;
   color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  background: transparent !important;
+  border: none !important;
   border-radius: 0 !important;
 }
 .lab__rail button b {
-  font-size: 11px !important;
-  font-weight: 500 !important;
+  font-size: 10px !important;
+  font-weight: 400 !important;
   letter-spacing: 0.16em !important;
   color: #ffffff !important;
   text-transform: uppercase;
 }
 
-/* Hover: OPEN PAGE と同じウォームダークトーン＆白縁強調 */
+/* Hover: OPEN PAGE と完全に同じ（位置は一切動かさない） */
 .lab__rail button:hover {
   background: rgba(60, 48, 38, 0.85) !important;
   border-color: rgba(255, 255, 255, 0.85) !important;
-  transform: translateX(-4px) !important;
+  transform: none !important;
 }
 
-/* Active State */
+/* Active State: ハイライトのみ（位置は一切動かさない） */
 .lab__rail button.is-active {
   background: rgba(60, 48, 38, 0.95) !important;
   border-color: #ffffff !important;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2) !important;
-  transform: translateX(-8px) !important;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.2) !important;
+  transform: none !important;
+}
+.lab__rail button.is-active:before {
+  display: none !important;
 }
 .lab__rail button.is-active span {
-  background: #ffffff !important;
-  color: #111111 !important;
-  border-color: #ffffff !important;
+  color: #ffffff !important;
 }
 
 /* サムネイル領域の直押し遷移カーソル */
@@ -350,133 +356,228 @@ html, body {
   cursor: pointer;
 }
 
-/* --- B1F 暗号認証モーダル --- */
+/* --- モーダル表示時の背景完全ロック --- */
+body.cipher-locked {
+  overflow: hidden !important;
+  touch-action: none !important;
+}
+body.cipher-locked .stage > *:not(#cipherModal),
+body.cipher-locked .lab > *:not(#cipherModal),
+body.cipher-locked nav,
+body.cipher-locked aside,
+body.cipher-locked header,
+body.cipher-locked canvas {
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+/* --- 暗号式Passロック解除モーダル (サイト内アプリUI / ref: pin.it/1pHr4ikHh & pin.it/1yQaf6x8L) --- */
 .cipherModal {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: rgba(6, 8, 12, 0.85);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  animation: cipherFadeIn 0.25s ease-out;
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 100000 !important;
+  background: rgba(0, 0, 0, 0.92) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+  box-sizing: border-box !important;
+  pointer-events: auto !important;
+  animation: cipherFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .cipherModal[hidden] {
   display: none !important;
 }
 @keyframes cipherFadeIn {
-  from { opacity: 0; transform: scale(0.97); }
-  to { opacity: 1; transform: scale(1); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-.cipherBox {
-  width: min(440px, 92vw);
-  background: #11141c;
-  border: 1px solid rgba(248, 113, 113, 0.4);
-  border-radius: 8px;
-  padding: 28px 24px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(248, 113, 113, 0.15);
-  color: #fff;
+
+.cipherApp {
+  width: min(350px, 88vw);
+  max-width: 350px;
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 36px;
+  padding: 32px 26px 26px;
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.98), 0 0 50px rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  animation: cipherAppPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.cipherBadge {
+@keyframes cipherAppPop {
+  from { opacity: 0; transform: scale(0.93) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ヘキサゴンドットマトリクス演出 (ref_pin2) */
+.cipherHexWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  width: 100%;
+}
+#cipherHexCanvas {
+  width: 160px;
+  height: 160px;
+  display: block;
+}
+.cipherStatus {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  color: #f87171;
-  margin-bottom: 10px;
-}
-.cipherTitle {
-  font-size: 20px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  margin: 0 0 8px;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 6px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
 }
-.cipherDesc {
+.cipherStatus.is-unlocked {
+  color: #22c55e !important;
+  text-shadow: 0 0 14px rgba(34, 197, 94, 0.7);
+}
+.cipherStatus.is-denied {
+  color: #ef4444 !important;
+  text-shadow: 0 0 14px rgba(239, 68, 68, 0.7);
+}
+
+/* フォーム構造 (Keyword:, 認証, 戻る, ヒント のみ) */
+.cipherForm {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.cipherField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  width: 100%;
+}
+.cipherLabel {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.65);
-  margin: 0 0 20px;
-  line-height: 1.5;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #ffffff;
+  text-transform: uppercase;
+  font-family: 'Inter', sans-serif;
+  margin-left: 4px;
 }
 .cipherInput {
   width: 100%;
   box-sizing: border-box;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 4px;
-  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  height: 46px;
+  padding: 0 16px;
+  color: #ffffff;
   font-family: ui-monospace, monospace;
-  font-size: 15px;
-  padding: 12px 14px;
+  font-size: 14px;
   text-align: center;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: all 0.25s ease;
 }
 .cipherInput:focus {
-  border-color: #f87171;
-  box-shadow: 0 0 12px rgba(248, 113, 113, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #ffffff;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
 }
 .cipherInput.is-error {
-  border-color: #ef4444;
-  box-shadow: 0 0 16px rgba(239, 68, 68, 0.7);
+  border-color: #ef4444 !important;
+  color: #ef4444 !important;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.5) !important;
   animation: cipherShake 0.4s ease;
+}
+.cipherInput.is-unlocked {
+  border-color: #22c55e !important;
+  color: #22c55e !important;
+  background: rgba(34, 197, 94, 0.1) !important;
+  box-shadow: 0 0 24px rgba(34, 197, 94, 0.5) !important;
 }
 @keyframes cipherShake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-6px); }
   75% { transform: translateX(6px); }
 }
+
 .cipherActions {
   display: flex;
-  gap: 8px;
-  margin-top: 18px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  margin-top: 4px;
 }
-.cipherBtn {
-  flex: 1;
-  min-width: 100px;
-  padding: 10px 12px;
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  border-radius: 4px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.cipherBtn--submit {
-  background: #f87171;
-  color: #000;
+.cipherBtn--auth {
+  background: #ffffff;
+  color: #000000;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
   font-weight: 700;
+  letter-spacing: 0.12em;
+  height: 46px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.cipherBtn--submit:hover {
-  background: #ef4444;
-  box-shadow: 0 0 14px rgba(239, 68, 68, 0.6);
+.cipherBtn--auth:hover {
+  opacity: 0.9;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
 }
-.cipherBtn--bypass {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: #fff;
+.cipherBtn--auth.is-unlocked {
+  background: #22c55e !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 24px rgba(34, 197, 94, 0.6) !important;
 }
-.cipherBtn--bypass:hover {
-  background: rgba(255, 255, 255, 0.18);
+
+.cipherBtn--back {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.85);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cipherBtn--back:hover {
+  background: rgba(255, 255, 255, 0.15);
   border-color: rgba(255, 255, 255, 0.4);
+  color: #ffffff;
 }
-.cipherBtn--cancel {
-  background: transparent;
-  border-color: rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.6);
-}
-.cipherBtn--cancel:hover {
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.3);
-}
+
 .cipherHint {
-  margin-top: 14px;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.45);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.38);
+  letter-spacing: 0.08em;
+  margin-top: 18px;
+  font-family: 'Inter', sans-serif;
 }
 .cipherHint code {
   color: #f87171;
@@ -507,19 +608,20 @@ html, body {
     -webkit-text-stroke: 5.5px #ffffff;
   }
   
-  /* Floating pill dock for mobile rail */
+  /* Mobile rail (枠の二重化を完全排除、ボタン単体の枠のみ) */
   .lab__rail {
     right: 8px !important;
     top: auto !important;
     bottom: 16px !important;
     transform: none !important;
-    padding: 6px 4px !important;
-    background: rgba(12, 14, 20, 0.82) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    border-radius: 20px !important;
-    border: 1px solid rgba(255, 255, 255, 0.14) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65) !important;
+    padding: 0 !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    gap: 6px !important;
   }
   .lab__rail button {
     padding: 6px 8px !important;
