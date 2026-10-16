@@ -172,7 +172,7 @@ html, body {
   font-weight: 900;
   font-size: clamp(3.5rem, 13vw, 13rem);
   line-height: 0.9;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.048em;
   color: #000000;
   -webkit-text-stroke: 9px #ffffff;
   paint-order: stroke fill;
@@ -186,6 +186,7 @@ html, body {
   display: inline-block;
   clip-path: polygon(-30% 6.5%, 130% 6.5%, 130% 93.5%, -30% 93.5%);
 }
+.cenotaph__prefix,
 .cenotaph__for {
   display: block;
   font-family: "Cormorant Garamond", "Baskerville", "Libre Baskerville", "Didot", "Times New Roman", serif;
@@ -194,9 +195,14 @@ html, body {
   font-weight: 300;
   letter-spacing: 0.06em;
   color: #ffffff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95);
+}
+.cenotaph__prefix {
+  margin-bottom: clamp(0.1rem, 0.4vw, 0.6rem);
+}
+.cenotaph__for {
   margin-top: clamp(-0.4rem, -0.8vw, -0.1rem);
   transform: translateY(-4px);
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95);
 }
 
 /* --- 画面最下段の SCROLL Cue --- */
@@ -469,14 +475,20 @@ html, body {
   .cenotaph {
     width: 96vw;
   }
-  .cenotaph__title {
-    font-size: clamp(2.4rem, 11.5vw, 4.8rem);
-    letter-spacing: -0.035em;
-    -webkit-text-stroke: 5.5px #ffffff;
-  }
+  .cenotaph__prefix,
   .cenotaph__for {
     font-size: clamp(1.4rem, 4.5vw, 2rem);
+  }
+  .cenotaph__prefix {
+    margin-bottom: 0.1rem;
+  }
+  .cenotaph__for {
     margin-top: -0.2rem;
+  }
+  .cenotaph__title {
+    font-size: clamp(2.4rem, 11.5vw, 4.8rem);
+    letter-spacing: -0.04em;
+    -webkit-text-stroke: 5.5px #ffffff;
   }
   
   /* Floating pill dock for mobile rail */
