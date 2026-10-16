@@ -388,6 +388,10 @@
   async function goFloor(i, opts) {
     opts = opts || {};
     if (i < 0 || i >= FLOORS.length) return;
+    if (i === 5 && !unlockedSecret) {
+      openCipherModal();
+      return;
+    }
     if (i === 0) return goLobbyEnd();
     if (busy && !opts.force) return;
 
@@ -461,6 +465,10 @@
 
   function jump(i) {
     if (i === cur) return;
+    if (i === 5 && !unlockedSecret) {
+      openCipherModal();
+      return;
+    }
     token++;
     stopClip(dolly);
     busy = false;
@@ -673,25 +681,33 @@
     const cx = w / 2;
     const cy = h / 2;
 
-    // Generate 3D isometric particle cube/lattice (5x5x5 dots in 3D space)
+    // 3D Morphing Particles: Sphere (丸) <---> Cube (立方体) (ref: https://pin.it/1yQaf6x8L)
     const points = [];
-    const span = 2;
-    const step = 15;
-    for (let x = -span; x <= span; x++) {
-      for (let y = -span; y <= span; y++) {
-        for (let z = -span; z <= span; z++) {
-          const dist = Math.hypot(x, y, z);
-          // Keep spherical bounds to match Pinterest galaxy/spherical dot lattice
-          if (dist <= span + 0.4) {
-            points.push({
-              x: x * step,
-              y: y * step,
-              z: z * step,
-              dist: dist * step
-            });
-          }
-        }
-      }
+    const N = 216;
+    const phi = (1 + Math.sqrt(5)) / 2;
+    const sphereRadius = 40;
+    const cubeHalf = 32;
+
+    for (let i = 0; i < N; i++) {
+      // Fibonacci sphere distribution for uniform sphere surface
+      const y = 1 - (i / (N - 1)) * 2;
+      const radiusAtY = Math.sqrt(1 - y * y);
+      const theta = 2 * Math.PI * i / phi;
+      const x = Math.cos(theta) * radiusAtY;
+      const z = Math.sin(theta) * radiusAtY;
+
+      // Sphere coordinates
+      const sx = x * sphereRadius;
+      const sy = y * sphereRadius;
+      const sz = z * sphereRadius;
+
+      // Map (x, y, z) vector onto a cube surface
+      const maxComp = Math.max(Math.abs(x), Math.abs(y), Math.abs(z)) || 1;
+      const cx0 = (x / maxComp) * cubeHalf;
+      const cy0 = (y / maxComp) * cubeHalf;
+      const cz0 = (z / maxComp) * cubeHalf;
+
+      points.push({ sx, sy, sz, cx: cx0, cy: cy0, cz: cz0 });
     }
 
     let yaw = 0;
@@ -699,8 +715,13 @@
     function render(time) {
       ctx.clearRect(0, 0, w, h);
 
+      // Smooth cyclic morphing between Sphere (丸: 0) and Cube (立方体: 1)
+      const cycle = time * 0.0016;
+      const rawMorph = (Math.sin(cycle) + 1) / 2;
+      const morph = rawMorph * rawMorph * (3 - 2 * rawMorph);
+
       yaw += 0.016;
-      const pitch = 0.52 + 0.16 * Math.sin(time * 0.0012);
+      const pitch = 0.52 + 0.14 * Math.sin(time * 0.001);
       const cosY = Math.cos(yaw), sinY = Math.sin(yaw);
       const cosP = Math.cos(pitch), sinP = Math.sin(pitch);
 
@@ -711,12 +732,17 @@
 
       for (let i = 0; i < points.length; i++) {
         const p = points[i];
+        // Morph interpolation: Sphere <-> Cube
+        const mx = (1 - morph) * p.sx + morph * p.cx;
+        const my = (1 - morph) * p.sy + morph * p.cy;
+        const mz = (1 - morph) * p.sz + morph * p.cz;
+
         // Rotate around Y
-        const x1 = p.x * cosY + p.z * sinY;
-        const z1 = -p.x * sinY + p.z * cosY;
+        const x1 = mx * cosY + mz * sinY;
+        const z1 = -mx * sinY + mz * cosY;
         // Rotate around X (pitch)
-        const y1 = p.y * cosP - z1 * sinP;
-        const z2 = p.y * sinP + z1 * cosP;
+        const y1 = my * cosP - z1 * sinP;
+        const z2 = my * sinP + z1 * cosP;
 
         // Perspective projection
         const fov = 190;
@@ -740,33 +766,33 @@
           py,
           z: z2,
           scale,
-          dist: p.dist
+          dist: Math.hypot(mx, my, mz)
         });
       }
 
       // Depth sort for authentic 3D occlusion
       projected.sort((a, b) => a.z - b.z);
 
-      // Render dots in sharp red
+      // Render dots: clean white originally, red only on error or unlock shockwave
       projected.forEach(d => {
-        let alpha = Math.max(0.18, Math.min(1.0, (d.z + 55) / 100));
-        let dotR = Math.max(1.1, 2.2 * d.scale);
-        let color = 'rgba(239, 68, 68, ';
+        let alpha = Math.max(0.25, Math.min(1.0, (d.z + 55) / 100));
+        let dotR = Math.max(1.1, 2.0 * d.scale);
+        let color = `rgba(255, 255, 255, ${alpha})`;
 
-        if (hexState === 'unlock') {
+        if (hexState === 'error') {
+          color = `rgba(239, 68, 68, ${alpha})`;
+        } else if (hexState === 'unlock') {
           const waveDist = Math.abs(d.dist - shockwaveR);
           if (waveDist < 20) {
             const glow = 1 - waveDist / 20;
-            color = 'rgba(255, 255, 255, ';
-            alpha = Math.min(1, 0.6 + glow * 0.4);
+            color = `rgba(255, 255, 255, ${Math.min(1, 0.6 + glow * 0.4)})`;
             dotR = dotR * (1.2 + glow * 1.5);
           } else if (d.dist < shockwaveR) {
-            color = 'rgba(239, 68, 68, ';
-            alpha = 0.9;
+            color = `rgba(239, 68, 68, ${Math.min(1, alpha * 1.2)})`;
           }
         }
 
-        ctx.fillStyle = `${color}${alpha})`;
+        ctx.fillStyle = color;
         ctx.beginPath();
         ctx.arc(d.px, d.py, dotR, 0, Math.PI * 2);
         ctx.fill();
@@ -940,7 +966,14 @@
   const idx = FLOORS.findIndex(f => f.key === hash);
 
   seqSize();
-  if (idx === 0) {
+  if (idx === 5 && !unlockedSecret) {
+    // Secret restricted floor! Direct URL access strictly intercepted!
+    history.replaceState(null, '', location.pathname);
+    setState('hero');
+    seqLoad();
+    if (heroVideo) heroVideo.play().catch(() => {});
+    openCipherModal();
+  } else if (idx === 0) {
     setState('lobby');
     goLobbyEnd();
   } else if (idx > 0) {
@@ -960,6 +993,12 @@
   addEventListener('hashchange', () => {
     const k = location.hash.replace('#', '');
     const j = FLOORS.findIndex(f => f.key === k);
+    if (j === 5 && !unlockedSecret) {
+      // Intercept URL hash change to #other
+      history.replaceState(null, '', location.pathname + (cur >= 0 ? '#' + FLOORS[cur].key : ''));
+      openCipherModal();
+      return;
+    }
     if (j >= 0 && j !== cur) {
       if (j === 0) goLobbyEnd();
       else goFloor(j, { instant: false, force: true });

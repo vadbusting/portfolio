@@ -405,10 +405,7 @@ body.cipher-locked canvas {
   user-select: none;
   -webkit-user-drag: none;
   transform-origin: 50% 90%;
-  transition: filter 0.2s ease;
-}
-.atomDollWrap:hover .atomDoll {
-  filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.7));
+  transition: opacity 0.2s ease;
 }
 .atomDoll.is-bobbling {
   animation: atomBobble 0.85s cubic-bezier(0.25, 1, 0.5, 1);
@@ -424,25 +421,27 @@ body.cipher-locked canvas {
   100% { transform: rotate(0deg) scale(1); }
 }
 
-/* 吹き出し: keyword: ハングリーアート */
+/* 吹き出し: シンプルな白の透過吹き出し */
 .atomBubble {
   position: absolute;
   bottom: calc(100% + 14px);
   left: 50%;
   transform: translateX(-50%);
-  background: #000000;
-  border: 1px solid #ef4444;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   color: #ffffff;
   padding: 8px 14px;
   border-radius: 0;
   white-space: nowrap;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.12em;
-  box-shadow: 0 0 24px rgba(239, 68, 68, 0.55), 0 8px 24px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
   pointer-events: auto;
-  animation: atomBubblePop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: atomBubbleFade 0.3s ease;
   z-index: 20;
 }
 .atomBubble[hidden] {
@@ -457,21 +456,21 @@ body.cipher-locked canvas {
   height: 0;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-top: 7px solid #ef4444;
+  border-top: 6px solid rgba(255, 255, 255, 0.28);
 }
 @keyframes atomBubbleFade {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-/* --- 暗号式Passロック解除モーダル (角R全廃・赤テーマ・リファレンス3D回転アニメ) --- */
+/* --- 暗号式Passロック解除モーダル (サイト内アプリUI / 角R全廃・緑だった箇所のみ赤・球体↔立方体モーフィング) --- */
 .cipherModal {
   position: fixed !important;
   inset: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
   z-index: 100000 !important;
-  background: rgba(0, 0, 0, 0.94) !important;
+  background: rgba(0, 0, 0, 0.92) !important;
   backdrop-filter: blur(28px) !important;
   -webkit-backdrop-filter: blur(28px) !important;
   display: flex !important;
@@ -491,13 +490,13 @@ body.cipher-locked canvas {
 }
 
 .cipherApp {
-  width: min(360px, 92vw);
-  max-width: 360px;
+  width: min(350px, 90vw);
+  max-width: 350px;
   background: #000000;
-  border: 1px solid #ef4444;
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 0 !important;
-  padding: 28px 24px 22px;
-  box-shadow: 0 0 50px rgba(239, 68, 68, 0.25), 0 30px 100px rgba(0, 0, 0, 0.98);
+  padding: 30px 24px 24px;
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.98), 0 0 50px rgba(255, 255, 255, 0.04);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -512,13 +511,13 @@ body.cipher-locked canvas {
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* 3D回転パーティクル演出 (ref: https://pin.it/1yQaf6x8L) */
+/* 3D回転パーティクル演出 (Sphere ↔ Cube Morphing / ref: https://pin.it/1yQaf6x8L) */
 .cipherHexWrap {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   width: 100%;
 }
 #cipherHexCanvas {
@@ -542,10 +541,10 @@ body.cipher-locked canvas {
   width: 100%;
 }
 .cipherLabel {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.18em;
-  color: #ef4444;
+  color: #ffffff;
   text-transform: uppercase;
   font-family: 'Inter', sans-serif;
   text-align: center !important;
@@ -556,8 +555,8 @@ body.cipher-locked canvas {
 .cipherInput {
   width: 100%;
   box-sizing: border-box;
-  background: rgba(239, 68, 68, 0.05);
-  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 0 !important;
   height: 44px;
   padding: 0 14px;
@@ -571,21 +570,21 @@ body.cipher-locked canvas {
   transition: all 0.2s ease;
 }
 .cipherInput:focus {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: #ef4444;
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #ffffff;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
 }
 .cipherInput.is-error {
   border-color: #ef4444 !important;
   color: #ef4444 !important;
-  box-shadow: 0 0 24px rgba(239, 68, 68, 0.7) !important;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.5) !important;
   animation: cipherShake 0.4s ease;
 }
 .cipherInput.is-unlocked {
   border-color: #ef4444 !important;
   color: #ffffff !important;
-  background: rgba(239, 68, 68, 0.2) !important;
-  box-shadow: 0 0 30px rgba(239, 68, 68, 0.8) !important;
+  background: rgba(239, 68, 68, 0.15) !important;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.6) !important;
 }
 @keyframes cipherShake {
   0%, 100% { transform: translateX(0); }
@@ -601,8 +600,8 @@ body.cipher-locked canvas {
   margin-top: 4px;
 }
 .cipherBtn--auth {
-  background: #ef4444;
-  color: #ffffff;
+  background: #ffffff;
+  color: #000000;
   font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 700;
@@ -618,25 +617,26 @@ body.cipher-locked canvas {
   justify-content: center;
 }
 .cipherBtn--auth:hover {
-  background: #dc2626;
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+  opacity: 0.9;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
 }
+/* 元が緑だった解除完了状態を赤に変更 */
 .cipherBtn--auth.is-unlocked {
-  background: #b91c1c !important;
+  background: #ef4444 !important;
   color: #ffffff !important;
-  box-shadow: 0 0 30px rgba(239, 68, 68, 0.9) !important;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.7) !important;
 }
 
 .cipherBtn--hint {
-  background: rgba(239, 68, 68, 0.08);
-  color: #ef4444;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.85);
   font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.12em;
   height: 38px;
   border-radius: 0 !important;
-  border: 1px solid rgba(239, 68, 68, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   cursor: pointer;
   transition: all 0.2s ease;
   width: 100%;
@@ -645,8 +645,9 @@ body.cipher-locked canvas {
   justify-content: center;
 }
 .cipherBtn--hint:hover {
-  background: rgba(239, 68, 68, 0.18);
-  border-color: #ef4444;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
 }
 
 .cipherBtn--back {
@@ -676,8 +677,8 @@ body.cipher-locked canvas {
   margin-top: 14px;
   width: 100%;
   box-sizing: border-box;
-  background: rgba(239, 68, 68, 0.06);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   padding: 12px 14px;
   text-align: left;
   border-radius: 0 !important;
@@ -696,7 +697,7 @@ body.cipher-locked canvas {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 .cipherHintList li::marker {
-  color: #ef4444;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 /* ==========================================================================
