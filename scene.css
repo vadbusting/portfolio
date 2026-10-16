@@ -185,6 +185,11 @@ html, body {
 .cenotaph__n {
   display: inline-block;
   clip-path: polygon(-30% 6.5%, 130% 6.5%, 130% 93.5%, -30% 93.5%);
+  margin-left: -0.022em;
+}
+.cenotaph__a {
+  display: inline-block;
+  margin-left: -0.032em;
 }
 .cenotaph__prefix,
 .cenotaph__for {
@@ -198,7 +203,8 @@ html, body {
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95);
 }
 .cenotaph__prefix {
-  margin-bottom: clamp(0.1rem, 0.4vw, 0.6rem);
+  margin-bottom: clamp(-0.1rem, 0.1vw, 0.25rem);
+  transform: translateY(3px);
 }
 .cenotaph__for {
   margin-top: clamp(-0.4rem, -0.8vw, -0.1rem);
@@ -480,7 +486,8 @@ html, body {
     font-size: clamp(1.4rem, 4.5vw, 2rem);
   }
   .cenotaph__prefix {
-    margin-bottom: 0.1rem;
+    margin-bottom: 0rem;
+    transform: translateY(1.5px);
   }
   .cenotaph__for {
     margin-top: -0.2rem;
