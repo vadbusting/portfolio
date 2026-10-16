@@ -186,10 +186,11 @@ html, body {
   font-size: 154px;
   fill: #000000;
   stroke: #ffffff;
-  stroke-width: 19px;
-  stroke-linejoin: round;
+  stroke-width: 17px;
+  stroke-linejoin: miter;
+  stroke-miterlimit: 1.414;
   paint-order: stroke fill;
-  letter-spacing: -0.095em;
+  letter-spacing: -0.045em;
   text-transform: uppercase;
   text-rendering: geometricPrecision;
 }
