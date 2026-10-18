@@ -49,7 +49,24 @@
   - [x] Tablet Portrait (768x1024): 画面中央に収まりのよいプロポーション
   - [x] Tablet Landscape (1024x768): 堂々たるシネマティックなHALコンソール
   - [x] Mobile Portrait (390x844): スマートフォン画面で片手操作に最適なタッチターゲットと配置を維持
-- [x] 3. Conventional Commit（`fix(cipher): ...`）作成
+---
+
+# Task: 静止画（plate）の上ズレ解消およびスクロールバック時の中央整列・動画巻き戻し
+
+- [x] 1. `scene.js` の wheel / touchmove における垂直パン（`platePanY`）ロジックの完全撤廃
+  - [x] 横長時 (`boxRatio >= 1.05`): `platePanX = 0.5; platePanY = 0.5` を常時固定。上スクロール時に画像が天井方向へズレ上がるバグを根本排除
+  - [x] 縦長時 (`boxRatio < 1.05`): 左右スワイプで切れている左右領域のみをパン（`platePanX` 0.0〜1.0）し、垂直位置は `platePanY = 0.5` に物理固定
+  - [x] スクロールバック時: 上方向スクロール（`deltaY < -15` / `dy < -20`）で `--pos` を即座に `50.0% 50.0%` へ整列させ、余計なズレなしで即時動画ループ巻き戻しへ移行
+  - [x] 1F（ABOUT）からのスクロールバック時: `goHero({ fromLobby: true })` を呼び出し、HERO（タイトル）への滑らかな回帰を保証
+- [x] 2. `other.html`（OTHERページ）の最終演出・文字配置の根本修正
+  - [x] 1. `BREAK THROUGH` の表示アニメーションと連動し、遠くから背景（フォグ・通路）を徐々に白く明るくフェードさせ、中央表示完了時に背景が完全な純白（`#ffffff`）になるよう制御
+  - [x] 2. 画像の上に文字を被せる誤ったDOMオーバーレイを完全撤廃。Three.js 空間内の最深部（全画像の背後・最背面）に 3D テキストプレーン（`depthWrite: false, depthTest: true`）として配置し、画像の手前通過・カメラ前停止の自然な奥行き演出を実証
+- [x] 3. 5状態レスポンシブ実機検証（Chrome DevTools MCP）
+  - [x] PC Fluid (1440x900) - PASS: デスク・人形が完全中央（`50.0% 50.0%`）、OTHER最終カードで全画像が文字の手前を通過し、背景純白化を完全実証
+  - [x] Mobile Portrait (390x844) - PASS: 左右パン（71.4% 50.0%）および上スクロールでの中央再整列
+  - [x] Mobile Landscape (844x390) - PASS: 水平・垂直ともに完全中央固定
+  - [x] Tablet Portrait (768x1024) - PASS: 静止画・フロア遷移ともにブレなし
+  - [x] Tablet Landscape (1024x768) - PASS: アスペクト比に依存しない均整な表示
 
 
 

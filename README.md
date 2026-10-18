@@ -1,35 +1,31 @@
-# TESHIMA LAB portfolio — v18
+# TESHIMA LAB portfolio
 
-`start-3002.command` をダブルクリック → http://localhost:3002/
+ポートフォリオサイト（シネマティック映像遷移 ＆ 3D回廊アーカイブ）
 
-## 体験の流れ
-1. **外観（3D・夜景）** — 夜空・月・星、ライトアップされたドーム、街灯、窓の灯るビル群。下スクロール／スワイプ／`↓`キーで入口へ接近（`exterior.js`）。
-2. **入口が開く** — カメラが入口に着くと、3Dの中に投影した「ロビー始点画像」がちょうど画面いっぱいに収まり、そのまま下のDOMのロビー連番に**継ぎ目なく**切り替わる。
-3. **ロビー（スクロール動画）** — 続けてスクロールするとロビー全景 → 受付 → ガイドブックへ寄るカメラが進む（`assets/lobby_seq/f000〜f095.webp` を canvas に描画、スクロール連動）。**ロビー＝1F:ABOUT**。
-4. **ロビーの終点** — 左に `ABOUT` と `OPEN PAGE`、右に階数選択（01〜06）。**ここでスクロールは止まり**、階は右の選択か `1`〜`6`キーで選ぶ。
-5. **2F以降** — エレベーター（カゴの中から見る視点。階数が上がり扉が開くと、その階の動画が見える）→ ドリー動画 → 左に階名と `OPEN PAGE`。
-6. 左上の `PORTFOLIO` で最初（外観）に戻る。`#about` `#presentation` などのURLで各階へ直接リンク可（3Dを飛ばす）。
+## 起動方法
+`start-3002.command` をダブルクリック、またはターミナルで実行：
+```bash
+./start-3002.command
+# または
+python3 serve.py 3002
+```
+ブラウザで `http://localhost:3002/` を開きます。
+（`serve.py` は動画シーク用の HTTP Range リクエストや Unicode ファイル名解決に対応しています）
 
-画面内の文字（PORTFOLIO / CONTACT / 同じ条件を異なる結果へ… / 階名 / OPEN PAGE / LOADING 3D など）は**すべて元サイトの文言のまま**です（`hero-v13.css` も元のまま流用）。
+## サイト構造とフロア構成
+- **HERO（エントランス）**: シネマティック高精細背景映像。スクロールまたは下スワイプでエントランスからフロアへ突入。
+- **1F ABOUT**: プロフィール、スキルセット、お問い合わせ窓口。
+- **2F PRESENTATION**: プレゼンテーション実績（スライド・企画書ギャラリー）。
+- **3F LP**: ランディングページ制作実績（LP詳細・デザイン解説）。
+- **4F WEB**: Webサイト・コーポレートサイト実績。
+- **5F DIRECTION**: ディレクション・ブランディング実績。
+- **B1F OTHER**: ディスカバリー号 3D回廊空間（Three.js WebGL / 移動・ズーム・作品ライトボックス閲覧機能）。
 
-## 素材の差し替え
-| 何を | どこを | 備考 |
-|---|---|---|
-| ロビーの動画 | `tools/make-lobby-seq.sh 動画.mp4 始点.jpg 終点.jpg` | 連番と始点/終点静止画を作り直す。コマ数が変わったら `scene.js` の `SEQ_COUNT` |
-| 2F〜6Fの動画 | `assets/video/<key>_dolly.mp4` を同名で上書き → `tools/make-end-frame.sh <key>` | 現在は**静止画からの仮ズーム**（プロンプトは `VIDEO_PROMPTS.md`） |
-| 各階の静止画 | `assets/scenes/<key>_start.webp / _end.webp` | 動画が使えない端末でのクロスフェード用 |
-
-## フォールバック
-- 動画を使わず静止画クロスフェード: 「視差効果を減らす」、データセーバー、`?novideo=1`、動画が4.5秒以内に再生開始しない場合
-- WebGL非対応／3Dの読込が40秒を超える場合: 外観を飛ばしてロビー連番から開始
-
-## 構成
-- `index.html` `scene.css` `scene.js` — 画面遷移の制御（元サイトのUIマークアップを流用）
-- `exterior.js` — 外観3D（`assets/architecture/city.glb` `dome.glb` のみ読込）
-- `assets/lobby_seq/` `assets/scenes/` `assets/video/` `assets/elevator/` — 素材
-- `_legacy_three/` — 旧Three.js全フロア版（不要なら削除可）
-- `about.html` `presentation.html` `lp.html` `other.html` `works.html` — 詳細ページ（変更なし）
-
-## 既知の制限
-- 3Dの建物・ドームは手作りのジオメトリ＋プロシージャルな夜景です。写真並みの質感にするには、外部の夜景HDRI／高精細GLBの追加が必要です。
-- 2F〜6Fの動画はまだ仮です。
+## 主要ファイル構成
+- `index.html` / `scene.css` / `scene.js`: メインサイトの画面遷移・フロア管理・シネマティック動画/静止画制御
+- `other.html` / `floating-world.js`: B1F OTHER の 3D回廊アーカイブ空間（Three.js r160 CDN 利用）
+- `about.html`, `presentation.html`, `lp.html`, `works.html`: 各フロアの詳細閲覧ページ
+- `serve.py`: HTTP Range（206 Partial Content）対応のローカル配信サーバー
+- `start-3002.command`: ワンクリック起動スクリプト
+- `assets/scenes/`: 画面静止画プレート（共通始点 `floor_start.webp`、各フロア終点画像等）
+- `assets/video/`: 高精細シネマティック背景動画

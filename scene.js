@@ -20,16 +20,12 @@
   ];
 
   const PATH = {
-    plate: (k, s) => `assets/scenes/${k}_${s}.webp`,
+    plate: (k, s) => s === 'start' ? 'assets/scenes/floor_start.webp' : `assets/scenes/${k}_${s}.webp`,
     dolly: k => `assets/video/${k}_dolly.mp4`,
-    seq: i => `assets/lobby_seq/f${String(i).padStart(3, '0')}.webp`,
     lobbyEnd: 'assets/scenes/lobby_end.webp',
-    lobbyStart: 'assets/scenes/lobby_start.webp',
-    heroVideo: 'assets/video/hero_entrance.mp4',
-    heroPoster: 'assets/scenes/hero_start.webp'
+    heroVideo: 'assets/video/hero_entrance.mp4'
   };
 
-  const SEQ_COUNT = 96;
   const WATCHDOG_MS = 9000;
 
   /* ---------------- DOM References ---------------- */
@@ -43,6 +39,14 @@
   const plateB = plateA.cloneNode();
   plateB.classList.add('b');
   plate.appendChild(plateB);
+
+  if (dolly) {
+    dolly.addEventListener('loadedmetadata', () => {
+      if (state === 'floor' && Number.isFinite(dolly.duration) && dolly.duration > 0) {
+        try { dolly.currentTime = clamp01(floorQ) * dolly.duration; } catch (e) {}
+      }
+    });
+  }
 
   const wait = ms => new Promise(r => setTimeout(r, ms));
   const mq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
@@ -71,9 +75,9 @@
       platePanX = 0.5;
       platePanY = 0.5;
     }
-    const posVal = `${(platePanX * 100).toFixed(1)}% ${(platePanY * 100).toFixed(1)}%`;
+    const posVal = `${(platePanX * 100).toFixed(1)}% 50.0%`;
     if (plate) plate.style.setProperty('--pos', posVal);
-    if (dollyLayer) dollyLayer.style.setProperty('--pos', '50% 50%');
+    if (dollyLayer) dollyLayer.style.setProperty('--pos', posVal);
     updateStageHotspot();
     updateAtomDollPosition();
     if (typeof seq !== 'undefined' && cur === 0) {
@@ -343,50 +347,15 @@
     if (dollyLayer) dollyLayer.style.setProperty('--pos', '50% 50%');
   };
 
-  /* ---------------- Lobby Sequence (Canvas Scrubbing) ---------------- */
-  const seq = { imgs: new Array(SEQ_COUNT), ok: new Array(SEQ_COUNT).fill(false), end: new Image(), endOk: false, q: 0, qt: 0, started: false, auto: false, raf: 0, last: 0, dirty: true };
+  /* ---------------- 1F ABOUT Sequence (Clean Canvas / Endplate) ---------------- */
+  const seq = { end: new Image(), endOk: false, q: 1, qt: 1, dirty: true };
   seq.end.onload = () => { seq.endOk = true; seq.dirty = true; drawSeq(); };
-
-  function seqOrder() {
-    const out = [], seen = new Set();
-    [SEQ_COUNT - 1, 0].forEach(i => { out.push(i); seen.add(i); });
-    for (let s = 32; s >= 1; s = s >> 1) {
-      for (let i = 0; i < SEQ_COUNT; i += s) {
-        if (!seen.has(i)) { seen.add(i); out.push(i); }
-      }
-    }
-    return out;
-  }
+  seq.end.src = PATH.lobbyEnd;
 
   function seqLoad() {
-    if (seq.started) return;
-    seq.started = true;
-    seq.end.src = PATH.lobbyEnd;
-    const order = seqOrder();
-    let k = 0;
-    const next = () => {
-      if (k >= order.length) return;
-      const i = order[k++], im = new Image();
-      im.decoding = 'async';
-      im.onload = () => {
-        seq.ok[i] = true;
-        seq.dirty = true;
-        if (state === 'lobby' || (state === 'floor' && cur === 0)) drawSeq();
-        next();
-      };
-      im.onerror = next;
-      im.src = PATH.seq(i);
-      seq.imgs[i] = im;
-    };
-    for (let n = 0; n < (lightNet() ? 2 : 4); n++) next();
-  }
-
-  function nearest(i) {
-    for (let d = 0; d < SEQ_COUNT; d++) {
-      if (i - d >= 0 && seq.ok[i - d]) return i - d;
-      if (i + d < SEQ_COUNT && seq.ok[i + d]) return i + d;
+    if (!seq.endOk && !seq.end.src) {
+      seq.end.src = PATH.lobbyEnd;
     }
-    return -1;
   }
 
   function seqSize() {
@@ -399,13 +368,22 @@
     }
   }
 
-  function cover(img, a) {
+  function getSeqPanX() {
+    const boxRatio = window.innerWidth / window.innerHeight;
+    if (boxRatio >= 1.25) return 0.5;
+    const renderW = window.innerHeight * (2752 / 1536);
+    const targetX = Math.min(1, Math.max(0, (0.7024 * renderW - window.innerWidth / 2) / (renderW - window.innerWidth)));
+    if (state === 'floor' && cur === 0) return platePanX;
+    return targetX;
+  }
+
+  function cover(img, a = 1) {
     const cw = seqCv.width, ch = seqCv.height, iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
     if (!iw || !ih) return;
     const s = Math.max(cw / iw, ch / ih);
     const w = iw * s, h = ih * s;
-    const px = (state === 'floor' && cur === 0) ? platePanX : 0.5;
-    const py = (state === 'floor' && cur === 0) ? platePanY : 0.5;
+    const px = getSeqPanX();
+    const py = 0.5;
     const ox = (cw - w) * px;
     const oy = (ch - h) * py;
     seqCtx.globalAlpha = a;
@@ -416,17 +394,11 @@
     seqSize();
     if (!seq.dirty) return;
     seq.dirty = false;
-    const f = clamp01(seq.q) * (SEQ_COUNT - 1), i0 = Math.floor(f), a = f - i0;
-    const A = nearest(i0);
     seqCtx.globalCompositeOperation = 'source-over';
     seqCtx.clearRect(0, 0, seqCv.width, seqCv.height);
-    if (A >= 0) cover(seq.imgs[A], 1);
-    if (a > 0.03 && i0 + 1 < SEQ_COUNT) {
-      const B = nearest(i0 + 1);
-      if (B >= 0 && B !== A) cover(seq.imgs[B], a);
+    if (seq.endOk || (seq.end && seq.end.complete && seq.end.naturalWidth > 0)) {
+      cover(seq.end, 1);
     }
-    const e = smooth(0.88, 1.0, seq.q);
-    if (e > 0 && seq.endOk) cover(seq.end, e);
     seqCtx.globalAlpha = 1;
   }
 
@@ -550,16 +522,16 @@
       }
     }
 
-    // Cinematic CENOTAPH movie title: visible as approaching gate, fades out smoothly as passing through the gate (~3.8s to 4.8s)
+    // Cinematic CENOTAPH movie title: visible as approaching gate, fades out smoothly as passing through the gate (~3.0s to 4.3s)
     if (cenotaph) {
       const t = targetTime;
-      if (t < 3.8) {
+      if (t < 3.0) {
         cenotaph.style.opacity = '1';
         cenotaph.style.filter = 'none';
         cenotaph.style.transform = 'translate(-50%, -50%) scale(1)';
         cenotaph.style.pointerEvents = 'auto';
-      } else if (t <= 4.8) {
-        const p = (t - 3.8) / 1.0;
+      } else if (t <= 4.3) {
+        const p = (t - 3.0) / 1.3;
         const alpha = Math.max(0, 1 - p);
         cenotaph.style.opacity = alpha.toFixed(4);
         cenotaph.style.filter = `blur(${(p * 8).toFixed(1)}px)`;
@@ -608,6 +580,7 @@
     if (heroVideo && heroVideo.hasAttribute('poster')) {
       heroVideo.removeAttribute('poster');
     }
+    seqLoad();
     heroQt = clamp01(heroQt + d);
     startHeroLoop();
   }
@@ -630,6 +603,11 @@
       updateCreditBtnVisibility();
       updateAtomVisibility();
     }
+
+    const panX = 0.5 + (platePanX - 0.5) * clamp01(floorQ);
+    const loopPosVal = `${(panX * 100).toFixed(1)}% 50.0%`;
+    if (dollyLayer) dollyLayer.style.setProperty('--pos', loopPosVal);
+    if (plate) plate.style.setProperty('--pos', loopPosVal);
 
     if (dolly && Number.isFinite(dolly.duration) && dolly.duration > 0) {
       const targetTime = clamp01(floorQ) * dolly.duration;
@@ -658,6 +636,10 @@
     // Settle back at Start Frame: video's first frame directly (currentTime = 0) + show SCROLL cue
     if (floorQt <= 0.001 && floorQ <= 0.005 && !busy) {
       floorQ = floorQt = 0;
+      platePanX = 0.5;
+      platePanY = 0.5;
+      if (dollyLayer) dollyLayer.style.setProperty('--pos', '50.0% 50.0%');
+      if (plate) plate.style.setProperty('--pos', '50.0% 50.0%');
       if (dolly && Number.isFinite(dolly.duration)) {
         try { dolly.currentTime = 0; } catch (e) {}
       }
@@ -788,6 +770,7 @@
       plate.classList.add('no-fade');
     }
     if (dollyLayer) dollyLayer.classList.remove('is-on');
+    seqLoad();
     seq.q = seq.qt = 1;
     seq.dirty = true;
     drawSeq();
@@ -835,7 +818,7 @@
   async function goFloor(i, opts) {
     opts = opts || {};
     if (i < 0 || i >= FLOORS.length) return;
-    if (i === 5 && !unlockedSecret) {
+    if (i === 5 && !isSecretUnlocked()) {
       openCipherModal();
       return;
     }
@@ -892,8 +875,14 @@
       await loadPlates();
       if (!alive(t)) return;
       floorQ = floorQt = 1;
-      if (dolly && Number.isFinite(dolly.duration)) {
-        try { dolly.currentTime = dolly.duration; } catch (e) {}
+      if (dolly) {
+        const syncEnd = () => {
+          if (Number.isFinite(dolly.duration) && dolly.duration > 0) {
+            try { dolly.currentTime = dolly.duration; } catch (e) {}
+          }
+        };
+        if (dolly.readyState >= 1) syncEnd();
+        else dolly.addEventListener('loadedmetadata', syncEnd, { once: true });
       }
       plate.classList.add('is-end');
       setDip(false);
@@ -936,7 +925,7 @@
 
   function jump(i) {
     if (i === cur) return;
-    if (i === 5 && !unlockedSecret) {
+    if (i === 5 && !isSecretUnlocked()) {
       openCipherModal();
       return;
     }
@@ -997,6 +986,7 @@
 
             const pVal = `50.0% ${(platePanY * 100).toFixed(1)}%`;
             if (plate) plate.style.setProperty('--pos', pVal);
+            if (dollyLayer) dollyLayer.style.setProperty('--pos', pVal);
             updateStageHotspot(0.5, platePanY);
             if (cur === 2) updateAtomDollPosition(0.5, platePanY);
             if (cur === 0) {
@@ -1010,11 +1000,12 @@
               platePanX = 0.5;
               platePanY = 0.5;
               if (plate) plate.style.setProperty('--pos', '50.0% 50.0%');
+              if (dollyLayer) dollyLayer.style.setProperty('--pos', '50.0% 50.0%');
               updateStageHotspot(0.5, 0.5);
               if (cur === 2) updateAtomDollPosition(0.5, 0.5);
 
               if (cur === 0) {
-                toLobbyState(0.98);
+                goHero({ fromLobby: true });
                 return;
               }
               if (scrollCue) scrollCue.classList.add('is-hidden');
@@ -1034,10 +1025,11 @@
             if (Math.abs(e.deltaX) > 0.5) {
               platePanX = clamp01(platePanX + e.deltaX / (window.innerWidth * 1.5));
             }
-            platePanY = 0.5; // 垂直位置は中央固定
+            platePanY = 0.5; // 垂直位置は常に完全中央50%固定（上ズレを物理的に排除）
 
             const pVal = `${(platePanX * 100).toFixed(1)}% 50.0%`;
             if (plate) plate.style.setProperty('--pos', pVal);
+            if (dollyLayer) dollyLayer.style.setProperty('--pos', pVal);
             updateStageHotspot(platePanX, 0.5);
             if (cur === 2) updateAtomDollPosition(platePanX, 0.5);
             if (cur === 0) {
@@ -1048,15 +1040,8 @@
           } else {
             // 上下スクロール (垂直操作: 上スクロールでスクロールバック / 巻き戻し)
             if (e.deltaY < -15) {
-              platePanX = 0.5;
-              platePanY = 0.5;
-              const pVal = '50.0% 50.0%';
-              if (plate) plate.style.setProperty('--pos', pVal);
-              updateStageHotspot(0.5, 0.5);
-              if (cur === 2) updateAtomDollPosition(0.5, 0.5);
-
               if (cur === 0) {
-                toLobbyState(0.98);
+                goHero({ fromLobby: true });
                 return;
               }
               if (scrollCue) scrollCue.classList.add('is-hidden');
@@ -1131,6 +1116,7 @@
 
             const pVal = `50.0% ${(platePanY * 100).toFixed(1)}%`;
             if (plate) plate.style.setProperty('--pos', pVal);
+            if (dollyLayer) dollyLayer.style.setProperty('--pos', pVal);
             updateStageHotspot(0.5, platePanY);
             if (cur === 2) updateAtomDollPosition(0.5, platePanY);
             if (cur === 0) {
@@ -1146,13 +1132,14 @@
               platePanX = 0.5;
               platePanY = 0.5;
               if (plate) plate.style.setProperty('--pos', '50.0% 50.0%');
+              if (dollyLayer) dollyLayer.style.setProperty('--pos', '50.0% 50.0%');
               updateStageHotspot(0.5, 0.5);
               if (cur === 2) updateAtomDollPosition(0.5, 0.5);
 
               if (cur === 0) {
                 touchStartY = null;
                 touchStartX = null;
-                toLobbyState(0.98);
+                goHero({ fromLobby: true });
                 return;
               }
               touchStartY = y;
@@ -1176,10 +1163,11 @@
             if (Math.abs(dx) > 0.8) {
               platePanX = clamp01(platePanX + dx / (window.innerWidth * 1.2));
             }
-            platePanY = 0.5; // 垂直位置は中央固定
+            platePanY = 0.5; // 垂直位置は常に完全中央50%固定（上ズレを物理的に排除）
 
             const pVal = `${(platePanX * 100).toFixed(1)}% 50.0%`;
             if (plate) plate.style.setProperty('--pos', pVal);
+            if (dollyLayer) dollyLayer.style.setProperty('--pos', pVal);
             updateStageHotspot(platePanX, 0.5);
             if (cur === 2) updateAtomDollPosition(platePanX, 0.5);
             if (cur === 0) {
@@ -1192,17 +1180,10 @@
           } else {
             // 垂直スワイプ: 上下操作 (スクロールバック / 巻き戻し)
             if (dy < -20) {
-              platePanX = 0.5;
-              platePanY = 0.5;
-              const pVal = '50.0% 50.0%';
-              if (plate) plate.style.setProperty('--pos', pVal);
-              updateStageHotspot(0.5, 0.5);
-              if (cur === 2) updateAtomDollPosition(0.5, 0.5);
-
               if (cur === 0) {
                 touchStartY = null;
                 touchStartX = null;
-                toLobbyState(0.98);
+                goHero({ fromLobby: true });
                 return;
               }
               touchStartY = y;
@@ -1265,7 +1246,7 @@
       if (cur === 0) {
         if (rev) {
           e.preventDefault();
-          toLobbyState(0.98);
+          goHero({ fromLobby: true });
           return;
         }
       } else {
@@ -1411,8 +1392,33 @@
   }, { passive: true });
 
   /* ---------------- B???F Secured Access Terminal UI ---------------- */
-  let unlockedSecret = false;
-  try { sessionStorage.removeItem('cenotaph_unlocked'); } catch (e) {}
+  const AUTH_KEY = 'cenotaph_unlocked';
+  const AUTH_DURATION = 24 * 60 * 60 * 1000; // 24 hours persistent access
+
+  function isSecretUnlocked() {
+    try {
+      const raw = localStorage.getItem(AUTH_KEY) || sessionStorage.getItem(AUTH_KEY);
+      if (!raw) return false;
+      const data = JSON.parse(raw);
+      if (data && data.unlocked && data.expiresAt > Date.now()) {
+        return true;
+      }
+    } catch (e) {
+      if (sessionStorage.getItem(AUTH_KEY) === 'unlocked') return true;
+    }
+    return false;
+  }
+
+  function setSecretUnlocked() {
+    const payload = JSON.stringify({
+      unlocked: true,
+      expiresAt: Date.now() + AUTH_DURATION
+    });
+    try { localStorage.setItem(AUTH_KEY, payload); } catch (e) {}
+    try { sessionStorage.setItem(AUTH_KEY, payload); } catch (e) {}
+  }
+
+  let unlockedSecret = isSecretUnlocked();
   const cipherModal = document.getElementById('cipherModal');
   const authCard = document.getElementById('authCard');
   const keyInput = document.getElementById('keyInput');
@@ -1456,6 +1462,7 @@
 
   function handleCipherUnlock() {
     unlockedSecret = true;
+    setSecretUnlocked();
 
     if (keyInput) {
       keyInput.blur();
@@ -1572,7 +1579,10 @@
     if (!b) return;
     const targetIdx = +b.dataset.stageJump - 1;
     if (targetIdx === 5) {
-      // Secret restricted floor (B???F OTHER): Always open verification modal on rail click
+      if (isSecretUnlocked()) {
+        jump(5);
+        return;
+      }
       openCipherModal();
       return;
     }
@@ -1610,7 +1620,7 @@
   if (params.get('debug') === 'hotspots' || params.get('debug') === '1') {
     if (stage) stage.classList.add('is-debug-hotspots');
   }
-  if (idx === 5 && !unlockedSecret) {
+  if (idx === 5 && !isSecretUnlocked()) {
     // Secret restricted floor! Direct URL access strictly intercepted!
     history.replaceState(null, '', location.pathname);
     setState('hero');
@@ -1647,7 +1657,7 @@
   addEventListener('hashchange', () => {
     const k = location.hash.replace('#', '');
     const j = FLOORS.findIndex(f => f.key === k);
-    if (j === 5 && !unlockedSecret) {
+    if (j === 5 && !isSecretUnlocked()) {
       // Intercept URL hash change to #other
       history.replaceState(null, '', location.pathname + (cur >= 0 ? '#' + FLOORS[cur].key : ''));
       openCipherModal();
