@@ -776,17 +776,17 @@ body.cipher-locked canvas {
   display: block !important;
 }
 
-/* 赤ランプの中央の焦点部分のみが小さく繊細に静かに明滅 (HAL 9000の精密な光学レンズ点滅) */
+/* 赤ランプの中央の焦点部分のみが小さくふわっとゆっくり点滅 (デフォルト・縦長) */
 .hal-eye-focal {
   position: absolute;
   inset: 0;
   margin: auto;
-  width: 5px;
-  height: 5px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #ffffff;
-  box-shadow: 0 0 2px 1px #ffffff, 0 0 6px 2px rgba(255, 26, 42, 0.75);
-  animation: halFocalPulse 3.4s ease-in-out infinite;
+  box-shadow: 0 0 8px 3px #ffffff, 0 0 20px 8px #ff1a2a;
+  animation: halFocalPulse 3.2s ease-in-out infinite;
   pointer-events: none;
   z-index: 4;
   transition: opacity 0.3s ease;
@@ -794,14 +794,14 @@ body.cipher-locked canvas {
 
 @keyframes halFocalPulse {
   0%, 100% {
-    transform: scale(0.85);
+    transform: scale(0.82);
     opacity: 0.45;
-    box-shadow: 0 0 2px 0.5px #ffffff, 0 0 4px 1.5px rgba(255, 26, 42, 0.45);
+    box-shadow: 0 0 6px 2px #ffffff, 0 0 15px 5px rgba(255, 26, 42, 0.45);
   }
   50% {
-    transform: scale(1.1);
-    opacity: 0.95;
-    box-shadow: 0 0 3px 1px #ffffff, 0 0 7px 2px rgba(255, 26, 42, 0.85);
+    transform: scale(1.18);
+    opacity: 1;
+    box-shadow: 0 0 10px 4px #ffffff, 0 0 24px 9px #ff1a2a;
   }
 }
 
@@ -975,21 +975,128 @@ body.cipher-locked canvas {
   color: #ffffff;
 }
 
-/* 横長画面（デスクトップ・ノート・横長表示）でのHALレンズ最適化 */
-@media (min-width: 768px), (orientation: landscape) {
-  .hal-eye-wrapper {
-    width: 72px;
-    height: 72px;
-    margin: 0 auto 14px auto;
+@media (max-height: 720px) {
+  .auth-card.hal-console {
+    padding: 16px 20px 14px;
+    max-width: 340px;
   }
-  .hal-eye-focal {
-    width: 4px;
-    height: 4px;
-    box-shadow: 0 0 2px 0.5px #ffffff, 0 0 5px 1.5px rgba(255, 26, 42, 0.7);
+  .hal-eye-wrapper {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 10px auto;
+  }
+  .auth-title {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .auth-desc {
+    font-size: 10px;
+    margin-bottom: 10px;
+    line-height: 1.35;
+  }
+  .field-label {
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+  .input-field {
+    height: 36px;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  .btn-hint {
+    height: 34px;
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  .btn-auth {
+    height: 36px;
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  .btn-back {
+    padding: 2px 0;
+    font-size: 11px;
   }
 }
 
-@media (max-height: 720px) {
+@media (max-height: 480px) {
+  .cipherModal {
+    padding: 6px 12px !important;
+  }
+  .auth-card.hal-console {
+    padding: 10px 16px 8px;
+    max-width: 300px;
+    max-height: 96vh;
+    max-height: 96dvh;
+  }
+  .hal-eye-wrapper {
+    width: 46px;
+    height: 46px;
+    margin: 0 auto 6px auto;
+  }
+  .auth-title {
+    font-size: 11px;
+    margin-bottom: 2px;
+  }
+  .auth-desc {
+    display: none;
+  }
+  .field-label {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+  .input-field {
+    height: 30px;
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  .btn-hint {
+    height: 30px;
+    font-size: 11px;
+    margin-bottom: 5px;
+  }
+  .btn-auth {
+    height: 30px;
+    font-size: 11px;
+    margin-bottom: 5px;
+  }
+  .btn-back {
+    padding: 1px 0;
+    font-size: 10px;
+  }
+}
+
+/* ==============================================================
+   横長表示（orientation: landscape）時のみ赤ライトの明滅・サイズを抑制
+   ============================================================== */
+@media (orientation: landscape) {
+  .hal-eye-wrapper {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 12px auto;
+  }
+  .hal-eye-focal {
+    width: 4.5px;
+    height: 4.5px;
+    box-shadow: 0 0 2px 1px #ffffff, 0 0 5px 2px rgba(255, 26, 42, 0.75);
+    animation: halFocalPulseLandscape 3.2s ease-in-out infinite;
+  }
+}
+
+@keyframes halFocalPulseLandscape {
+  0%, 100% {
+    transform: scale(0.85);
+    opacity: 0.45;
+    box-shadow: 0 0 2px 0.5px #ffffff, 0 0 4px 1.5px rgba(255, 26, 42, 0.45);
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.95;
+    box-shadow: 0 0 3px 1px #ffffff, 0 0 7px 2px rgba(255, 26, 42, 0.85);
+  }
+}
+
+@media (orientation: landscape) and (max-height: 720px) {
   .auth-card.hal-console {
     padding: 16px 20px 14px;
     max-width: 320px;
@@ -1038,7 +1145,7 @@ body.cipher-locked canvas {
   }
 }
 
-@media (max-height: 480px) {
+@media (orientation: landscape) and (max-height: 480px) {
   .cipherModal {
     padding: 6px 12px !important;
   }
