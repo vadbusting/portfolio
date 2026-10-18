@@ -25,7 +25,12 @@ body {
 
 body.floating-world-page,
 body.floating-world {
-    background-color: transparent;
+    background-color: #050508;
+    background-image: url('image/discovery_corridor.webp');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     color: #121212;
     overflow-y: auto;
     overflow-x: hidden;
@@ -331,6 +336,29 @@ body.lightbox-open {
 body.floating-world-page .main-header {
     background: transparent;
     backdrop-filter: none;
+}
+
+body.floating-world-page .main-header .header-item a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff !important;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 8px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: all 0.25s ease;
+}
+
+body.floating-world-page .main-header .header-item a:hover {
+    background: rgba(255, 255, 255, 0.95);
+    color: #000000 !important;
+    border-color: #ffffff;
 }
 
 /* --- Button Container & Cool Buttons --- */
@@ -720,7 +748,7 @@ body.menu-active .cursor-dot, body.menu-active .cursor-outline { opacity: 0 !imp
     text-align: center;
     text-transform: uppercase;
     letter-spacing: -0.1em;
-    text-shadow: 0 18px 28px rgba(0, 0, 0, 0.12);
+    text-shadow: 0 0 24px rgba(255, 255, 255, 0.95), 0 0 48px rgba(255, 255, 255, 0.8), 0 10px 30px rgba(0, 0, 0, 0.35);
     opacity: var(--ending-progress);
     transform: translate3d(0, calc((1 - var(--ending-progress)) * 64px), 0);
 }
