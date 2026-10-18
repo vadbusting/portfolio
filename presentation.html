@@ -52,6 +52,33 @@ html, body {
   padding: 10px;
 }
 
+.presentation-back-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9999;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  background: rgba(18, 18, 18, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 8px 14px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.25s ease;
+}
+.presentation-back-btn:hover {
+  background: rgba(45, 45, 45, 0.7);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateX(-2px);
+}
+
 /* 3D Perspective Context */
 .slide-deck {
   position: relative;
@@ -1022,6 +1049,8 @@ a:hover { color: #888; }
 </head>
 <body>
 
+<a href="index.html#presentation" class="presentation-back-btn" id="presBackBtn"><i class="fa-solid fa-arrow-left"></i> BACK</a>
+
 <div class="presentation-wrapper">
 <div class="slide-deck" id="slideDeck">
 
@@ -1736,6 +1765,18 @@ window.addEventListener('load', () => {
 scale();
 setTimeout(scale, 150);
 go(0);
+
+const presBack = document.getElementById('presBackBtn');
+if (presBack) {
+  presBack.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (window.history.length > 1 && document.referrer && document.referrer.includes(location.host)) {
+      window.history.back();
+    } else {
+      window.location.href = 'index.html#presentation';
+    }
+  });
+}
 </script>
 
 </body>

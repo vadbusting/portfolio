@@ -2041,7 +2041,7 @@ a:hover { color: #888; }
 
 <!-- LP Fixed Header -->
 <header class="lp-header">
-  <a href="index.html" class="lp-back-btn" id="lpBackBtn"><i class="fa-solid fa-arrow-left"></i> BACK</a>
+  <a href="index.html#lp" class="lp-back-btn" id="lpBackBtn"><i class="fa-solid fa-arrow-left"></i> BACK</a>
 </header>
 
 <!-- Floating Scroll Top Button -->
@@ -3035,6 +3035,18 @@ function initEscherConformalGrid() {
   }
   
   draw();
+  // Robust Back button handler returning directly to 3F LP
+  const lpBack = document.getElementById('lpBackBtn');
+  if (lpBack) {
+    lpBack.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (window.history.length > 1 && document.referrer && document.referrer.includes(location.host)) {
+        window.history.back();
+      } else {
+        window.location.href = 'index.html#lp';
+      }
+    });
+  }
 }
 </script>
 

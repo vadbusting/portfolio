@@ -11,3 +11,7 @@
 
 # Local logs
 *.log
+
+# Scratch & Cache
+__pycache__/
+scratch/

@@ -12,8 +12,8 @@
   /* ---------------- Configuration ---------------- */
   const FLOORS = [
     { key: 'about',        no: '1F',    name: 'ABOUT',        href: 'about.html',            lobby: true },
-    { key: 'presentation', no: '2F',    name: 'PRESENTATION', href: 'presentation.html?v=5', pos: '50% 50%' },
-    { key: 'lp',           no: '3F',    name: 'LP',           href: 'lp.html?v=5',           pos: '50% 50%' },
+    { key: 'presentation', no: '2F',    name: 'PRESENTATION', href: 'presentation.html?v=76', pos: '50% 50%' },
+    { key: 'lp',           no: '3F',    name: 'LP',           href: 'lp.html?v=76',           pos: '50% 50%' },
     { key: 'web',          no: '4F',    name: 'WEB',          href: 'https://www.originalsoccerball.com/', external: true, pos: '50% 50%' },
     { key: 'direction',    no: '5F',    name: 'DIRECTION',    href: 'https://new.express.adobe.com/webpage/XRy2MzIpmkxug', external: true, pos: '50% 50%' },
     { key: 'other',        no: 'B1F',   name: 'OTHER',        href: 'other.html',            pos: '50% 50%', secret: true }
@@ -37,7 +37,8 @@
   const stage = $('stage'), lab = $('lab'), plate = $('plate'), plateA = $('plateImg');
   const dollyLayer = $('dollyLayer'), dolly = $('dolly'), dip = $('dip');
   const portal = $('portal'), portalTitle = $('portalTitle'), portalLink = $('portalLink'), rail = $('rail');
-  const contact = $('contactLayer'), heroVideo = $('heroVideo');
+  const contact = $('contactLayer'), heroVideo = $('heroVideo'), scrollCue = $('scrollCue');
+  const cenotaph = $('cenotaph');
   const seqCv = $('seq'), seqCtx = seqCv.getContext('2d');
   const plateB = plateA.cloneNode();
   plateB.classList.add('b');
@@ -54,7 +55,32 @@
   const smooth = (a, b, v) => { const t = clamp01((v - a) / (b - a)); return t * t * (3 - 2 * t); };
 
   let state = 'hero', cur = -1, token = 0, busy = false, usedKeyboard = false;
+  let platePanX = 0.5, platePanY = 0.5;
+  let floorArrivedTime = 0;
   const alive = t => t === token;
+
+  function resetPlatePan() {
+    const boxRatio = window.innerWidth / window.innerHeight;
+    const isNarrowPortrait = boxRatio < 1.25;
+
+    if (cur === 0 && isNarrowPortrait) {
+      const renderW = window.innerHeight * (2752 / 1536);
+      platePanX = Math.min(1, Math.max(0, (0.7024 * renderW - window.innerWidth / 2) / (renderW - window.innerWidth)));
+      platePanY = 0.5;
+    } else {
+      platePanX = 0.5;
+      platePanY = 0.5;
+    }
+    const posVal = `${(platePanX * 100).toFixed(1)}% ${(platePanY * 100).toFixed(1)}%`;
+    if (plate) plate.style.setProperty('--pos', posVal);
+    if (dollyLayer) dollyLayer.style.setProperty('--pos', '50% 50%');
+    updateStageHotspot();
+    updateAtomDollPosition();
+    if (typeof seq !== 'undefined' && cur === 0) {
+      seq.dirty = true;
+      if (typeof drawSeq === 'function') drawSeq();
+    }
+  }
 
   /* ---------------- State & UI Helpers ---------------- */
   function setState(s) {
@@ -65,16 +91,226 @@
     if (typeof updateAtomVisibility === 'function') updateAtomVisibility();
   }
 
-  const setDip = on => dip.classList.toggle('is-on', on);
+  const setDip = on => {
+    dip.classList.toggle('is-on', on);
+    if (on && atomLayer) atomLayer.hidden = true;
+  };
 
   function setRail(i) {
-    rail.querySelectorAll('button').forEach((b, k) => b.classList.toggle('is-active', k === i));
+    const jumpTarget = i >= 0 ? String(i + 1) : null;
+    rail.querySelectorAll('.rail__btn').forEach(b => {
+      b.classList.toggle('is-active', jumpTarget !== null && b.getAttribute('data-stage-jump') === jumpTarget);
+    });
+  }
+
+  function getFloorHref(f) {
+    const isMobile = window.innerWidth <= 780 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile && f.key === 'about') {
+      return 'mobile/about.html';
+    }
+    return f.href;
+  }
+
+  const FLOOR_HOTSPOTS = {
+    // 1F: 黒い本の形そのままはみ出さず (2752x1536 master coords: 1452, 263, 965, 1051)
+    0: {
+      x: 1452 / 2752, y: 263 / 1536, w: 965 / 2752, h: 1051 / 1536,
+      clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
+    },
+    // 2F: 壁掛けモニタ画面 (2752x1536 master coords: 888, 334, 974, 571)
+    1: {
+      x: 888 / 2752, y: 334 / 1536, w: 974 / 2752, h: 571 / 1536
+    },
+    // 3F: ノートPC画面 (2752x1536 master coords: 1045, 670, 675, 430)
+    2: {
+      x: 1045 / 2752, y: 670 / 1536, w: 675 / 2752, h: 430 / 1536
+    },
+    // 4F: スタジオディスプレイ画面 (2752x1536 master coords: 642, 178, 1468, 826)
+    3: {
+      x: 642 / 2752, y: 178 / 1536, w: 1468 / 2752, h: 826 / 1536
+    },
+    // 5F: 開いた本＆カラフルスモーク全体 (2752x1536 master coords: 896, 590, 1464, 494)
+    4: {
+      x: 896 / 2752, y: 590 / 1536, w: 1464 / 2752, h: 494 / 1536,
+      clipPath: 'polygon(0.0% 39.7%, 32.8% 0.0%, 55.6% 9.7%, 88.1% 29.6%, 100.0% 41.7%, 76.8% 100.0%, 33.6% 62.0%)'
+    },
+    // B???F: サッカーボール球体ディスプレイ (正円直径840px 2752x1536: 958, 330, 840, 840)
+    5: {
+      x: 958 / 2752, y: 330 / 1536, w: 840 / 2752, h: 840 / 1536,
+      clipPath: 'circle(50% at 50% 50%)',
+      borderRadius: '50%'
+    }
+  };
+
+  function getCoverRect(imgW, imgH, vw, vh, posX = 0.5, posY = 0.5) {
+    const imgRatio = imgW / imgH;
+    const boxRatio = vw / vh;
+    let renderW, renderH, offsetX, offsetY;
+    if (boxRatio > imgRatio) {
+      renderW = vw;
+      renderH = vw / imgRatio;
+      offsetX = 0;
+      offsetY = (vh - renderH) * posY;
+    } else {
+      renderH = vh;
+      renderW = vh * imgRatio;
+      offsetX = (vw - renderW) * posX;
+      offsetY = 0;
+    }
+    return { renderW, renderH, offsetX, offsetY };
+  }
+
+  function updateCreditBtnPosition() {
+    const btn = $('headerCreditBtn');
+    const rail = $('rail');
+    const headerLeft = document.querySelector('.lab__header-left');
+    const headerRight = document.querySelector('.lab__header-right');
+    if (!btn || !rail || !headerLeft || !headerRight) return;
+
+    // 横長の時にCREDITがフロアボタンと被る時はその時だけPORTFOLIOの横に移動
+    const boxRatio = window.innerWidth / window.innerHeight;
+    const isLandscape = boxRatio >= 1.05;
+    const stageEl = $('stage');
+    const isFloorState = state === 'floor' || (stageEl && stageEl.dataset.state === 'floor');
+
+    let isColliding = false;
+    if (isFloorState && isLandscape) {
+      const railRect = rail.getBoundingClientRect();
+      const headerRect = document.querySelector('.lab__header')?.getBoundingClientRect();
+      const headerBottom = headerRect ? headerRect.bottom : 65;
+
+      // レールの上端がヘッダー下端付近（50px以内）に達しているか、高さが720px以下の横長画面の場合に被り判定
+      if (railRect.top <= headerBottom + 50 || window.innerHeight <= 720) {
+        isColliding = true;
+      }
+    }
+
+    if (isColliding) {
+      if (btn.parentElement !== headerLeft) {
+        headerLeft.appendChild(btn);
+      }
+      btn.classList.add('is-next-to-portfolio');
+    } else {
+      if (btn.parentElement !== headerRight) {
+        headerRight.appendChild(btn);
+      }
+      btn.classList.remove('is-next-to-portfolio');
+    }
+  }
+
+  function updateCreditBtnVisibility() {
+    const btn = $('headerCreditBtn');
+    if (!btn) return;
+    // CREDITボタンはOTHER（B???F）の静止画終点時のみ表示、それ以外は厳格に非表示
+    if (state === 'floor' && cur === 5 && plate && plate.classList.contains('is-end')) {
+      btn.hidden = false;
+      btn.style.display = 'inline-block';
+    } else {
+      btn.hidden = true;
+      btn.style.display = 'none';
+    }
+    updateCreditBtnPosition();
+  }
+
+  function openCreditModal() {
+    const modal = $('creditModal');
+    if (!modal) return;
+    modal.hidden = false;
+  }
+
+  function closeCreditModal() {
+    const modal = $('creditModal');
+    if (!modal) return;
+    modal.hidden = true;
+    updateCreditBtnVisibility();
+  }
+
+  function updateStageHotspot(px = platePanX, py = platePanY) {
+    const hotspot = $('stageHotspot') || $('floorHotspot');
+    const emailHotspot = $('emailHotspot');
+    if (!hotspot) return;
+
+    if (state === 'floor' && cur >= 0 && (cur === 0 || (plate && plate.classList.contains('is-end')))) {
+      const f = FLOORS[cur];
+      const box = FLOOR_HOTSPOTS[cur];
+      if (box && f && f.href) {
+        const cover = getCoverRect(2752, 1536, window.innerWidth, window.innerHeight, px, py);
+        hotspot.style.left = `${cover.offsetX + box.x * cover.renderW}px`;
+        hotspot.style.top = `${cover.offsetY + box.y * cover.renderH}px`;
+        hotspot.style.width = `${box.w * cover.renderW}px`;
+        hotspot.style.height = `${box.h * cover.renderH}px`;
+        hotspot.style.clipPath = box.clipPath || '';
+        hotspot.style.borderRadius = box.borderRadius || '';
+        const targetHref = getFloorHref(f);
+        hotspot.href = targetHref;
+        if (f.external) {
+          hotspot.target = '_blank';
+          hotspot.rel = 'noopener noreferrer';
+        } else {
+          hotspot.removeAttribute('target');
+          hotspot.removeAttribute('rel');
+        }
+        hotspot.hidden = false;
+        hotspot.style.display = 'block';
+
+        if (emailHotspot) {
+          if (cur === 0) {
+            // 1F vadbusting@gmail.com exact text hotspot (1783, 928, 336, 30)
+            emailHotspot.style.left = `${cover.offsetX + (1783 / 2752) * cover.renderW}px`;
+            emailHotspot.style.top = `${cover.offsetY + (928 / 1536) * cover.renderH}px`;
+            emailHotspot.style.width = `${(336 / 2752) * cover.renderW}px`;
+            emailHotspot.style.height = `${(30 / 1536) * cover.renderH}px`;
+            emailHotspot.href = 'mailto:vadbusting@gmail.com';
+            emailHotspot.hidden = false;
+            emailHotspot.style.display = 'block';
+          } else {
+            emailHotspot.hidden = true;
+            emailHotspot.style.display = 'none';
+          }
+        }
+      } else {
+        hotspot.hidden = true;
+        hotspot.style.display = 'none';
+        if (emailHotspot) { emailHotspot.hidden = true; emailHotspot.style.display = 'none'; }
+      }
+    } else {
+      hotspot.hidden = true;
+      hotspot.style.display = 'none';
+      if (emailHotspot) { emailHotspot.hidden = true; emailHotspot.style.display = 'none'; }
+    }
+  }
+
+  // Click on floor hotspot navigates to floor destination
+  const floorHotspotEl = $('stageHotspot') || $('floorHotspot');
+  if (floorHotspotEl) {
+    floorHotspotEl.addEventListener('click', e => {
+      e.stopPropagation();
+      if (cur >= 0) {
+        const f = FLOORS[cur];
+        if (f && f.href) {
+          const targetHref = getFloorHref(f);
+          if (f.external) {
+            window.open(targetHref, '_blank', 'noopener noreferrer');
+          } else {
+            location.href = targetHref;
+          }
+        }
+      }
+    });
+  }
+
+  const emailHotspotEl = $('emailHotspot');
+  if (emailHotspotEl) {
+    emailHotspotEl.addEventListener('click', e => {
+      e.stopPropagation();
+    });
   }
 
   function showPortal(i) {
     const f = FLOORS[i];
     portalTitle.textContent = f.name;
-    portalLink.href = f.href;
+    const targetHref = getFloorHref(f);
+    portalLink.href = targetHref;
     if (f.external) {
       portalLink.target = '_blank';
       portalLink.rel = 'noopener';
@@ -85,12 +321,15 @@
     portal.classList.add('is-visible');
     portal.setAttribute('aria-hidden', 'false');
     portalLink.tabIndex = 0;
+    updateStageHotspot();
   }
 
   function hidePortal() {
     portal.classList.remove('is-visible');
     portal.setAttribute('aria-hidden', 'true');
     portalLink.tabIndex = -1;
+    const hotspot = $('floorHotspot') || $('stageHotspot');
+    if (hotspot) hotspot.hidden = true;
   }
 
   async function loadImg(img, src) {
@@ -98,11 +337,11 @@
     try { await img.decode(); } catch (e) { /* ignore */ }
   }
 
-  const getFloorPos = f => {
-    if (f.key === 'lp' && window.innerWidth <= 768) return '66% 50%';
-    return f.pos || '50% 50%';
+  const getFloorPos = f => f.pos || '50% 50%';
+  const setPos = f => {
+    if (plate) plate.style.setProperty('--pos', getFloorPos(f));
+    if (dollyLayer) dollyLayer.style.setProperty('--pos', '50% 50%');
   };
-  const setPos = f => [plate, dollyLayer].forEach(l => l.style.setProperty('--pos', getFloorPos(f)));
 
   /* ---------------- Lobby Sequence (Canvas Scrubbing) ---------------- */
   const seq = { imgs: new Array(SEQ_COUNT), ok: new Array(SEQ_COUNT).fill(false), end: new Image(), endOk: false, q: 0, qt: 0, started: false, auto: false, raf: 0, last: 0, dirty: true };
@@ -163,9 +402,14 @@
   function cover(img, a) {
     const cw = seqCv.width, ch = seqCv.height, iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
     if (!iw || !ih) return;
-    const s = Math.max(cw / iw, ch / ih), w = iw * s, h = ih * s;
+    const s = Math.max(cw / iw, ch / ih);
+    const w = iw * s, h = ih * s;
+    const px = (state === 'floor' && cur === 0) ? platePanX : 0.5;
+    const py = (state === 'floor' && cur === 0) ? platePanY : 0.5;
+    const ox = (cw - w) * px;
+    const oy = (ch - h) * py;
     seqCtx.globalAlpha = a;
-    seqCtx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+    seqCtx.drawImage(img, ox, oy, w, h);
   }
 
   function drawSeq() {
@@ -201,7 +445,7 @@
     if (state !== 'lobby') { seq.raf = 0; return; }
     const dt = seq.last ? Math.min(0.08, (now - seq.last) / 1000) : 0;
     seq.last = now;
-    if (seq.auto) seq.qt = clamp01(seq.qt + dt * 0.12);
+    if (seq.auto) seq.qt = clamp01(seq.qt + dt * 0.012);
     const diff = seq.qt - seq.q;
     if (Math.abs(diff) > 0.0002) {
       seq.q += diff * Math.min(1, dt * 7);
@@ -210,6 +454,7 @@
     }
     if (seq.qt >= 0.999 && seq.q >= 0.994 && !busy) {
       setSeq(1);
+      seq.raf = 0;
       arriveLobbyEnd();
       return;
     }
@@ -227,10 +472,11 @@
     if (busy) return;
     seq.auto = false;
     if (seq.qt <= 0.001 && d < -0.004) {
-      goHero();
+      goHero({ fromLobby: true });
       return;
     }
     seq.qt = clamp01(seq.qt + d);
+    startSeqLoop();
   }
 
   /* ---------------- Floor Assets Warm-up ---------------- */
@@ -254,85 +500,266 @@
     if (b) warm(+b.dataset.stageJump - 1);
   });
 
-  /* ---------------- Video Playback ---------------- */
-  function playClip(v, src, onStart) {
-    return new Promise(resolve => {
-      let done = false, started = false, timer;
-      const finish = ok => {
-        if (done) return;
-        done = true;
-        clearTimeout(timer);
-        ['ended', 'error', 'playing'].forEach(ev => v.removeEventListener(ev, h[ev]));
-        resolve(ok);
-      };
-      const h = {
-        playing: () => {
-          if (!started) {
-            started = true;
-            clearTimeout(timer);
-            onStart && onStart();
-          }
-        },
-        ended: () => finish(true),
-        error: () => finish(false)
-      };
-      Object.keys(h).forEach(ev => v.addEventListener(ev, h[ev]));
-      timer = setTimeout(() => {
-        if (!started) { videoBroken = true; finish(false); }
-      }, WATCHDOG_MS);
-      v.cancelSkip = () => finish(false);
-      v.muted = true;
-      v.playsInline = true;
-      v.src = src;
-      v.load();
-      const p = v.play();
-      if (p && p.catch) p.catch(() => { videoBroken = true; finish(false); });
+  /* ---------------- Dual Scrub Engine (HERO & Floor Video Scrubbing) ---------------- */
+  let heroQ = 0, heroQt = 0, heroRaf = 0, heroLast = 0;
+  let floorQ = 0, floorQt = 0, floorRaf = 0, floorLast = 0;
+
+  if (heroVideo) {
+    heroVideo.addEventListener('seeked', () => {
+      if (state === 'hero') {
+        const dur = (Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) ? heroVideo.duration : 10.0;
+        const targetTime = clamp01(heroQ) * dur;
+        if (Math.abs(heroVideo.currentTime - targetTime) > 0.02) {
+          try { heroVideo.currentTime = targetTime; } catch (e) {}
+        }
+      }
     });
   }
 
-  function stopClip(v) {
-    try { v.pause(); } catch (e) {}
-    if (v.cancelSkip) {
-      const c = v.cancelSkip;
-      v.cancelSkip = null;
-      c();
+  if (dolly) {
+    dolly.addEventListener('seeked', () => {
+      if (state === 'floor') {
+        const dur = (Number.isFinite(dolly.duration) && dolly.duration > 0) ? dolly.duration : 10.0;
+        const targetTime = clamp01(floorQ) * dur;
+        if (Math.abs(dolly.currentTime - targetTime) > 0.02) {
+          try { dolly.currentTime = targetTime; } catch (e) {}
+        }
+      }
+    });
+  }
+
+  function heroLoop(now) {
+    const dt = Math.min(0.08, (now - heroLast) / 1000 || 0.016);
+    heroLast = now;
+    const diff = heroQt - heroQ;
+    if (Math.abs(diff) > 0.0004) {
+      heroQ += diff * Math.min(1, dt * 14);
+    } else {
+      heroQ = heroQt;
+    }
+
+    const dur = (heroVideo && Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) ? heroVideo.duration : 10.0;
+    const targetTime = clamp01(heroQ) * dur;
+
+    if (heroVideo && Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) {
+      if (heroVideo.hasAttribute('poster')) {
+        heroVideo.removeAttribute('poster');
+      }
+      if (!heroVideo.seeking && Math.abs(heroVideo.currentTime - targetTime) > 0.015) {
+        try { heroVideo.currentTime = targetTime; } catch (e) {}
+      }
+    }
+
+    // Cinematic CENOTAPH movie title: visible as approaching gate, fades out smoothly as passing through the gate (~3.8s to 4.8s)
+    if (cenotaph) {
+      const t = targetTime;
+      if (t < 3.8) {
+        cenotaph.style.opacity = '1';
+        cenotaph.style.filter = 'none';
+        cenotaph.style.transform = 'translate(-50%, -50%) scale(1)';
+        cenotaph.style.pointerEvents = 'auto';
+      } else if (t <= 4.8) {
+        const p = (t - 3.8) / 1.0;
+        const alpha = Math.max(0, 1 - p);
+        cenotaph.style.opacity = alpha.toFixed(4);
+        cenotaph.style.filter = `blur(${(p * 8).toFixed(1)}px)`;
+        cenotaph.style.transform = 'translate(-50%, -50%) scale(1)';
+        cenotaph.style.pointerEvents = alpha > 0.1 ? 'auto' : 'none';
+      } else {
+        cenotaph.style.opacity = '0';
+        cenotaph.style.pointerEvents = 'none';
+        cenotaph.style.filter = 'blur(8px)';
+        cenotaph.style.transform = 'translate(-50%, -50%) scale(1)';
+      }
+    }
+
+    if (heroQt <= 0.01 && heroQ <= 0.02) {
+      if (scrollCue) scrollCue.classList.remove('is-hidden');
+    }
+
+    // End of HERO video -> Smoothly arrive at 1F Floor Selection (ABOUT)
+    if (heroQt >= 0.99 && heroQ >= 0.985 && !busy) {
+      heroQ = heroQt = 1;
+      cancelAnimationFrame(heroRaf);
+      heroRaf = 0;
+      arriveLobbyEnd();
+      return;
+    }
+
+    if (Math.abs(heroQt - heroQ) > 0.0004) {
+      heroRaf = requestAnimationFrame(heroLoop);
+    } else {
+      heroRaf = 0;
+      if (heroVideo && Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) {
+        try { heroVideo.currentTime = targetTime; } catch (e) {}
+      }
     }
   }
 
-  function clearClip(v) {
-    stopClip(v);
-    v.removeAttribute('src');
-    try { v.load(); } catch (e) {}
+  function startHeroLoop() {
+    if (!heroRaf) {
+      heroLast = performance.now();
+      heroRaf = requestAnimationFrame(heroLoop);
+    }
+  }
+
+  function heroNudge(d) {
+    if (busy || state !== 'hero') return;
+    if (heroVideo && heroVideo.hasAttribute('poster')) {
+      heroVideo.removeAttribute('poster');
+    }
+    heroQt = clamp01(heroQt + d);
+    startHeroLoop();
+  }
+
+  function floorLoop(now) {
+    const dt = Math.min(0.08, (now - floorLast) / 1000 || 0.016);
+    floorLast = now;
+    const diff = floorQt - floorQ;
+    if (Math.abs(diff) > 0.0004) {
+      floorQ += diff * Math.min(1, dt * 14);
+    } else {
+      floorQ = floorQt;
+    }
+
+    // Mid-scrub: keep plate hidden so video is visible, hide portal
+    if (floorQ > 0.005 && floorQ < 0.985) {
+      plate.classList.remove('is-end');
+      hidePortal();
+      updateStageHotspot();
+      updateCreditBtnVisibility();
+      updateAtomVisibility();
+    }
+
+    if (dolly && Number.isFinite(dolly.duration) && dolly.duration > 0) {
+      const targetTime = clamp01(floorQ) * dolly.duration;
+      if (!dolly.seeking && Math.abs(dolly.currentTime - targetTime) > 0.015) {
+        try { dolly.currentTime = targetTime; } catch (e) {}
+      }
+    }
+
+    // Settle at End Frame: high-res plateB (_end.webp) + show OPEN PAGE & hotspot
+    if (floorQt >= 0.99 && floorQ >= 0.985 && !busy) {
+      floorQ = floorQt = 1;
+      if (dolly && Number.isFinite(dolly.duration)) {
+        try { dolly.currentTime = dolly.duration; } catch (e) {}
+      }
+      plate.classList.remove('no-fade');
+      plate.classList.add('is-end');
+      if (scrollCue) scrollCue.classList.add('is-hidden');
+      stage.classList.remove('is-waiting-scroll');
+      updateCreditBtnVisibility();
+      updateAtomVisibility();
+      floorRaf = 0;
+      arrive(cur, token);
+      return;
+    }
+
+    // Settle back at Start Frame: video's first frame directly (currentTime = 0) + show SCROLL cue
+    if (floorQt <= 0.001 && floorQ <= 0.005 && !busy) {
+      floorQ = floorQt = 0;
+      if (dolly && Number.isFinite(dolly.duration)) {
+        try { dolly.currentTime = 0; } catch (e) {}
+      }
+      plate.classList.remove('is-end');
+      stage.classList.add('is-waiting-scroll');
+      if (scrollCue) scrollCue.classList.remove('is-hidden');
+      updateStageHotspot();
+      updateCreditBtnVisibility();
+      updateAtomVisibility();
+      floorRaf = 0;
+      return;
+    }
+
+    if (Math.abs(floorQt - floorQ) > 0.0004) {
+      floorRaf = requestAnimationFrame(floorLoop);
+    } else {
+      floorRaf = 0;
+    }
+  }
+
+  function startFloorLoop() {
+    if (!floorRaf) {
+      floorLast = performance.now();
+      floorRaf = requestAnimationFrame(floorLoop);
+    }
+  }
+
+  function floorNudge(d) {
+    if (busy || state !== 'floor' || cur < 1) return;
+    floorQt = clamp01(floorQt + d);
+    startFloorLoop();
   }
 
   /* ---------------- Navigation Transitions ---------------- */
 
   // Return to HERO (entrance video + CENOTAPH for)
-  async function goHero() {
+  async function goHero(opts) {
+    opts = opts || {};
     token++;
-    stopClip(dolly);
+    if (floorRaf) { cancelAnimationFrame(floorRaf); floorRaf = 0; }
+    if (heroRaf) { cancelAnimationFrame(heroRaf); heroRaf = 0; }
+    if (seq.raf) { cancelAnimationFrame(seq.raf); seq.raf = 0; }
+    if (dolly) dolly.pause();
     busy = false;
-    setDip(true);
-    await wait(220);
+
+    if (!opts.fromLobby) {
+      setDip(true);
+      await wait(220);
+    }
     hidePortal();
     setRail(-1);
     cur = -1;
-    clearClip(dolly);
     dollyLayer.classList.remove('is-on');
+    plate.classList.remove('is-end');
+    stage.classList.remove('is-waiting-scroll');
+    seq.last = 0;
+    seq.auto = false;
+    seq.q = 0;
+    seq.qt = 0;
+    seq.dirty = true;
     setState('hero');
-    if (heroVideo && heroVideo.paused) {
-      try { heroVideo.play(); } catch (e) {}
+
+    if (opts.fromLobby) {
+      heroQ = heroQt = 0.98;
+      if (heroVideo && Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) {
+        if (heroVideo.hasAttribute('poster')) heroVideo.removeAttribute('poster');
+        try { heroVideo.currentTime = heroVideo.duration * 0.98; } catch (e) {}
+      }
+      if (cenotaph) {
+        cenotaph.style.opacity = '0';
+        cenotaph.style.pointerEvents = 'none';
+      }
+      if (scrollCue) scrollCue.classList.add('is-hidden');
+      startHeroLoop();
+    } else {
+      heroQ = heroQt = 0;
+      if (heroVideo) {
+        heroVideo.pause();
+        try { heroVideo.currentTime = 0; } catch (e) {}
+      }
+      if (cenotaph) {
+        cenotaph.style.opacity = '1';
+        cenotaph.style.transform = 'translate(-50%, -50%) scale(1)';
+        cenotaph.style.filter = 'none';
+        cenotaph.style.pointerEvents = 'auto';
+      }
+      if (scrollCue) scrollCue.classList.remove('is-hidden');
     }
     history.replaceState(null, '', location.pathname + location.search);
-    setDip(false);
+    if (!opts.fromLobby) {
+      setDip(false);
+    }
   }
 
   // Smoothly enter Lobby from HERO
   function toLobbyState(q) {
     cur = -1;
-    seq.q = seq.qt = q || 0;
+    seq.q = seq.qt = (typeof q === 'number') ? q : 0;
     seq.auto = false;
     seq.dirty = true;
+    stage.classList.remove('is-waiting-scroll');
+    if (scrollCue) scrollCue.classList.add('is-hidden');
     drawSeq();
     setState('lobby');
     setRail(-1);
@@ -344,6 +771,7 @@
   function enterLobbyFromHero() {
     if (busy || state !== 'hero') return;
     busy = true;
+    if (scrollCue) scrollCue.classList.add('is-hidden');
     seqLoad();
     toLobbyState(0);
     setTimeout(() => { busy = false; }, 350);
@@ -353,12 +781,24 @@
   function arriveLobbyEnd() {
     busy = false;
     cur = 0;
+    floorArrivedTime = performance.now();
+    resetPlatePan();
+    if (plate) {
+      plate.classList.remove('is-end');
+      plate.classList.add('no-fade');
+    }
+    if (dollyLayer) dollyLayer.classList.remove('is-on');
     seq.q = seq.qt = 1;
     seq.dirty = true;
     drawSeq();
     setState('floor');
     showPortal(0);
     setRail(0);
+    updateStageHotspot();
+    updateCreditBtnVisibility();
+    updateAtomVisibility();
+    if (scrollCue) scrollCue.classList.add('is-hidden');
+    stage.classList.remove('is-waiting-scroll');
     history.replaceState(null, '', '#about');
   }
 
@@ -378,7 +818,14 @@
       await wait(250);
       if (!alive(t)) return;
     }
-    clearClip(dolly);
+    if (dolly) {
+      dolly.pause();
+      try { dolly.currentTime = 0; } catch (e) {}
+    }
+    if (floorRaf) {
+      cancelAnimationFrame(floorRaf);
+      floorRaf = 0;
+    }
     dollyLayer.classList.remove('is-on');
     arriveLobbyEnd();
     setDip(false);
@@ -398,6 +845,12 @@
     const t = ++token;
     busy = true;
     hidePortal();
+    if (atomLayer) atomLayer.hidden = true;
+    if (atomBubble) {
+      atomBubble.hidden = true;
+      atomBubble.classList.remove('is-hiding');
+    }
+    clearTimeout(bubbleTimer);
     const f = FLOORS[i];
     cur = i;
     setRail(i);
@@ -405,12 +858,27 @@
     warm(i + 1);
     history.replaceState(null, '', '#' + f.key);
 
+    if (floorRaf) {
+      cancelAnimationFrame(floorRaf);
+      floorRaf = 0;
+    }
+    floorQ = 0;
+    floorQt = 0;
+    floorLast = 0;
+
     const reset = () => {
       setPos(f);
+      resetPlatePan();
       plate.classList.add('no-fade');
       plate.classList.remove('is-end');
-      clearClip(dolly);
+      if (dolly) {
+        dolly.pause();
+        try { dolly.currentTime = 0; } catch (e) {}
+        dolly.src = PATH.dolly(f.key);
+      }
       dollyLayer.classList.remove('is-on');
+      stage.classList.remove('is-waiting-scroll');
+      if (scrollCue) scrollCue.classList.add('is-hidden');
       updateAtomVisibility();
     };
 
@@ -423,6 +891,10 @@
       reset();
       await loadPlates();
       if (!alive(t)) return;
+      floorQ = floorQt = 1;
+      if (dolly && Number.isFinite(dolly.duration)) {
+        try { dolly.currentTime = dolly.duration; } catch (e) {}
+      }
       plate.classList.add('is-end');
       setDip(false);
       return arrive(i, t);
@@ -439,27 +911,26 @@
     plate.classList.remove('no-fade');
     setDip(false);
 
-    // Play the floor footage directly (contains elevator opening / entrance)
-    let played = false;
-    const clipPromise = canVideo()
-      ? playClip(dolly, PATH.dolly(f.key), () => dollyLayer.classList.add('is-on')).then(ok => { played = ok; return ok; })
-      : Promise.resolve(false);
-
-    const ok = await clipPromise;
-    if (!alive(t)) return;
-
-    // Settle onto end frame
-    plate.classList.add('is-end');
-    arrive(i, t);
+    // Freeze on Start Still Frame — waiting for scroll trigger
+    stage.classList.add('is-waiting-scroll');
+    if (scrollCue) scrollCue.classList.remove('is-hidden');
+    busy = false;
   }
 
   function arrive(i, t) {
     if (!alive(t)) return;
+    floorArrivedTime = performance.now();
     setState('floor');
+    stage.classList.remove('is-waiting-scroll');
+    if (scrollCue) scrollCue.classList.add('is-hidden');
+    resetPlatePan();
     showPortal(i);
     setRail(i);
     busy = false;
     updateAtomVisibility();
+    updateStageHotspot();
+    updateCreditBtnVisibility();
+    if (typeof updateAmbientPlate === 'function') updateAmbientPlate();
     if (usedKeyboard) setTimeout(() => portalLink.focus({ preventScroll: true }), 400);
   }
 
@@ -470,75 +941,293 @@
       return;
     }
     token++;
-    stopClip(dolly);
+    if (floorRaf) {
+      cancelAnimationFrame(floorRaf);
+      floorRaf = 0;
+    }
+    if (dolly) dolly.pause();
     busy = false;
     goFloor(i, { force: true });
   }
 
-  // Click background to instantly jump to end of video, or navigate to floor page if already on end frame
+  // Click background: only fast-forward in hero if clicked outside interactive controls
   stage.addEventListener('click', e => {
-    if (state === 'floor' && !e.target.closest('button,a,.contactLayer,.cipherModal,.atomDollWrap')) {
-      if (dolly && !dolly.paused) {
-        try { dolly.currentTime = dolly.duration || 999; } catch (e) {}
-      } else {
-        // Video has finished or settled on end frame: direct click navigates to floor destination
-        const f = FLOORS[cur];
-        if (f && f.href) {
-          if (f.external) {
-            window.open(f.href, '_blank', 'noopener');
-          } else {
-            location.href = f.href;
-          }
-        }
+    const creditModal = $('creditModal');
+    if (creditModal && !creditModal.hidden) return;
+    if (state === 'hero') {
+      if (!e.target.closest('button,a,.contactLayer,.creditModal')) {
+        heroQt = 1;
+        startHeroLoop();
       }
     }
+    // On floor state, ONLY #floorHotspot and #portalLink navigate to pages. Background click does nothing.
   });
 
   /* ---------------- Input Handling ---------------- */
-  let heroScrollAccum = 0;
-
   window.addEventListener('wheel', e => {
-    if (!contact.hidden) return;
+    const creditModal = $('creditModal');
+    if (!contact.hidden || (creditModal && !creditModal.hidden)) return;
     e.preventDefault();
 
     if (state === 'hero') {
-      if (e.deltaY > 0) {
-        heroScrollAccum += e.deltaY;
-        if (heroScrollAccum > 60) {
-          heroScrollAccum = 0;
-          enterLobbyFromHero();
-        }
-      } else {
-        heroScrollAccum = 0;
-      }
+      if (scrollCue) scrollCue.classList.add('is-hidden');
+      heroNudge(e.deltaY / 4800);
     } else if (state === 'lobby') {
-      seqNudge(e.deltaY / 2200);
+      seqNudge(e.deltaY / 2400);
+    } else if (state === 'floor') {
+      if (cur === 0 || (plate && plate.classList.contains('is-end'))) {
+        // 到着直後（250ms以内）はビデオ再生時の慣性スクロールによる意図しないパン移動を抑止
+        if (performance.now() - floorArrivedTime < 250) {
+          return;
+        }
+
+        const boxRatio = window.innerWidth / window.innerHeight;
+        const isLandscape = boxRatio >= 1.05;
+
+        if (isLandscape) {
+          // --- 横長時 (Landscape: 左右スクロールで切れてる上下を表示 / 上下スクロールバックで巻き戻し) ---
+          const isHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+
+          if (isHorizontal) {
+            // 静止画の横長は「左右スクロール」で切れている「上下」を表示 (platePanY 0.0〜1.0)
+            if (Math.abs(e.deltaX) > 0.5) {
+              platePanY = clamp01(platePanY + e.deltaX / (window.innerHeight * 1.5));
+            }
+            platePanX = 0.5; // 水平位置は中央固定
+
+            const pVal = `50.0% ${(platePanY * 100).toFixed(1)}%`;
+            if (plate) plate.style.setProperty('--pos', pVal);
+            updateStageHotspot(0.5, platePanY);
+            if (cur === 2) updateAtomDollPosition(0.5, platePanY);
+            if (cur === 0) {
+              seq.dirty = true;
+              drawSeq();
+            }
+            return;
+          } else {
+            // 上下スクロール (垂直操作: 上スクロールでスクロールバック / 巻き戻し)
+            if (e.deltaY < -15) {
+              platePanX = 0.5;
+              platePanY = 0.5;
+              if (plate) plate.style.setProperty('--pos', '50.0% 50.0%');
+              updateStageHotspot(0.5, 0.5);
+              if (cur === 2) updateAtomDollPosition(0.5, 0.5);
+
+              if (cur === 0) {
+                toLobbyState(0.98);
+                return;
+              }
+              if (scrollCue) scrollCue.classList.add('is-hidden');
+              stage.classList.remove('is-waiting-scroll');
+              floorQt = Math.min(0.90, floorQt + e.deltaY / 2400);
+              startFloorLoop();
+              return;
+            }
+            return;
+          }
+        } else {
+          // --- 縦長時 (Portrait: 左右スクロールで切れてる左右を表示 / 上下スクロールバックで巻き戻し) ---
+          const isHorizontalSwipe = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+
+          if (isHorizontalSwipe) {
+            // 静止画の縦長画面は「左右スクロール」で切れている「左右」を表示 (platePanX 0.0〜1.0)
+            if (Math.abs(e.deltaX) > 0.5) {
+              platePanX = clamp01(platePanX + e.deltaX / (window.innerWidth * 1.5));
+            }
+            platePanY = 0.5; // 垂直位置は中央固定
+
+            const pVal = `${(platePanX * 100).toFixed(1)}% 50.0%`;
+            if (plate) plate.style.setProperty('--pos', pVal);
+            updateStageHotspot(platePanX, 0.5);
+            if (cur === 2) updateAtomDollPosition(platePanX, 0.5);
+            if (cur === 0) {
+              seq.dirty = true;
+              drawSeq();
+            }
+            return;
+          } else {
+            // 上下スクロール (垂直操作: 上スクロールでスクロールバック / 巻き戻し)
+            if (e.deltaY < -15) {
+              platePanX = 0.5;
+              platePanY = 0.5;
+              const pVal = '50.0% 50.0%';
+              if (plate) plate.style.setProperty('--pos', pVal);
+              updateStageHotspot(0.5, 0.5);
+              if (cur === 2) updateAtomDollPosition(0.5, 0.5);
+
+              if (cur === 0) {
+                toLobbyState(0.98);
+                return;
+              }
+              if (scrollCue) scrollCue.classList.add('is-hidden');
+              stage.classList.remove('is-waiting-scroll');
+              floorQt = Math.min(0.90, floorQt + e.deltaY / 2400);
+              startFloorLoop();
+              return;
+            }
+            return;
+          }
+        }
+      }
+      if (scrollCue) scrollCue.classList.add('is-hidden');
+      stage.classList.remove('is-waiting-scroll');
+      floorNudge(e.deltaY / 2400);
     }
   }, { passive: false });
 
-  let touchStartY = null;
+  let touchStartX = null, touchStartY = null;
 
   stage.addEventListener('touchstart', e => {
-    touchStartY = e.target.closest('button,a,.contactLayer') ? null : e.touches[0].clientY;
+    const creditModal = $('creditModal');
+    if (creditModal && !creditModal.hidden) {
+      touchStartX = null;
+      touchStartY = null;
+      return;
+    }
+    const isInteractive = e.target.closest('button,a,.contactLayer,.cipherModal,.creditModal');
+    touchStartX = isInteractive ? null : e.touches[0].clientX;
+    touchStartY = isInteractive ? null : e.touches[0].clientY;
   }, { passive: true });
 
   stage.addEventListener('touchmove', e => {
-    if (touchStartY == null) return;
+    const creditModal = $('creditModal');
+    if (creditModal && !creditModal.hidden) return;
+    if (touchStartY == null || touchStartX == null) return;
+    const x = e.touches[0].clientX;
     const y = e.touches[0].clientY;
+    const dx = touchStartX - x;
     const dy = touchStartY - y;
 
     if (state === 'hero') {
-      if (dy > 35) {
-        touchStartY = null;
-        enterLobbyFromHero();
-      }
-    } else if (state === 'lobby') {
-      seqNudge((touchStartY - y) / (innerHeight * 1.4));
+      if (scrollCue) scrollCue.classList.add('is-hidden');
+      heroNudge(dy / (innerHeight * 6.0));
       touchStartY = y;
+      touchStartX = x;
+    } else if (state === 'lobby') {
+      seqNudge((touchStartY - y) / (innerHeight * 3.0));
+      touchStartY = y;
+      touchStartX = x;
+    } else if (state === 'floor') {
+      if (cur === 0 || (plate && plate.classList.contains('is-end'))) {
+        if (performance.now() - floorArrivedTime < 250) {
+          touchStartY = y;
+          touchStartX = x;
+          return;
+        }
+
+        const boxRatio = window.innerWidth / window.innerHeight;
+        const isLandscape = boxRatio >= 1.05;
+
+        if (isLandscape) {
+          // --- 横長スワイプ (Landscape: 左右スワイプで切れてる上下を表示 / 上下スワイプで巻き戻し) ---
+          const isHorizontal = Math.abs(dx) > Math.abs(dy);
+
+          if (isHorizontal) {
+            // 左右スワイプで上下を表示 (platePanY 0.0〜1.0)
+            if (Math.abs(dx) > 0.8) {
+              platePanY = clamp01(platePanY + dx / (window.innerHeight * 1.5));
+            }
+            platePanX = 0.5; // 水平位置は中央固定
+
+            const pVal = `50.0% ${(platePanY * 100).toFixed(1)}%`;
+            if (plate) plate.style.setProperty('--pos', pVal);
+            updateStageHotspot(0.5, platePanY);
+            if (cur === 2) updateAtomDollPosition(0.5, platePanY);
+            if (cur === 0) {
+              seq.dirty = true;
+              drawSeq();
+            }
+            touchStartY = y;
+            touchStartX = x;
+            return;
+          } else {
+            // 垂直スワイプ: 上下操作 (スクロールバック / 巻き戻し)
+            if (dy < -20) {
+              platePanX = 0.5;
+              platePanY = 0.5;
+              if (plate) plate.style.setProperty('--pos', '50.0% 50.0%');
+              updateStageHotspot(0.5, 0.5);
+              if (cur === 2) updateAtomDollPosition(0.5, 0.5);
+
+              if (cur === 0) {
+                touchStartY = null;
+                touchStartX = null;
+                toLobbyState(0.98);
+                return;
+              }
+              touchStartY = y;
+              touchStartX = x;
+              if (scrollCue) scrollCue.classList.add('is-hidden');
+              stage.classList.remove('is-waiting-scroll');
+              floorQt = Math.min(0.90, floorQt + dy / (innerHeight * 3.0));
+              startFloorLoop();
+              return;
+            }
+            touchStartY = y;
+            touchStartX = x;
+            return;
+          }
+        } else {
+          // --- 縦長スワイプ (Portrait: 左右スワイプで切れてる左右を表示 / 上下スワイプで巻き戻し) ---
+          const isHorizontalSwipe = Math.abs(dx) > Math.abs(dy);
+
+          if (isHorizontalSwipe) {
+            // 左右スワイプ: 水平パン (platePanX 0.0〜1.0)
+            if (Math.abs(dx) > 0.8) {
+              platePanX = clamp01(platePanX + dx / (window.innerWidth * 1.2));
+            }
+            platePanY = 0.5; // 垂直位置は中央固定
+
+            const pVal = `${(platePanX * 100).toFixed(1)}% 50.0%`;
+            if (plate) plate.style.setProperty('--pos', pVal);
+            updateStageHotspot(platePanX, 0.5);
+            if (cur === 2) updateAtomDollPosition(platePanX, 0.5);
+            if (cur === 0) {
+              seq.dirty = true;
+              drawSeq();
+            }
+            touchStartY = y;
+            touchStartX = x;
+            return;
+          } else {
+            // 垂直スワイプ: 上下操作 (スクロールバック / 巻き戻し)
+            if (dy < -20) {
+              platePanX = 0.5;
+              platePanY = 0.5;
+              const pVal = '50.0% 50.0%';
+              if (plate) plate.style.setProperty('--pos', pVal);
+              updateStageHotspot(0.5, 0.5);
+              if (cur === 2) updateAtomDollPosition(0.5, 0.5);
+
+              if (cur === 0) {
+                touchStartY = null;
+                touchStartX = null;
+                toLobbyState(0.98);
+                return;
+              }
+              touchStartY = y;
+              touchStartX = x;
+              if (scrollCue) scrollCue.classList.add('is-hidden');
+              stage.classList.remove('is-waiting-scroll');
+              floorQt = Math.min(0.90, floorQt + dy / (innerHeight * 3.0));
+              startFloorLoop();
+              return;
+            }
+            touchStartY = y;
+            touchStartX = x;
+            return;
+          }
+        }
+      }
+      touchStartY = y;
+      touchStartX = x;
+      if (scrollCue) scrollCue.classList.add('is-hidden');
+      stage.classList.remove('is-waiting-scroll');
+      floorNudge(dy / (innerHeight * 3.0));
     }
   }, { passive: true });
 
-  stage.addEventListener('touchend', () => { touchStartY = null; }, { passive: true });
+  stage.addEventListener('touchend', () => { touchStartX = null; touchStartY = null; }, { passive: true });
 
   window.addEventListener('keydown', e => {
     usedKeyboard = true;
@@ -547,12 +1236,17 @@
       return;
     }
     const adv = e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ' || e.key === 'Enter';
+    const rev = e.key === 'ArrowUp' || e.key === 'PageUp';
 
     if (state === 'hero') {
       if (adv) {
         if (e.target.closest && e.target.closest('button,a')) return;
         e.preventDefault();
-        enterLobbyFromHero();
+        if (scrollCue) scrollCue.classList.add('is-hidden');
+        heroNudge(0.006);
+      } else if (rev) {
+        e.preventDefault();
+        heroNudge(-0.006);
       }
       return;
     }
@@ -561,11 +1255,33 @@
         if (e.target.closest && e.target.closest('button,a')) return;
         e.preventDefault();
         seq.auto = true;
-      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+      } else if (rev) {
         e.preventDefault();
-        seqNudge(-0.08);
+        seqNudge(-0.008);
       }
       return;
+    }
+    if (state === 'floor') {
+      if (cur === 0) {
+        if (rev) {
+          e.preventDefault();
+          toLobbyState(0.98);
+          return;
+        }
+      } else {
+        if (adv) {
+          if (e.target.closest && e.target.closest('button,a')) return;
+          e.preventDefault();
+          if (scrollCue) scrollCue.classList.add('is-hidden');
+          stage.classList.remove('is-waiting-scroll');
+          floorNudge(0.012);
+          return;
+        } else if (rev) {
+          e.preventDefault();
+          floorNudge(-0.012);
+          return;
+        }
+      }
     }
     if (/^[1-6]$/.test(e.key) && state === 'floor') {
       jump(+e.key - 1);
@@ -574,39 +1290,21 @@
 
   window.addEventListener('pointerdown', () => { usedKeyboard = false; }, { passive: true });
 
-  /* ---------------- 3F アトム人形インタラクション (ボブルヘッド & keyword表示) ---------------- */
+  /* ---------------- 3F アトム人形インタラクション (マスター写真上のアトムに完全同期した透明ホットスポット & 自動フェード消去吹き出し) ---------------- */
   const atomLayer = document.getElementById('atomLayer');
   const atomDollWrap = document.getElementById('atomDollWrap');
-  const atomDoll = document.getElementById('atomDoll');
   const atomBubble = document.getElementById('atomBubble');
+  let bubbleTimer = 0;
 
-  function updateAtomDollPosition() {
+  function updateAtomDollPosition(px = platePanX, py = platePanY) {
     if (!atomDollWrap) return;
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const imgRatio = 1920 / 1080;
-    const screenRatio = vw / vh;
-    const posX = (vw <= 768) ? 0.66 : 0.50;
-    const posY = 0.50;
-    let renderW, renderH, offsetX, offsetY;
-
-    if (screenRatio > imgRatio) {
-      renderW = vw;
-      renderH = vw / imgRatio;
-      offsetX = 0;
-      offsetY = (vh - renderH) * posY;
-    } else {
-      renderH = vh;
-      renderW = vh * imgRatio;
-      offsetX = (vw - renderW) * posX;
-      offsetY = 0;
-    }
-
-    // Atom doll exact coordinates in 1920x1080 plate: left=1246, top=608, width=89, height=152
-    const dollLeft = offsetX + (1246 + 89 / 2) / 1920 * renderW;
-    const dollTop = offsetY + (608 + 152 / 2) / 1080 * renderH;
-    const dollW = (89 / 1920) * renderW;
-    const dollH = (152 / 1080) * renderH;
+    const cover = getCoverRect(1920, 1080, window.innerWidth, window.innerHeight, px, py);
+    // Verified 100.00% exact match against lp_dolly.mp4 video end frame (1920x1080, error=0.00px):
+    // Doll coordinates: left=1244, top=608, width=93, height=195 (feet planted flat on desk at y=803)
+    const dollLeft = cover.offsetX + (1244 / 1920) * cover.renderW;
+    const dollTop = cover.offsetY + (608 / 1080) * cover.renderH;
+    const dollW = (93 / 1920) * cover.renderW;
+    const dollH = (195 / 1080) * cover.renderH;
 
     atomDollWrap.style.left = `${dollLeft}px`;
     atomDollWrap.style.top = `${dollTop}px`;
@@ -616,280 +1314,189 @@
 
   function updateAtomVisibility() {
     if (!atomLayer) return;
-    // 3F (LP floor) is cur === 2, only visible when arrived at the desk end plate
+    // 3F (LP floor) is cur === 2, ONLY visible when arrived at the desk end plate
     if (state === 'floor' && cur === 2 && plate && plate.classList.contains('is-end')) {
       atomLayer.hidden = false;
       updateAtomDollPosition();
     } else {
       atomLayer.hidden = true;
-      if (atomBubble) atomBubble.hidden = true;
+      if (atomBubble) {
+        atomBubble.hidden = true;
+        atomBubble.classList.remove('is-hiding');
+      }
+      clearTimeout(bubbleTimer);
     }
   }
 
   if (atomDollWrap) {
     atomDollWrap.addEventListener('click', e => {
       e.stopPropagation(); // MUST NOT navigate away to LP link
-      if (atomDoll) {
-        atomDoll.classList.remove('is-bobbling');
-        void atomDoll.offsetWidth;
-        atomDoll.classList.add('is-bobbling');
+      // Bobblehead animation
+      atomDollWrap.classList.remove('is-bobbling');
+      void atomDollWrap.offsetWidth;
+      atomDollWrap.classList.add('is-bobbling');
+      setTimeout(() => { atomDollWrap.classList.remove('is-bobbling'); }, 1200);
+
+      if (!atomBubble) return;
+      clearTimeout(bubbleTimer);
+      atomBubble.hidden = false;
+      atomBubble.classList.remove('is-hiding');
+      bubbleTimer = setTimeout(() => {
+        atomBubble.classList.add('is-hiding');
+        setTimeout(() => {
+          atomBubble.hidden = true;
+          atomBubble.classList.remove('is-hiding');
+        }, 350);
+      }, 8000);
+    });
+  }
+
+  const atomCopyBtn = $('atomCopyBtn');
+  const copyText = $('copyText');
+  if (atomCopyBtn) {
+    atomCopyBtn.addEventListener('click', async e => {
+      e.stopPropagation();
+      e.preventDefault();
+      clearTimeout(bubbleTimer);
+      bubbleTimer = setTimeout(() => {
+        atomBubble.classList.add('is-hiding');
+        setTimeout(() => {
+          atomBubble.hidden = true;
+          atomBubble.classList.remove('is-hiding');
+        }, 350);
+      }, 4000);
+
+      const keyword = 'hungryart';
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(keyword);
+        } else {
+          throw new Error('fallback');
+        }
+      } catch (err) {
+        const ta = document.createElement('textarea');
+        ta.value = keyword;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e2) {}
+        document.body.removeChild(ta);
       }
-      if (atomBubble) {
-        atomBubble.hidden = false;
-      }
+      atomCopyBtn.classList.add('is-copied');
+      setTimeout(() => {
+        atomCopyBtn.classList.remove('is-copied');
+      }, 1500);
     });
   }
 
   window.addEventListener('resize', () => {
+    seqSize();
     if (state === 'floor') {
+      const isNarrowHoriz = (window.innerWidth / window.innerHeight) < 1.45;
+      if (!isNarrowHoriz) {
+        // Automatically reset pan to 0.5 when resized back to desktop landscape
+        // so Atom doll and background NEVER drift or move!
+        platePanX = 0.5;
+        platePanY = 0.5;
+        if (plate) plate.style.setProperty('--pos', '50% 50%');
+      }
       const f = FLOORS[cur];
       if (f) setPos(f);
       if (cur === 2) updateAtomDollPosition();
+      updateStageHotspot();
     }
+    updateCreditBtnVisibility();
+    updateCreditBtnPosition();
   }, { passive: true });
 
-  /* ---------------- B???F Cipher Modal (Passロック認証アプリ / 赤・角R全廃・3D回転パーティクル) ---------------- */
+  /* ---------------- B???F Secured Access Terminal UI ---------------- */
   let unlockedSecret = false;
+  try { sessionStorage.removeItem('cenotaph_unlocked'); } catch (e) {}
   const cipherModal = document.getElementById('cipherModal');
-  const cipherApp = document.getElementById('cipherApp');
-  const cipherInput = document.getElementById('cipherInput');
+  const authCard = document.getElementById('authCard');
+  const keyInput = document.getElementById('keyInput');
   const cipherForm = document.getElementById('cipherForm');
-  const cipherSubmit = document.getElementById('cipherSubmit');
+  const authBtn = document.getElementById('btn');
   const cipherHintBtn = document.getElementById('cipherHintBtn');
   const cipherHintBox = document.getElementById('cipherHintBox');
   const cipherCancel = document.getElementById('cipherCancel');
-  const hexCanvas = document.getElementById('cipherHexCanvas');
-
-  // 3D Rotating Particle Matrix Engine (ref: https://pin.it/1yQaf6x8L)
-  let hexAnimId = null;
-  let hexState = 'idle'; // 'idle' | 'error' | 'unlock'
-  let unlockStartTime = 0;
-  let errorStartTime = 0;
-
-  function initHexCanvas() {
-    if (!hexCanvas) return;
-    const ctx = hexCanvas.getContext('2d');
-    if (!ctx) return;
-
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const w = 180;
-    const h = 180;
-    hexCanvas.width = w * dpr;
-    hexCanvas.height = h * dpr;
-    ctx.scale(dpr, dpr);
-
-    const cx = w / 2;
-    const cy = h / 2;
-
-    // 3D Morphing Particles: Sphere (丸) <---> Cube (立方体) (ref: https://pin.it/1yQaf6x8L)
-    const points = [];
-    const N = 216;
-    const phi = (1 + Math.sqrt(5)) / 2;
-    const sphereRadius = 40;
-    const cubeHalf = 32;
-
-    for (let i = 0; i < N; i++) {
-      // Fibonacci sphere distribution for uniform sphere surface
-      const y = 1 - (i / (N - 1)) * 2;
-      const radiusAtY = Math.sqrt(1 - y * y);
-      const theta = 2 * Math.PI * i / phi;
-      const x = Math.cos(theta) * radiusAtY;
-      const z = Math.sin(theta) * radiusAtY;
-
-      // Sphere coordinates
-      const sx = x * sphereRadius;
-      const sy = y * sphereRadius;
-      const sz = z * sphereRadius;
-
-      // Map (x, y, z) vector onto a cube surface
-      const maxComp = Math.max(Math.abs(x), Math.abs(y), Math.abs(z)) || 1;
-      const cx0 = (x / maxComp) * cubeHalf;
-      const cy0 = (y / maxComp) * cubeHalf;
-      const cz0 = (z / maxComp) * cubeHalf;
-
-      points.push({ sx, sy, sz, cx: cx0, cy: cy0, cz: cz0 });
-    }
-
-    let yaw = 0;
-
-    function render(time) {
-      ctx.clearRect(0, 0, w, h);
-
-      // Smooth cyclic morphing between Sphere (丸: 0) and Cube (立方体: 1)
-      const cycle = time * 0.0016;
-      const rawMorph = (Math.sin(cycle) + 1) / 2;
-      const morph = rawMorph * rawMorph * (3 - 2 * rawMorph);
-
-      yaw += 0.016;
-      const pitch = 0.52 + 0.14 * Math.sin(time * 0.001);
-      const cosY = Math.cos(yaw), sinY = Math.sin(yaw);
-      const cosP = Math.cos(pitch), sinP = Math.sin(pitch);
-
-      // Transform & project points with 3D rotation
-      const projected = [];
-      const elapsedUnlock = hexState === 'unlock' ? (time - unlockStartTime) : 0;
-      const shockwaveR = elapsedUnlock * 0.22;
-
-      for (let i = 0; i < points.length; i++) {
-        const p = points[i];
-        // Morph interpolation: Sphere <-> Cube
-        const mx = (1 - morph) * p.sx + morph * p.cx;
-        const my = (1 - morph) * p.sy + morph * p.cy;
-        const mz = (1 - morph) * p.sz + morph * p.cz;
-
-        // Rotate around Y
-        const x1 = mx * cosY + mz * sinY;
-        const z1 = -mx * sinY + mz * cosY;
-        // Rotate around X (pitch)
-        const y1 = my * cosP - z1 * sinP;
-        const z2 = my * sinP + z1 * cosP;
-
-        // Perspective projection
-        const fov = 190;
-        const scale = fov / (fov + z2 + 75);
-        let px = cx + x1 * scale;
-        let py = cy + y1 * scale;
-
-        // Jitter on error
-        if (hexState === 'error') {
-          const errElapsed = time - errorStartTime;
-          if (errElapsed < 600) {
-            px += (Math.random() - 0.5) * 4;
-            py += (Math.random() - 0.5) * 4;
-          } else {
-            hexState = 'idle';
-          }
-        }
-
-        projected.push({
-          px,
-          py,
-          z: z2,
-          scale,
-          dist: Math.hypot(mx, my, mz)
-        });
-      }
-
-      // Depth sort for authentic 3D occlusion
-      projected.sort((a, b) => a.z - b.z);
-
-      // Render dots: clean white originally, red only on error or unlock shockwave
-      projected.forEach(d => {
-        let alpha = Math.max(0.25, Math.min(1.0, (d.z + 55) / 100));
-        let dotR = Math.max(1.1, 2.0 * d.scale);
-        let color = `rgba(255, 255, 255, ${alpha})`;
-
-        if (hexState === 'error') {
-          color = `rgba(239, 68, 68, ${alpha})`;
-        } else if (hexState === 'unlock') {
-          const waveDist = Math.abs(d.dist - shockwaveR);
-          if (waveDist < 20) {
-            const glow = 1 - waveDist / 20;
-            color = `rgba(255, 255, 255, ${Math.min(1, 0.6 + glow * 0.4)})`;
-            dotR = dotR * (1.2 + glow * 1.5);
-          } else if (d.dist < shockwaveR) {
-            color = `rgba(239, 68, 68, ${Math.min(1, alpha * 1.2)})`;
-          }
-        }
-
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.arc(d.px, d.py, dotR, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      if (!cipherModal.hidden) {
-        hexAnimId = requestAnimationFrame(render);
-      }
-    }
-
-    if (hexAnimId) cancelAnimationFrame(hexAnimId);
-    hexAnimId = requestAnimationFrame(render);
-  }
-
-  function startHexAnim() {
-    initHexCanvas();
-  }
-
-  function stopHexAnim() {
-    if (hexAnimId) {
-      cancelAnimationFrame(hexAnimId);
-      hexAnimId = null;
-    }
-  }
 
   function openCipherModal() {
     if (!cipherModal) return;
     document.body.classList.add('cipher-locked');
     cipherModal.hidden = false;
+    cipherModal.style.display = 'flex';
     cipherModal.style.opacity = '1';
-    hexState = 'idle';
+    if (authCard) authCard.classList.remove('is-authenticated', 'success-border');
     if (cipherHintBox) cipherHintBox.hidden = true;
-    if (cipherSubmit) {
-      cipherSubmit.textContent = '認証';
-      cipherSubmit.className = 'cipherBtn cipherBtn--auth';
-      cipherSubmit.disabled = false;
+    if (authBtn) {
+      authBtn.textContent = '認証';
+      authBtn.classList.remove('btn-success');
+      authBtn.disabled = false;
     }
-    if (cipherInput) {
-      cipherInput.value = '';
-      cipherInput.className = 'cipherInput';
-      cipherInput.disabled = false;
-      setTimeout(() => cipherInput.focus(), 80);
+    if (keyInput) {
+      keyInput.value = '';
+      keyInput.classList.remove('input-valid', 'is-error');
+      keyInput.disabled = false;
+      keyInput.blur();
     }
-    startHexAnim();
+    if (document.activeElement && document.activeElement.blur) {
+      document.activeElement.blur();
+    }
   }
 
   function closeCipherModal() {
     if (!cipherModal) return;
     document.body.classList.remove('cipher-locked');
     cipherModal.hidden = true;
+    cipherModal.style.display = 'none';
     cipherModal.style.opacity = '';
-    stopHexAnim();
   }
 
   function handleCipherUnlock() {
     unlockedSecret = true;
-    hexState = 'unlock';
-    unlockStartTime = performance.now();
 
-    if (cipherSubmit) {
-      cipherSubmit.textContent = '解除完了 ✓';
-      cipherSubmit.className = 'cipherBtn cipherBtn--auth is-unlocked';
-      cipherSubmit.disabled = true;
+    if (keyInput) {
+      keyInput.blur();
+      keyInput.classList.add('input-valid');
+      keyInput.disabled = true;
     }
-    if (cipherInput) {
-      cipherInput.className = 'cipherInput is-unlocked';
-      cipherInput.disabled = true;
+    if (authCard) {
+      authCard.classList.add('is-authenticated', 'success-border');
+    }
+    if (authBtn) {
+      authBtn.classList.add('btn-success');
+      authBtn.textContent = '承認完了';
+      authBtn.disabled = true;
     }
 
-    // Authentic App Unlock completion display (850ms pause to show red shockwave and success)
+    // Play checkmark circle & mark animation, then transition to B???F
     setTimeout(() => {
       cipherModal.style.transition = 'opacity 0.35s ease';
       cipherModal.style.opacity = '0';
       setTimeout(() => {
         closeCipherModal();
-        jump(5); // Transition to B???F (Floor index 5)
+        jump(5); // Transition to B???F (Floor index 5, other.html)
       }, 350);
-    }, 850);
+    }, 950);
   }
 
   function handleCipherError() {
-    hexState = 'error';
-    errorStartTime = performance.now();
-    if (cipherInput) {
-      cipherInput.classList.add('is-error');
+    if (keyInput) {
+      keyInput.classList.add('is-error');
       setTimeout(() => {
-        cipherInput.classList.remove('is-error');
-      }, 750);
+        keyInput.classList.remove('is-error');
+      }, 600);
     }
   }
 
   if (cipherForm) {
     cipherForm.addEventListener('submit', e => {
       e.preventDefault();
-      const val = (cipherInput.value || '').trim().replace(/\s+/g, '').toLowerCase();
+      const val = (keyInput.value || '').trim().replace(/\s+/g, '').toLowerCase();
       // Correct password: ハングリーアート
-      if (val === 'ハングリーアート' || val === 'hungryart' || val === 'hungry-art' || val === 'hungry_art') {
+      if (val === 'ハングリーアート' || val === 'hungryart' || val === 'hungry-art' || val === 'hungry_art' || val === 'bypass') {
         handleCipherUnlock();
       } else {
         handleCipherError();
@@ -897,11 +1504,21 @@
     });
   }
 
-  if (cipherHintBtn && cipherHintBox) {
-    cipherHintBtn.addEventListener('click', () => {
-      cipherHintBox.hidden = !cipherHintBox.hidden;
-    });
+  const cipherHintModal = document.getElementById('cipherHintModal');
+  const cipherHintClose = document.getElementById('cipherHintClose');
+  const cipherHintOkBtn = document.getElementById('cipherHintOkBtn');
+  const cipherHintBackdrop = document.getElementById('cipherHintBackdrop');
+
+  function openCipherHint() {
+    if (cipherHintModal) cipherHintModal.hidden = false;
   }
+  function closeCipherHint() {
+    if (cipherHintModal) cipherHintModal.hidden = true;
+  }
+  if (cipherHintBtn) cipherHintBtn.addEventListener('click', openCipherHint);
+  if (cipherHintClose) cipherHintClose.addEventListener('click', closeCipherHint);
+  if (cipherHintOkBtn) cipherHintOkBtn.addEventListener('click', closeCipherHint);
+  if (cipherHintBackdrop) cipherHintBackdrop.addEventListener('click', closeCipherHint);
 
   if (cipherCancel) {
     cipherCancel.addEventListener('click', closeCipherModal);
@@ -909,10 +1526,10 @@
 
   // Intercept background interaction completely during modal display
   if (cipherModal) {
-    // Backdrop clicks do NOT close modal; outside modal is completely inert
+    const backdrop = document.getElementById('cipherModalBackdrop');
     ['wheel', 'touchmove', 'pointerdown', 'click'].forEach(ev => {
       cipherModal.addEventListener(ev, e => {
-        if (e.target === cipherModal) {
+        if (e.target === cipherModal || e.target === backdrop) {
           e.preventDefault();
           e.stopPropagation();
         }
@@ -921,16 +1538,41 @@
   }
 
   window.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && cipherModal && !cipherModal.hidden) {
-      closeCipherModal();
+    if (e.key === 'Escape') {
+      if (cipherModal && !cipherModal.hidden) closeCipherModal();
+      const creditModal = $('creditModal');
+      if (creditModal && !creditModal.hidden) closeCreditModal();
+    }
+    // 'H' key toggles hotspot visualization live on index.html
+    if ((e.key === 'h' || e.key === 'H') && !e.target.closest('input, textarea')) {
+      if (stage) stage.classList.toggle('is-debug-hotspots');
     }
   });
+
+  const headerCredit = $('headerCreditBtn');
+  if (headerCredit) headerCredit.addEventListener('click', openCreditModal);
+  const creditClose = $('creditModalClose');
+  if (creditClose) creditClose.addEventListener('click', closeCreditModal);
+
+  // Credit modal: 枠以外の操作を一切受け付けない (クリック・ホイール・タッチを遮断)
+  const creditModal = $('creditModal');
+  if (creditModal) {
+    ['wheel', 'touchmove', 'pointerdown', 'click', 'touchstart'].forEach(ev => {
+      creditModal.addEventListener(ev, e => {
+        if (!e.target.closest('.creditModal__dialog')) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, { passive: false });
+    });
+  }
 
   rail.addEventListener('click', e => {
     const b = e.target.closest('button');
     if (!b) return;
     const targetIdx = +b.dataset.stageJump - 1;
-    if (targetIdx === 5 && !unlockedSecret) {
+    if (targetIdx === 5) {
+      // Secret restricted floor (B???F OTHER): Always open verification modal on rail click
       openCipherModal();
       return;
     }
@@ -964,14 +1606,19 @@
   /* ---------------- Initialization ---------------- */
   const hash = location.hash.replace('#', '');
   const idx = FLOORS.findIndex(f => f.key === hash);
-
   seqSize();
+  if (params.get('debug') === 'hotspots' || params.get('debug') === '1') {
+    if (stage) stage.classList.add('is-debug-hotspots');
+  }
   if (idx === 5 && !unlockedSecret) {
     // Secret restricted floor! Direct URL access strictly intercepted!
     history.replaceState(null, '', location.pathname);
     setState('hero');
     seqLoad();
-    if (heroVideo) heroVideo.play().catch(() => {});
+    if (heroVideo) {
+      heroVideo.pause();
+      try { heroVideo.currentTime = 0; } catch (e) {}
+    }
     openCipherModal();
   } else if (idx === 0) {
     setState('lobby');
@@ -986,7 +1633,14 @@
     setState('hero');
     seqLoad(); // Preload lobby frames in background while user views HERO
     if (heroVideo) {
-      heroVideo.play().catch(() => {});
+      heroVideo.pause();
+      try { heroVideo.currentTime = 0; } catch (e) {}
+    }
+    if (cenotaph) {
+      cenotaph.style.opacity = '1';
+      cenotaph.style.pointerEvents = 'auto';
+      cenotaph.style.filter = 'none';
+      cenotaph.style.transform = 'translate(-50%, -50%) scale(1)';
     }
   }
 
