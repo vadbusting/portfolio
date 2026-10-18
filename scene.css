@@ -776,17 +776,17 @@ body.cipher-locked canvas {
   display: block !important;
 }
 
-/* 赤ランプの中央の焦点部分のみが小さくふわっとゆっくり点滅 */
+/* 赤ランプの中央の焦点部分のみが小さく繊細に静かに明滅 (HAL 9000の精密な光学レンズ点滅) */
 .hal-eye-focal {
   position: absolute;
   inset: 0;
   margin: auto;
-  width: 12px;
-  height: 12px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: #ffffff;
-  box-shadow: 0 0 8px 3px #ffffff, 0 0 20px 8px #ff1a2a;
-  animation: halFocalPulse 3.2s ease-in-out infinite;
+  box-shadow: 0 0 2px 1px #ffffff, 0 0 6px 2px rgba(255, 26, 42, 0.75);
+  animation: halFocalPulse 3.4s ease-in-out infinite;
   pointer-events: none;
   z-index: 4;
   transition: opacity 0.3s ease;
@@ -794,14 +794,14 @@ body.cipher-locked canvas {
 
 @keyframes halFocalPulse {
   0%, 100% {
-    transform: scale(0.82);
+    transform: scale(0.85);
     opacity: 0.45;
-    box-shadow: 0 0 6px 2px #ffffff, 0 0 15px 5px rgba(255, 26, 42, 0.45);
+    box-shadow: 0 0 2px 0.5px #ffffff, 0 0 4px 1.5px rgba(255, 26, 42, 0.45);
   }
   50% {
-    transform: scale(1.18);
-    opacity: 1;
-    box-shadow: 0 0 10px 4px #ffffff, 0 0 24px 9px #ff1a2a;
+    transform: scale(1.1);
+    opacity: 0.95;
+    box-shadow: 0 0 3px 1px #ffffff, 0 0 7px 2px rgba(255, 26, 42, 0.85);
   }
 }
 
@@ -975,15 +975,34 @@ body.cipher-locked canvas {
   color: #ffffff;
 }
 
+/* 横長画面（デスクトップ・ノート・横長表示）でのHALレンズ最適化 */
+@media (min-width: 768px), (orientation: landscape) {
+  .hal-eye-wrapper {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 14px auto;
+  }
+  .hal-eye-focal {
+    width: 4px;
+    height: 4px;
+    box-shadow: 0 0 2px 0.5px #ffffff, 0 0 5px 1.5px rgba(255, 26, 42, 0.7);
+  }
+}
+
 @media (max-height: 720px) {
   .auth-card.hal-console {
     padding: 16px 20px 14px;
-    max-width: 340px;
+    max-width: 320px;
   }
   .hal-eye-wrapper {
-    width: 68px;
-    height: 68px;
+    width: 56px;
+    height: 56px;
     margin: 0 auto 10px auto;
+  }
+  .hal-eye-focal {
+    width: 3.5px;
+    height: 3.5px;
+    box-shadow: 0 0 1.5px 0.5px #ffffff, 0 0 4px 1.2px rgba(255, 26, 42, 0.75);
   }
   .auth-title {
     font-size: 13px;
@@ -999,17 +1018,17 @@ body.cipher-locked canvas {
     margin-bottom: 6px;
   }
   .input-field {
-    height: 36px;
-    font-size: 14px;
+    height: 34px;
+    font-size: 13px;
     margin-bottom: 8px;
   }
   .btn-hint {
-    height: 34px;
-    font-size: 12px;
+    height: 32px;
+    font-size: 11px;
     margin-bottom: 6px;
   }
   .btn-auth {
-    height: 36px;
+    height: 34px;
     font-size: 12px;
     margin-bottom: 6px;
   }
@@ -1025,14 +1044,19 @@ body.cipher-locked canvas {
   }
   .auth-card.hal-console {
     padding: 10px 16px 8px;
-    max-width: 300px;
+    max-width: 290px;
     max-height: 96vh;
     max-height: 96dvh;
   }
   .hal-eye-wrapper {
-    width: 46px;
-    height: 46px;
+    width: 40px;
+    height: 40px;
     margin: 0 auto 6px auto;
+  }
+  .hal-eye-focal {
+    width: 3px;
+    height: 3px;
+    box-shadow: 0 0 1px 0.5px #ffffff, 0 0 3px 1px rgba(255, 26, 42, 0.7);
   }
   .auth-title {
     font-size: 11px;
@@ -1043,22 +1067,22 @@ body.cipher-locked canvas {
   }
   .field-label {
     font-size: 10px;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
   }
   .input-field {
-    height: 30px;
-    font-size: 12px;
-    margin-bottom: 6px;
+    height: 28px;
+    font-size: 11px;
+    margin-bottom: 5px;
   }
   .btn-hint {
-    height: 30px;
+    height: 28px;
     font-size: 11px;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
   }
   .btn-auth {
-    height: 30px;
+    height: 28px;
     font-size: 11px;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
   }
   .btn-back {
     padding: 1px 0;
