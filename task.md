@@ -24,3 +24,15 @@
   - [x] 1440x900 / 1920x1080 / 1440x480 で `centerOffsetY: 0`（完全中央）およびフォントサイズ（208px〜216px）を実証
   - [x] 短寸横長画面（1440x500 / 1440x480）で `CREDIT` が `PORTFOLIO` の横（左48px・右159px、間隔26px）へ退避し、フロアボタンとの重なりがゼロであることを実証
 
+---
+
+# Task: 不要ファイル削除およびリポジトリ整理・構造クリーンアップ
+
+- [x] 1. ルート直下の必須画像（スライド画像6点、ルーツ画像1点、サッカーボール画像1点）を `image/` へ移動・整理
+- [x] 2. `lp.html` および `presentation.html` の画像パス（`image/...`）を一括更新
+- [x] 3. 完全未使用の不要ファイル群（`_legacy_three/`, `exterior.js`, `convert_gray.swift`, `test_screens/`, `tools/`, 旧メモ等）を `/usr/bin/trash` で安全削除
+- [x] 4. Chrome DevTools MCP 実機検証
+  - [x] `lp.html` および `presentation.html` の全スライド画像・ルーツ画像が 404 エラーなく正常にロード（`complete: true`, `naturalWidth > 0`）されることを完全実証
+- [x] 5. コミット（`84f8642`）および `origin/dev` へのプッシュ完了
+
+
