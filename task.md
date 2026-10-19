@@ -66,7 +66,27 @@
   - [x] Mobile Portrait (390x844) - PASS: 左右パン（71.4% 50.0%）および上スクロールでの中央再整列
   - [x] Mobile Landscape (844x390) - PASS: 水平・垂直ともに完全中央固定
   - [x] Tablet Portrait (768x1024) - PASS: 静止画・フロア遷移ともにブレなし
-  - [x] Tablet Landscape (1024x768) - PASS: アスペクト比に依存しない均整な表示
+  - [x] Tablet Landscape (1024x768) - PASS: アスペクト比に依存しない均整な表示---
 
+# Task: 外部AI指摘精査・完全リポジトリクリーンアップ & 動作検証
 
+- [x] 1. 重複開始画像（5枚・6.2MB）の集約
+  - [x] `assets/scenes/floor_start.webp`（1枚・1.2MB）へ集約
+  - [x] 重複していた `presentation_start.webp`, `lp_start.webp`, `web_start.webp`, `direction_start.webp`, `other_start.webp`, `lobby_start.webp` を `/usr/bin/trash` で完全削除
+  - [x] `scene.js` の `PATH.plate` を `floor_start.webp` 参照へ更新
+- [x] 2. 未使用ライブラリおよびコード残骸の安全削除
+  - [x] 未使用のローカルThree.js（`assets/vendor/three/` 2.3MB）を `/usr/bin/trash` で完全削除（`other.html` はCDN r128から読込）
+  - [x] `scene.js` 内の未使用死にコード（`seqLoop`, `seqNudge`, `startSeqLoop`, 未使用定数等）を安全に整理
+  - [x] `start-3002.command` を `serve.py 3002`（Rangeヘッダー対応サーバー）経由に変更
+- [x] 3. ドキュメント（`README.md`, `ASSET_CREDITS.md`）の現行仕様完全同期
+  - [x] 削除済み旧資産（`exterior.js`, `architecture`, `lobby_seq`）の記述を完全一新
+  - [x] シネマティック映像＋ディスカバリー号3D回廊の現行構成および納品ZIP作成手順を正確に記述
+- [x] 4. Gitコミット整理と納品ZIP検証
+  - [x] 248件の未コミット削除状態をすべてコミット（`7d6d37d`）し、Working Tree を完全クリーン化
+  - [x] 納品用ZIP（`.git`, `__MACOSX`, `.DS_Store` 除外）の生成検証を実施し、439MBから130MBへの軽量化（▲309MB削減）を実証
+- [x] 5. 5状態レスポンシブ実機検証および構文・コンソールエラー検証
+  - [x] `node -c scene.js` 構文エラー 0 件
+  - [x] Chrome DevTools MCP 実機検証: コンソールエラー 0 件
+  - [x] 5画面状態（PC Fluid, Mobile Portrait, Mobile Landscape, Tablet Portrait, Tablet Landscape）での表示崩れ・レイアウト破綻ゼロを実証
+  - [x] `other.html`（ディスカバリー号3D回廊・白フェード）の完全動作を実証
 
