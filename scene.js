@@ -45,6 +45,9 @@
       }
     });
     dolly.addEventListener('error', () => {
+      // Ignore if dolly has no valid src set (e.g. initial empty video on page load)
+      const s = dolly.currentSrc || dolly.getAttribute('src');
+      if (!s || s === window.location.href || s === 'about:blank') return;
       videoBroken = true;
       stage.classList.add('is-video-fallback');
       if (plate) plate.classList.remove('no-fade');
@@ -55,6 +58,33 @@
     heroVideo.addEventListener('error', () => {
       stage.classList.add('is-hero-fallback');
     });
+
+    // Mobile Safari / Chrome video prime & arm
+    let heroArmed = false;
+    const armHeroVideo = () => {
+      if (heroArmed || !heroVideo) return;
+      heroArmed = true;
+      try {
+        const p = heroVideo.play();
+        if (p && typeof p.then === 'function') {
+          p.then(() => {
+            if (state === 'hero' && heroQt === 0) {
+              heroVideo.pause();
+              try { heroVideo.currentTime = 0; } catch (e) {}
+            }
+          }).catch(() => {});
+        }
+      } catch (e) {}
+    };
+
+    if (heroVideo.readyState >= 1) {
+      armHeroVideo();
+    } else {
+      heroVideo.addEventListener('loadedmetadata', armHeroVideo, { once: true });
+      heroVideo.addEventListener('canplay', armHeroVideo, { once: true });
+    }
+    window.addEventListener('touchstart', armHeroVideo, { once: true, passive: true });
+    window.addEventListener('pointerdown', armHeroVideo, { once: true, passive: true });
   }
 
   const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -62,7 +92,7 @@
   const conn = navigator.connection || {};
   const params = new URLSearchParams(location.search);
   let videoBroken = false;
-  const canVideo = () => !videoBroken && !mq.matches && !conn.saveData && params.get('novideo') !== '1';
+  const canVideo = () => !videoBroken && !mq.matches && params.get('novideo') !== '1';
   const lightNet = () => conn.saveData || /(^|-)2g$/.test(conn.effectiveType || '');
   const clamp01 = v => Math.min(1, Math.max(0, v));
 
@@ -73,18 +103,9 @@
   const alive = t => t === token;
 
   function resetPlatePan() {
-    const boxRatio = window.innerWidth / window.innerHeight;
-    const isNarrowPortrait = boxRatio < 1.25;
-
-    if (cur === 0 && isNarrowPortrait) {
-      const renderW = window.innerHeight * (2752 / 1536);
-      platePanX = Math.min(1, Math.max(0, (0.7024 * renderW - window.innerWidth / 2) / (renderW - window.innerWidth)));
-      platePanY = 0.5;
-    } else {
-      platePanX = 0.5;
-      platePanY = 0.5;
-    }
-    const posVal = `${(platePanX * 100).toFixed(1)}% 50.0%`;
+    platePanX = 0.5;
+    platePanY = 0.5;
+    const posVal = '50.0% 50.0%';
     if (plate) plate.style.setProperty('--pos', posVal);
     if (dollyLayer) dollyLayer.style.setProperty('--pos', posVal);
     updateStageHotspot();
@@ -387,12 +408,8 @@
   }
 
   function getSeqPanX() {
-    const boxRatio = window.innerWidth / window.innerHeight;
-    if (boxRatio >= 1.25) return 0.5;
-    const renderW = window.innerHeight * (2752 / 1536);
-    const targetX = Math.min(1, Math.max(0, (0.7024 * renderW - window.innerWidth / 2) / (renderW - window.innerWidth)));
     if (state === 'floor' && cur === 0) return platePanX;
-    return targetX;
+    return 0.5;
   }
 
   function cover(img, a = 1) {
@@ -532,7 +549,7 @@
     const targetTime = clamp01(heroQ) * dur;
 
     if (heroVideo && Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) {
-      if (heroVideo.hasAttribute('poster')) {
+      if (heroVideo.hasAttribute('poster') && targetTime > 0.05 && heroVideo.readyState >= 2) {
         heroVideo.removeAttribute('poster');
       }
       if (!heroVideo.seeking && Math.abs(heroVideo.currentTime - targetTime) > 0.015) {
@@ -595,9 +612,6 @@
 
   function heroNudge(d) {
     if (busy || state !== 'hero') return;
-    if (heroVideo && heroVideo.hasAttribute('poster')) {
-      heroVideo.removeAttribute('poster');
-    }
     seqLoad();
     heroQt = clamp01(heroQt + d);
     startHeroLoop();
@@ -876,6 +890,22 @@
           dolly.pause();
           try { dolly.currentTime = 0; } catch (e) {}
           dolly.src = PATH.dolly(f.key);
+          dolly.load();
+          const primeDolly = () => {
+            try {
+              const p = dolly.play();
+              if (p && typeof p.then === 'function') {
+                p.then(() => {
+                  if (floorQt === 0) {
+                    dolly.pause();
+                    try { dolly.currentTime = 0; } catch (e) {}
+                  }
+                }).catch(() => {});
+              }
+            } catch (e) {}
+          };
+          if (dolly.readyState >= 1) primeDolly();
+          else dolly.addEventListener('canplay', primeDolly, { once: true });
         }
       } else {
         stage.classList.add('is-video-fallback');
@@ -1128,7 +1158,7 @@
 
     if (state === 'hero') {
       if (scrollCue) scrollCue.classList.add('is-hidden');
-      heroNudge(dy / (innerHeight * 6.0));
+      heroNudge(dy / (innerHeight * 1.5));
       touchStartY = y;
       touchStartX = x;
     } else if (state === 'lobby') {

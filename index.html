@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cormorant+Garamond:ital,wght@1,300;1,400&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="hero-v13.css?v=26">
-<link rel="stylesheet" href="scene.css?v=99">
+<link rel="stylesheet" href="scene.css?v=100">
 <script>
   // Immediate pre-paint detection of floor hash to suppress HERO flash
   (function() {
@@ -25,12 +25,12 @@
 
   <!-- 背景レイヤー（HERO実写映像 → ロビー連番 → フロア静止画 → 各階ドリー動画 → 場面転換ディップ） -->
   <div class="layer layer--hero" id="heroLayer">
-    <video id="heroVideo" src="assets/video/hero_entrance.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
+    <video id="heroVideo" src="assets/video/hero_entrance.mp4" muted playsinline webkit-playsinline preload="auto" aria-hidden="true"></video>
     <div class="heroOverlay" aria-hidden="true"></div>
   </div>
   <div class="layer layer--seq" id="seqLayer"><canvas id="seq" aria-hidden="true"></canvas><i class="seqScrim" aria-hidden="true"></i></div>
   <div class="layer layer--plate" id="plate"><img id="plateImg" alt="" decoding="async"></div>
-  <div class="layer layer--video" id="dollyLayer"><video id="dolly" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video></div>
+  <div class="layer layer--video" id="dollyLayer"><video id="dolly" muted playsinline webkit-playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video></div>
   <div class="layer layer--dip" id="dip"></div>
 
   <!-- UIオーバーレイ -->
@@ -211,6 +211,6 @@
     </div>
   </div>
 </main>
-<script src="scene.js?v=98"></script>
+<script src="scene.js?v=99"></script>
 </body>
 </html>

@@ -90,237 +90,363 @@ if (!stage || !canvas) {
     };
   }
 
-  // 1パネル描画関数（劇中実物拡大写真準拠）
-  const drawAccuratePanel = (ctx, x, y, w, h) => {
-    const COL_BASE = '#f2efe6';
-    const COL_FACE = '#ece7dc';
-    const COL_SHADOW = '#c5bfad';
-    const COL_LIGHT = '#ffffff';
+  // -------------------------------------------------------------
+  // Discovery One - Film-Accurate Pure 3D Recessed Hatch Corridor
+  // -------------------------------------------------------------
+  // 3Dライティング設定（白飛びさせず均一で自然な照明）
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.88);
+  scene.add(ambientLight);
 
-    // 下地
-    ctx.fillStyle = COL_BASE;
-    ctx.fillRect(x, y, w, h);
+  const mainLight = new THREE.DirectionalLight(0xffffff, 0.18);
+  mainLight.position.set(0, 0, 10);
+  mainLight.target.position.set(0, 0, -30);
+  scene.add(mainLight);
+  scene.add(mainLight.target);
 
-    // 外周の成型段差（角丸プレストレイ）
-    const padX = w * 0.04;
-    const padY = h * 0.03;
-    const innerW = w - padX * 2;
-    const innerH = h - padY * 2;
+  const bounceLight = new THREE.DirectionalLight(0xffffff, 0.08);
+  bounceLight.position.set(0, 4, 2);
+  scene.add(bounceLight);
 
-    ctx.fillStyle = COL_SHADOW;
-    ctx.beginPath();
-    ctx.roundRect(x + padX, y + padY, innerW, innerH, 16);
-    ctx.fill();
+  // 共有マテリアルの定義（極微オフホワイト・淡色エンボス設計）
+  const panelMaterial = new THREE.MeshBasicMaterial({
+    color: 0xfafaf5,
+    side: THREE.DoubleSide,
+    fog: true
+  });
 
-    ctx.fillStyle = COL_LIGHT;
-    ctx.beginPath();
-    ctx.roundRect(x + padX + 3, y + padY + 3, innerW - 6, innerH - 6, 14);
-    ctx.fill();
+  const recessFloorMaterial = new THREE.MeshBasicMaterial({
+    color: 0xf6f6f0,
+    side: THREE.DoubleSide,
+    fog: true
+  });
 
-    ctx.fillStyle = COL_FACE;
-    ctx.beginPath();
-    ctx.roundRect(x + padX + 6, y + padY + 6, innerW - 12, innerH - 12, 12);
-    ctx.fill();
+  const bevelMaterial = new THREE.MeshBasicMaterial({
+    color: 0xf1f1ec,
+    side: THREE.DoubleSide,
+    fog: true
+  });
 
-    // 上下端（八角形の角との境界）の固定ラッチ金具
-    const drawLatch = (lx, ly) => {
-      ctx.fillStyle = '#8a8473';
+  const blackHatchMaterial = new THREE.MeshStandardMaterial({
+    color: 0x050505,
+    roughness: 0.25,
+    metalness: 0.2,
+    fog: true
+  });
+
+  const lightTubeMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    fog: false
+  });
+
+  const slitBaseMaterial = new THREE.MeshBasicMaterial({
+    color: 0xeeeeea,
+    side: THREE.DoubleSide,
+    fog: true
+  });
+
+  const hingeMaterial = new THREE.MeshBasicMaterial({
+    color: 0xd8d8d2,
+    side: THREE.DoubleSide,
+    fog: true
+  });
+
+  // 六角形内の両翼に配置された印字スペックプレート（背景に溶け込む淡色印字）
+  function createSpecPlateTexture(plateTitle, secNum) {
+    const cv = document.createElement('canvas');
+    cv.width = 256;
+    cv.height = 384;
+    const ctx = cv.getContext('2d');
+
+    ctx.fillStyle = '#f8f8f4';
+    ctx.fillRect(0, 0, 256, 384);
+
+    ctx.strokeStyle = '#c8c8c0';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(10, 10, 236, 364);
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(18, 18, 220, 348);
+
+    ctx.fillStyle = '#dcdcd4';
+    ctx.fillRect(22, 24, 212, 42);
+    ctx.fillStyle = '#70706a';
+    ctx.font = 'bold 20px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(plateTitle, 128, 52);
+
+    ctx.fillStyle = '#9c9c94';
+    ctx.font = 'bold 15px monospace';
+    ctx.fillText('DISCOVERY 1', 128, 100);
+    ctx.font = '13px monospace';
+    ctx.fillText(`SEC-${secNum} ACCESS`, 128, 124);
+    ctx.fillText('MANUAL UNLATCH', 128, 148);
+
+    ctx.strokeStyle = '#c0c0b8';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(36, 170, 184, 52);
+    ctx.fillStyle = '#c8c8c0';
+    ctx.fillRect(44, 178, 60, 36);
+    ctx.fillStyle = '#888882';
+    ctx.font = 'bold 12px monospace';
+    ctx.fillText('LEVER 90°', 160, 202);
+
+    ctx.fillStyle = '#9c9c94';
+    ctx.font = '12px monospace';
+    ctx.fillText('PRESSURE SEAL OK', 128, 260);
+    ctx.fillText('REF NO. 2001-C', 128, 286);
+    ctx.fillText('0G LOCK VERIFIED', 128, 312);
+
+    ctx.fillStyle = '#b0b0a8';
+    [[24,24], [232,24], [24,360], [232,360]].forEach(([bx, by]) => {
       ctx.beginPath();
-      ctx.roundRect(lx - 20, ly - 6, 40, 12, 3);
+      ctx.arc(bx, by, 3, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = '#e6e2d6';
-      ctx.fillRect(lx - 14, ly - 4, 28, 5);
-      ctx.fillStyle = '#545044';
-      ctx.beginPath();
-      ctx.arc(lx - 12, ly, 2.5, 0, Math.PI * 2);
-      ctx.arc(lx + 12, ly, 2.5, 0, Math.PI * 2);
-      ctx.fill();
-    };
+    });
 
-    drawLatch(x + w * 0.28, y + padY + 18);
-    drawLatch(x + w * 0.72, y + padY + 18);
-    drawLatch(x + w * 0.28, y + h - padY - 18);
-    drawLatch(x + w * 0.72, y + h - padY - 18);
+    const tex = new THREE.CanvasTexture(cv);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }
 
-    // 上部・下部中央のピン突起
-    ctx.fillStyle = '#736d5e';
-    ctx.beginPath();
-    ctx.arc(x + w * 0.5, y + h * 0.11, 5, 0, Math.PI * 2);
-    ctx.arc(x + w * 0.5, y + h * 0.89, 5, 0, Math.PI * 2);
-    ctx.fill();
+  const plateTex1 = createSpecPlateTexture('HATCH-A', '08');
+  const plateTex2 = createSpecPlateTexture('PANEL-B', '04');
 
-    // 四隅の点検ポート
-    const drawSquarePort = (px, py) => {
-      ctx.fillStyle = COL_SHADOW;
-      ctx.fillRect(px - 14, py - 16, 28, 32);
-      ctx.fillStyle = COL_LIGHT;
-      ctx.fillRect(px - 11, py - 13, 22, 26);
-      ctx.fillStyle = '#d5cfbf';
-      ctx.fillRect(px - 8, py - 10, 16, 20);
-    };
-    drawSquarePort(x + w * 0.18, y + h * 0.18);
-    drawSquarePort(x + w * 0.82, y + h * 0.18);
-    drawSquarePort(x + w * 0.18, y + h * 0.82);
-    drawSquarePort(x + w * 0.82, y + h * 0.82);
+  const plateMaterial1 = new THREE.MeshBasicMaterial({
+    map: plateTex1,
+    fog: true
+  });
+  const plateMaterial2 = new THREE.MeshBasicMaterial({
+    map: plateTex2,
+    fog: true
+  });
 
-    // 中央の黒い横長ルーバー窓
-    const winW = w * 0.84;
-    const winH = h * 0.24;
-    const wx = x + (w - winW) / 2;
-    const wy = y + (h - winH) / 2 + 10;
+  const INRADIUS = 4.8;
+  const SIDE_WIDTH = 2 * INRADIUS * Math.tan(Math.PI / 8);
+  const PANEL_LENGTH = SIDE_WIDTH * 0.82;
+  const RECESS_DEPTH = 0.055;
+  const BEVEL_WIDTH = 0.065;
+  const BAND_WIDTH = 0.28;
+  const SEGMENT_PITCH = PANEL_LENGTH + BAND_WIDTH;
+  const SEGMENT_COUNT = 24;
+  const TOTAL_SPAN = SEGMENT_COUNT * SEGMENT_PITCH;
+  const Z_START = 8;
+  const Z_END = Z_START - TOTAL_SPAN;
 
-    // 縦長の注意書きネームプレート
-    const plateW = 44;
-    const plateH = 58;
-    const plateX = x + w * 0.5 - plateW / 2;
-    const plateY = wy - plateH - 28;
+  // 輪郭に沿って傾斜ベベル壁と一段低い底面を生成
+  function createRecessedPocket(outerPts, depth, shrink, hasCenterCutout, cutoutBox) {
+    const group = new THREE.Group();
+    const n = outerPts.length;
 
-    ctx.fillStyle = '#8f8978';
-    ctx.fillRect(plateX - 2, plateY - 2, plateW + 4, plateH + 4);
-    ctx.fillStyle = '#f9f7f2';
-    ctx.fillRect(plateX, plateY, plateW, plateH);
-    ctx.fillStyle = '#4c4940';
-    ctx.fillRect(plateX + 6, plateY + 10, plateW - 12, 2.5);
-    ctx.fillRect(plateX + 10, plateY + 22, plateW - 20, 2.5);
-    ctx.fillRect(plateX + 8, plateY + 34, plateW - 16, 2.5);
-    ctx.fillRect(plateX + 12, plateY + 44, plateW - 24, 2);
+    const cx = outerPts.reduce((acc, p) => acc + p[0], 0) / n;
+    const cy = outerPts.reduce((acc, p) => acc + p[1], 0) / n;
+    const innerPts = outerPts.map(p => {
+      const dx = p[0] - cx;
+      const dy = p[1] - cy;
+      const len = Math.hypot(dx, dy) || 1;
+      const factor = Math.max(0.1, (len - shrink) / len);
+      return [cx + dx * factor, cy + dy * factor];
+    });
 
-    // 上下の菱形エンボスライン
-    const drawRib = (p1, p2, p3) => {
-      ctx.strokeStyle = COL_SHADOW;
-      ctx.lineWidth = 4;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(p1[0], p1[1]);
-      ctx.lineTo(p2[0], p2[1]);
-      ctx.lineTo(p3[0], p3[1]);
-      ctx.stroke();
+    const positions = [];
+    for (let i = 0; i < n; i++) {
+      const next = (i + 1) % n;
+      const o1 = outerPts[i], o2 = outerPts[next];
+      const i1 = innerPts[i], i2 = innerPts[next];
 
-      ctx.strokeStyle = COL_LIGHT;
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.moveTo(p1[0] - 1, p1[1] - 1);
-      ctx.lineTo(p2[0], p2[1] - 1.5);
-      ctx.lineTo(p3[0] + 1, p3[1] - 1);
-      ctx.stroke();
-    };
+      positions.push(
+        o1[0], o1[1], 0,
+        i2[0], i2[1], -depth,
+        o2[0], o2[1], 0,
 
-    drawRib([wx - 2, wy - 6], [x + w * 0.5, wy - plateH - 10], [wx + winW + 2, wy - 6]);
-    drawRib([wx - 2, wy + winH + 6], [x + w * 0.5, y + h * 0.83], [wx + winW + 2, wy + winH + 6]);
-
-    // 黒窓外枠ベゼル
-    ctx.fillStyle = '#a6a090';
-    ctx.fillRect(wx - 5, wy - 5, winW + 10, winH + 10);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(wx - 2, wy - 2, winW + 4, winH + 4);
-
-    // 黒窓内部
-    ctx.fillStyle = '#060709';
-    ctx.fillRect(wx, wy, winW, winH);
-
-    // ルーバーフィン
-    ctx.fillStyle = '#1c1e22';
-    for (let ly = wy + 7; ly < wy + winH - 4; ly += 8) {
-      ctx.fillRect(wx + 3, ly, winW - 6, 2.5);
+        o1[0], o1[1], 0,
+        i1[0], i1[1], -depth,
+        i2[0], i2[1], -depth
+      );
     }
-  };
+    const wallGeo = new THREE.BufferGeometry();
+    wallGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    wallGeo.computeVertexNormals();
+    const wallMesh = new THREE.Mesh(wallGeo, bevelMaterial);
+    group.add(wallMesh);
 
-  // 3D Infinite Discovery One Octagonal Corridor (Film-Accurate Architecture)
+    const bottomShape = new THREE.Shape();
+    bottomShape.moveTo(innerPts[0][0], innerPts[0][1]);
+    for (let i = 1; i < n; i++) {
+      bottomShape.lineTo(innerPts[i][0], innerPts[i][1]);
+    }
+    bottomShape.closePath();
+
+    if (hasCenterCutout && cutoutBox) {
+      const hole = new THREE.Path();
+      hole.moveTo(-cutoutBox.w, -cutoutBox.h);
+      hole.lineTo( cutoutBox.w, -cutoutBox.h);
+      hole.lineTo( cutoutBox.w,  cutoutBox.h);
+      hole.lineTo(-cutoutBox.w,  cutoutBox.h);
+      hole.closePath();
+      bottomShape.holes.push(hole);
+    }
+
+    const bottomGeo = new THREE.ShapeGeometry(bottomShape);
+    const bottomMesh = new THREE.Mesh(bottomGeo, recessFloorMaterial);
+    bottomMesh.position.z = -depth;
+    group.add(bottomMesh);
+
+    return group;
+  }
+
+  // 1パネルのマスターコンポーネントを構築
+  function createRecessedPanelMesh() {
+    const panelGroup = new THREE.Group();
+
+    const halfX = SIDE_WIDTH * 0.5;
+    const halfY = PANEL_LENGTH * 0.5;
+
+    const hexX = halfX * 0.88;
+    const hexY = halfY * 0.86;
+    const flatX = halfX * 0.34;
+
+    const hexPts = [
+      [-flatX,  hexY],
+      [-hexX,   0],
+      [-flatX, -hexY],
+      [ flatX, -hexY],
+      [ hexX,   0],
+      [ flatX,  hexY]
+    ];
+
+    const gap = 0.09;
+    const triOuterX = halfX * 0.90;
+    const triInnerX = flatX + gap * 1.4;
+    const triOuterY = halfY * 0.86;
+    const triInnerY = gap * 0.9;
+
+    const tri1 = [[triInnerX, triOuterY], [triOuterX, triOuterY], [triOuterX, triInnerY]];
+    const tri2 = [[-triOuterX, triOuterY], [-triInnerX, triOuterY], [-triOuterX, triInnerY]];
+    const tri3 = [[-triOuterX, -triInnerY], [-triInnerX, -triOuterY], [-triOuterX, -triOuterY]];
+    const tri4 = [[triOuterX, -triInnerY], [triOuterX, -triOuterY], [triInnerX, -triOuterY]];
+
+    const mainShape = new THREE.Shape();
+    mainShape.moveTo(-halfX, -halfY);
+    mainShape.lineTo( halfX, -halfY);
+    mainShape.lineTo( halfX,  halfY);
+    mainShape.lineTo(-halfX,  halfY);
+    mainShape.closePath();
+
+    const addHole = (pts) => {
+      const p = new THREE.Path();
+      p.moveTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length; i++) p.lineTo(pts[i][0], pts[i][1]);
+      p.closePath();
+      mainShape.holes.push(p);
+    };
+    addHole(hexPts);
+    addHole(tri1);
+    addHole(tri2);
+    addHole(tri3);
+    addHole(tri4);
+
+    const mainMesh = new THREE.Mesh(new THREE.ShapeGeometry(mainShape), panelMaterial);
+    panelGroup.add(mainMesh);
+
+    const winX = flatX * 0.52;
+    const winY = hexY * 0.86;
+
+    panelGroup.add(createRecessedPocket(hexPts, RECESS_DEPTH, BEVEL_WIDTH, true, { w: winX, h: winY }));
+    panelGroup.add(createRecessedPocket(tri1, RECESS_DEPTH, BEVEL_WIDTH * 0.8, false));
+    panelGroup.add(createRecessedPocket(tri2, RECESS_DEPTH, BEVEL_WIDTH * 0.8, false));
+    panelGroup.add(createRecessedPocket(tri3, RECESS_DEPTH, BEVEL_WIDTH * 0.8, false));
+    panelGroup.add(createRecessedPocket(tri4, RECESS_DEPTH, BEVEL_WIDTH * 0.8, false));
+
+    const hatchDepth = RECESS_DEPTH + 0.035;
+    const hatchGeo = new THREE.BoxGeometry(winX * 2, winY * 2, 0.03);
+    const hatchMesh = new THREE.Mesh(hatchGeo, blackHatchMaterial);
+    hatchMesh.position.z = -hatchDepth;
+    panelGroup.add(hatchMesh);
+
+    const bezelThick = 0.075;
+    const bezelPosX = winX + bezelThick * 0.5;
+    const bezelPosY = winY + bezelThick * 0.5;
+    const bezelGeoH = new THREE.BoxGeometry(winX * 2 + bezelThick * 2, bezelThick, 0.045);
+    const bezelGeoV = new THREE.BoxGeometry(bezelThick, winY * 2, 0.045);
+
+    const topBezel = new THREE.Mesh(bezelGeoH, panelMaterial);
+    topBezel.position.set(0, bezelPosY, -RECESS_DEPTH + 0.015);
+    const botBezel = new THREE.Mesh(bezelGeoH, panelMaterial);
+    botBezel.position.set(0, -bezelPosY, -RECESS_DEPTH + 0.015);
+    const leftBezel = new THREE.Mesh(bezelGeoV, panelMaterial);
+    leftBezel.position.set(-bezelPosX, 0, -RECESS_DEPTH + 0.015);
+    const rightBezel = new THREE.Mesh(bezelGeoV, panelMaterial);
+    rightBezel.position.set(bezelPosX, 0, -RECESS_DEPTH + 0.015);
+
+    panelGroup.add(topBezel, botBezel, leftBezel, rightBezel);
+
+    const plateGeo = new THREE.BoxGeometry(0.22, 0.38, 0.02);
+    const plate1 = new THREE.Mesh(plateGeo, plateMaterial1);
+    plate1.position.set(hexX * 0.58, 0, -RECESS_DEPTH + 0.01);
+    const plate2 = new THREE.Mesh(plateGeo, plateMaterial2);
+    plate2.position.set(-hexX * 0.58, 0, -RECESS_DEPTH + 0.01);
+    panelGroup.add(plate1, plate2);
+
+    return panelGroup;
+  }
+
+  const masterPanel = createRecessedPanelMesh();
+
+  // 3D Infinite Discovery One Octagonal Corridor
   const createInfiniteCorridor = () => {
     const corridorGroup = new THREE.Group();
     scene.add(corridorGroup);
     window.__corridorGroup = corridorGroup;
 
-    // 1024x1024 Film-Accurate Facet Canvas Texture
-    const facetCanvas = document.createElement('canvas');
-    facetCanvas.width = 1024;
-    facetCanvas.height = 1024;
-    const sctx = facetCanvas.getContext('2d');
-    drawAccuratePanel(sctx, 0, 0, 1024, 1024);
+    const slitTroughGeo = new THREE.BoxGeometry(SIDE_WIDTH * 0.99, 0.04, BAND_WIDTH * 0.85);
+    const lightBarGeo = new THREE.BoxGeometry(SIDE_WIDTH * 0.92, 0.03, 0.11);
+    const hingeGeo = new THREE.CylinderGeometry(0.036, 0.036, 0.28, 10);
+    hingeGeo.rotateX(Math.PI / 2);
 
-    const facetTexture = new THREE.CanvasTexture(facetCanvas);
-    facetTexture.colorSpace = THREE.SRGBColorSpace;
-    facetTexture.anisotropy = 4;
+    const segments = [];
 
-    const INRADIUS = 4.8;
-    const SIDE_WIDTH = 2 * INRADIUS * Math.tan(Math.PI / 8); // ≈ 3.97
-    const PANEL_DEPTH = SIDE_WIDTH * 0.98; // 正方形比率（1:1）
-    const SEGMENT_PITCH = PANEL_DEPTH + 0.35; // パネル間のスリット間隔
-    const SEGMENT_COUNT = 28;
-    const TOTAL_SPAN = SEGMENT_COUNT * SEGMENT_PITCH;
-    const Z_START = 8;
-    const Z_END = Z_START - TOTAL_SPAN;
+    for (let s = 0; s < SEGMENT_COUNT; s++) {
+      const segGroup = new THREE.Group();
 
-    const panelMaterial = new THREE.MeshBasicMaterial({
-      map: facetTexture,
-      side: THREE.FrontSide,
-      fog: true
-    });
-
-    const whiteCasingMaterial = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      side: THREE.BackSide,
-      fog: true
-    });
-
-    const whiteNeonMaterial = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      fog: false
-    });
-
-    // 1パネルのジオメトリ
-    const planeGeo = new THREE.PlaneGeometry(PANEL_DEPTH, SIDE_WIDTH * 0.98);
-    planeGeo.rotateZ(-Math.PI / 2);
-
-    // パネル境界で光る八角形リングの直線蛍光灯
-    const slitLightGeo = new THREE.BoxGeometry(SIDE_WIDTH * 0.96, 0.10, 0.14);
-
-    // 外側のホワイトケーシング
-    const outerRadius = INRADIUS / Math.cos(Math.PI / 8) + 0.35;
-    const outerCylGeo = new THREE.CylinderGeometry(outerRadius, outerRadius, SEGMENT_PITCH, 8, 1, true);
-    outerCylGeo.rotateX(Math.PI / 2);
-    outerCylGeo.rotateZ(Math.PI / 8);
-
-    const createSegment = () => {
-      const seg = new THREE.Group();
-      const outerHousing = new THREE.Mesh(outerCylGeo, whiteCasingMaterial);
-      seg.add(outerHousing);
-
-      for (let j = 0; j < 8; j++) {
-        const angle = j * (Math.PI / 4);
+      for (let i = 0; i < 8; i++) {
+        const angle = i * (Math.PI / 4);
         const facetHolder = new THREE.Group();
         facetHolder.rotation.z = angle;
 
-        // パネル
-        const panelMesh = new THREE.Mesh(planeGeo, panelMaterial);
-        panelMesh.position.set(0, -INRADIUS, 0);
-        panelMesh.rotation.x = -Math.PI / 2;
-        facetHolder.add(panelMesh);
+        const p = masterPanel.clone();
+        p.position.set(0, -INRADIUS, 0);
+        p.rotation.x = -Math.PI / 2;
+        facetHolder.add(p);
 
-        // 輪切り境界の直線蛍光灯
-        const lightBar = new THREE.Mesh(slitLightGeo, whiteNeonMaterial);
-        lightBar.position.set(0, -(INRADIUS - 0.02), SEGMENT_PITCH / 2);
+        const zBoundary = PANEL_LENGTH * 0.5 + BAND_WIDTH * 0.5;
+
+        const slitBase = new THREE.Mesh(slitTroughGeo, slitBaseMaterial);
+        slitBase.position.set(0, -INRADIUS - 0.01, zBoundary);
+        facetHolder.add(slitBase);
+
+        const lightBar = new THREE.Mesh(lightBarGeo, lightTubeMaterial);
+        lightBar.position.set(0, -INRADIUS + 0.012, zBoundary);
         facetHolder.add(lightBar);
 
-        seg.add(facetHolder);
-      }
-      return seg;
-    };
+        const cornerX = SIDE_WIDTH * 0.5;
+        const cornerY = -INRADIUS + 0.02;
+        const hinge1 = new THREE.Mesh(hingeGeo, hingeMaterial);
+        hinge1.position.set(cornerX, cornerY, PANEL_LENGTH * 0.26);
+        const hinge2 = new THREE.Mesh(hingeGeo, hingeMaterial);
+        hinge2.position.set(cornerX, cornerY, -PANEL_LENGTH * 0.26);
+        facetHolder.add(hinge1, hinge2);
 
-    const segments = [];
-    for (let i = 0; i < SEGMENT_COUNT; i++) {
-      const seg = createSegment();
-      seg.userData.baseZ = Z_START - i * SEGMENT_PITCH;
-      seg.position.z = seg.userData.baseZ;
-      corridorGroup.add(seg);
-      segments.push(seg);
+        segGroup.add(facetHolder);
+      }
+
+      segGroup.userData.baseZ = Z_START - s * SEGMENT_PITCH;
+      segGroup.position.z = segGroup.userData.baseZ;
+      corridorGroup.add(segGroup);
+      segments.push(segGroup);
     }
 
     return {
       group: corridorGroup,
       update: (scrollOffset) => {
-        // scrollOffset is negative when user scrolls down
-        // Corridor moves backwards into depth ("背景は奥に")
         const speed = 0.9;
         const offset = scrollOffset * speed;
         for (let i = 0; i < SEGMENT_COUNT; i++) {
