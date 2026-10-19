@@ -481,7 +481,7 @@
       im.src = s;
     });
     if (canVideo()) {
-      try { fetch(PATH.dolly(f.key), { cache: 'force-cache', priority: 'low' }).catch(() => {}); } catch (e) {}
+      try { fetch(PATH.dolly(f.key), { cache: 'force-cache', priority: 'low', headers: { Range: 'bytes=0-524287' } }).catch(() => {}); } catch (e) {}
     }
   }
 

@@ -388,23 +388,26 @@ document.addEventListener('DOMContentLoaded', () => {
     applySmallKanaKerning(document.querySelector('.kerning-tight'));
     initFloatingWorldGallery();
 
-    const preloadTargets = images.slice(0, PRELOAD_LIMIT);
-
-    preloadImages(preloadTargets, {
-        onProgress: (value) => {
-            if (loaderOverlay && document.body.classList.contains('floating-world-page')) {
-                updateLoaderProgress(value * 0.4);
+    if (document.body.classList.contains('floating-world-page')) {
+        const preloadTargets = images.slice(0, PRELOAD_LIMIT);
+        preloadImages(preloadTargets, {
+            onProgress: (value) => {
+                if (loaderOverlay) {
+                    updateLoaderProgress(value * 0.4);
+                }
             }
-        }
-    })
-    .then(() => {
+        })
+        .then(() => {
+            document.body.classList.add('loaded');
+            console.log('Trail images prepared.');
+        })
+        .catch(err => {
+            console.error('Failed to preload some trail images', err);
+            document.body.classList.add('loaded');
+        });
+    } else {
         document.body.classList.add('loaded');
-        console.log('Trail images prepared.');
-    })
-    .catch(err => {
-        console.error('Failed to preload some trail images', err);
-        document.body.classList.add('loaded');
-    });
+    }
 
     const menuBtn = document.querySelector('.menu-btn');
     const closeBtn = document.querySelector('.close-btn');
