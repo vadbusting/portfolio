@@ -26,8 +26,6 @@
     heroVideo: 'assets/video/hero_entrance.mp4'
   };
 
-  const WATCHDOG_MS = 9000;
-
   /* ---------------- DOM References ---------------- */
   const $ = id => document.getElementById(id);
   const stage = $('stage'), lab = $('lab'), plate = $('plate'), plateA = $('plateImg');
@@ -67,7 +65,6 @@
   const canVideo = () => !videoBroken && !mq.matches && !conn.saveData && params.get('novideo') !== '1';
   const lightNet = () => conn.saveData || /(^|-)2g$/.test(conn.effectiveType || '');
   const clamp01 = v => Math.min(1, Math.max(0, v));
-  const smooth = (a, b, v) => { const t = clamp01((v - a) / (b - a)); return t * t * (3 - 2 * t); };
 
   let state = 'hero', cur = -1, token = 0, busy = false, usedKeyboard = false;
   let platePanX = 0.5, platePanY = 0.5;
@@ -238,7 +235,7 @@
   }
 
   function updateStageHotspot(px = platePanX, py = platePanY) {
-    const hotspot = $('stageHotspot') || $('floorHotspot');
+    const hotspot = $('stageHotspot');
     const emailHotspot = $('emailHotspot');
     if (!hotspot) return;
 
@@ -293,7 +290,7 @@
   }
 
   // Click on floor hotspot navigates to floor destination
-  const floorHotspotEl = $('stageHotspot') || $('floorHotspot');
+  const floorHotspotEl = $('stageHotspot');
   if (floorHotspotEl) {
     floorHotspotEl.addEventListener('click', e => {
       // Disambiguate drag/swipe vs pure tap/click: cancel click if user dragged > 8px or ended drag within 350ms
@@ -353,7 +350,7 @@
     portal.classList.remove('is-visible');
     portal.setAttribute('aria-hidden', 'true');
     portalLink.tabIndex = -1;
-    const hotspot = $('floorHotspot') || $('stageHotspot');
+    const hotspot = $('stageHotspot');
     if (hotspot) hotspot.hidden = true;
   }
 
@@ -774,15 +771,6 @@
     hidePortal();
     history.replaceState(null, '', '#lobby');
     startSeqLoop();
-  }
-
-  function enterLobbyFromHero() {
-    if (busy || state !== 'hero') return;
-    busy = true;
-    if (scrollCue) scrollCue.classList.add('is-hidden');
-    seqLoad();
-    toLobbyState(0);
-    setTimeout(() => { busy = false; }, 350);
   }
 
   // Arrive at Lobby End (1F ABOUT)
@@ -1475,7 +1463,6 @@
   }
 
   const atomCopyBtn = $('atomCopyBtn');
-  const copyText = $('copyText');
   if (atomCopyBtn) {
     atomCopyBtn.addEventListener('click', async e => {
       e.stopPropagation();
@@ -1567,7 +1554,6 @@
   const cipherForm = document.getElementById('cipherForm');
   const authBtn = document.getElementById('btn');
   const cipherHintBtn = document.getElementById('cipherHintBtn');
-  const cipherHintBox = document.getElementById('cipherHintBox');
   const cipherCancel = document.getElementById('cipherCancel');
 
   function openCipherModal() {
@@ -1577,7 +1563,6 @@
     cipherModal.style.display = 'flex';
     cipherModal.style.opacity = '1';
     if (authCard) authCard.classList.remove('is-authenticated', 'success-border');
-    if (cipherHintBox) cipherHintBox.hidden = true;
     if (authBtn) {
       authBtn.textContent = '認証';
       authBtn.classList.remove('btn-success');
@@ -1645,7 +1630,7 @@
       e.preventDefault();
       const val = (keyInput.value || '').trim().replace(/\s+/g, '').toLowerCase();
       // Correct password: ハングリーアート
-      if (val === 'ハングリーアート' || val === 'hungryart' || val === 'hungry-art' || val === 'hungry_art' || val === 'bypass') {
+      if (val === 'ハングリーアート' || val === 'hungryart' || val === 'hungry-art' || val === 'hungry_art') {
         handleCipherUnlock();
       } else {
         handleCipherError();

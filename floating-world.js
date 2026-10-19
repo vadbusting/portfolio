@@ -14,7 +14,6 @@ const layoutMetrics = { maxExtent: 0 };
 let initialScrollHandled = false;
 const ENDING_CARD_THRESHOLD = 0.94;
 const CANVAS_FADE_END = 1.0;
-const STAGE_SCROLL_LENGTH_SCALE = 4;
 let initialRenderPending = false;
 let resolveInitialRender;
 
@@ -427,107 +426,6 @@ const isMonochromeImage = (image) => {
       initialScrollHandled = true;
       window.resetPortfolioScrollTop?.();
     }
-  };
-
-  
-
-  const prepareScene = (items) => {
-    const sortedItems = items
-      .slice()
-      .sort((a, b) => (a.isMonochrome === b.isMonochrome ? 0 : a.isMonochrome ? -1 : 1));
-
-    let maxExtent = 0;
-
-    sortedItems.forEach(({ texture, src }, index) => {
-      const image = texture.image;
-      const ratio =
-        image && image.width && image.height ? image.width / image.height : 0.75;
-      const planeHeight = 3.35;
-      const planeWidth = planeHeight * ratio;
-
-      const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight, 1, 1);
-      const material = new THREE.MeshBasicMaterial({
-        map: texture,
-        transparent: true,
-        opacity: 0,
-        depthWrite: true,
-      });
-
-      const mesh = new THREE.Mesh(geometry, material);
-      const INITIAL_START_Z = -95;
-      mesh.position.z = INITIAL_START_Z - index * spacing;
-      const angle = index * 2.399963229728653; // golden angle in radians
-      // Keep cards elegantly floating inside the octagonal corridor volume (radius 5.6)
-      const radialSpread = 0.55 + Math.min(1.85, Math.pow((index % 42) + 1, 0.42) * 0.48);
-      const jitterX = (Math.random() - 0.5) * 0.12;
-      const jitterY = (Math.random() - 0.5) * 0.12;
-      mesh.position.x = Math.cos(angle) * radialSpread + jitterX;
-      mesh.position.y = Math.sin(angle) * radialSpread * 0.9 + jitterY;
-
-      if (src.includes('sub_banner_')) {
-        mesh.scale.multiplyScalar(0.55);
-        const signX = mesh.position.x >= 0 ? 1 : -1;
-        const signY = mesh.position.y >= 0 ? 1 : -1;
-        mesh.position.x = (Math.abs(mesh.position.x) + 0.8) * signX * 1.8;
-        mesh.position.y = (Math.abs(mesh.position.y) + 0.8) * signY * 1.8;
-      } else if (src.includes('9092-350501_230602_numazukanuki_300x250_320x50_320×50_1') || src.includes('9092-350501_230602_numazukanuki_300x250_320x50_320×50_2')) {
-        mesh.scale.multiplyScalar(0.25);
-      }
-      else if (src.includes('9092-350501_230602_numazukanuki_300x250_320x50-1') || src.includes('9092-350501_230602_numazukanuki_300x250_320x50-2')) {
-        mesh.scale.multiplyScalar(0.5);
-      }
-
-      const scaledWidth = planeWidth * mesh.scale.x;
-      const scaledHeight = planeHeight * mesh.scale.y;
-      const extentX = Math.abs(mesh.position.x) + scaledWidth * 0.6;
-      const extentY = Math.abs(mesh.position.y) + scaledHeight * 0.6;
-      maxExtent = Math.max(maxExtent, extentX, extentY);
-
-      mesh.userData.baseX = mesh.position.x;
-      mesh.userData.baseY = mesh.position.y;
-      mesh.userData.baseZ = mesh.position.z;
-      mesh.userData.baseScaleX = mesh.scale.x;
-      mesh.userData.baseScaleY = mesh.scale.y;
-      mesh.userData.src = src;
-
-      stackGroup.add(mesh);
-    });
-
-    layoutMetrics.xyScale = 1;
-    layoutMetrics.maxExtent = Math.max(1, maxExtent);
-
-    const INITIAL_START_Z = -95;
-    totalDepth = Math.abs(INITIAL_START_Z) + spacing * Math.max(0, stackGroup.children.length - 1) + 24;
-    updateCameraForExtent();
-
-    // Natural, rhythmic scroll travel: ~130px per item
-    const stageMinHeight = Math.max(
-      window.innerHeight * 3,
-      window.innerHeight + Math.max(stackGroup.children.length * 130, totalDepth * 32)
-    );
-    stage.style.minHeight = `${stageMinHeight}px`;
-
-    const spacer = stage.querySelector('.floating-scroll-spacer');
-    if (spacer) {
-      spacer.style.height = `${window.innerHeight * 0.3}px`;
-    }
-
-    resizeRenderer();
-    computeStageMetrics();
-    onScroll();
-    initialRenderPending = true;
-    const initialRenderPromise = new Promise((resolve) => {
-      resolveInitialRender = resolve;
-    });
-    animate();
-    window.resetPortfolioScrollTop?.();
-    requestAnimationFrame(() => window.resetPortfolioScrollTop?.());
-    initialRenderPromise.then(() => {
-      requestAnimationFrame(() => {
-        window.updatePortfolioLoaderProgress?.(100, { force: true });
-        revealScene(true);
-      });
-    });
   };
 
   const resizeRenderer = () => {

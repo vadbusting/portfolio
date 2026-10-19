@@ -327,9 +327,7 @@ html, body {
 
 /* Pre-paint suppression ONLY during initial page load with direct floor hash */
 html[data-page-floor] .stage .layer--hero,
-html[data-page-floor] .stage .cenotaph,
-html.is-floor-direct .stage .layer--hero,
-html.is-floor-direct .stage .cenotaph {
+html[data-page-floor] .stage .cenotaph {
   opacity: 0 !important;
   visibility: hidden !important;
   display: none !important;
@@ -867,10 +865,6 @@ body.cipher-locked canvas {
   display: none !important;
 }
 
-.check-svg {
-  display: none !important;
-}
-
 /* 認証モーダル タイトル・説明テキスト (中央揃え・白/グレー) */
 .auth-title {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -1249,22 +1243,6 @@ body.cipher-locked canvas {
   }
 }
 
-.authHintBox {
-  margin-top: 16px;
-  padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 4px;
-  font-size: 12px;
-  color: #ffffff;
-  line-height: 1.5;
-  text-align: center;
-  animation: fadeIn 0.2s ease;
-}
-.authHintBox[hidden] {
-  display: none !important;
-}
-
 /* ==========================================================================
    Step 3: Transparent Thumbnail Hotspot & B???F Shelf Credits
    ========================================================================== */
@@ -1309,14 +1287,12 @@ body.cipher-locked canvas {
 }
 
 /* サムネイル選択範囲 可視化検証用スタイル */
-.stage.is-debug-hotspots .stageHotspot,
-.stageHotspot.is-debug-visible {
+.stage.is-debug-hotspots .stageHotspot {
   outline: 2px solid #00f3ff !important;
   background: rgba(0, 243, 255, 0.22) !important;
   box-shadow: 0 0 16px rgba(0, 243, 255, 0.45) !important;
 }
-.stage.is-debug-hotspots .emailHotspot,
-.emailHotspot.is-debug-visible {
+.stage.is-debug-hotspots .emailHotspot {
   outline: 2px solid #ff0055 !important;
   background: rgba(255, 0, 85, 0.35) !important;
   box-shadow: 0 0 16px rgba(255, 0, 85, 0.6) !important;
