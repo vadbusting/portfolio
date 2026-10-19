@@ -1318,6 +1318,11 @@ a:hover { color: #888; }
 
 /* ── RESPONSIVE MEDIA QUERIES ── */
 @media (max-width: 1024px) and (orientation: portrait) {
+  /* Keep the ambient 200% pseudo-element from becoming a horizontal
+     scrolling surface on touch devices. */
+  .slide {
+    overflow: clip !important;
+  }
   .lp-nav {
     display: none; /* Hide header nav links on tablet/mobile */
   }

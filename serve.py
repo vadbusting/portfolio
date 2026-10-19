@@ -85,7 +85,9 @@ class ThreadedHTTPServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
     allow_reuse_address = True
 
 if __name__ == '__main__':
-    with ThreadedHTTPServer(('', PORT), RangeRequestHandler) as httpd:
+    # Supports local development and mobile real-device testing over Wi-Fi
+    HOST = '127.0.0.1' if '--localhost-only' in sys.argv else ''
+    with ThreadedHTTPServer((HOST, PORT), RangeRequestHandler) as httpd:
         print(f'Threaded HTTP server running on port {PORT} with Byte-Range & Unicode fallback support...')
         try:
             httpd.serve_forever()

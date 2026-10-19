@@ -72,6 +72,7 @@
   let state = 'hero', cur = -1, token = 0, busy = false, usedKeyboard = false;
   let platePanX = 0.5, platePanY = 0.5;
   let floorArrivedTime = 0;
+  let isTouchDragging = false, lastDragTime = 0;
   const alive = t => t === token;
 
   function resetPlatePan() {
@@ -119,7 +120,9 @@
   }
 
   function getFloorHref(f) {
-    const isMobile = window.innerWidth <= 780 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    // Keep the leaf-page breakpoint aligned with device-detect.js. The
+    // cinematic entrance remains the same on every device.
+    const isMobile = window.innerWidth <= 920 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     if (isMobile && f.key === 'about') {
       return 'mobile/about.html';
     }
@@ -299,6 +302,13 @@
   const floorHotspotEl = $('stageHotspot') || $('floorHotspot');
   if (floorHotspotEl) {
     floorHotspotEl.addEventListener('click', e => {
+      // Disambiguate drag/swipe vs pure tap/click: cancel click if user dragged > 8px or ended drag within 350ms
+      if (isTouchDragging || (performance.now() - lastDragTime < 350)) {
+        e.preventDefault();
+        e.stopPropagation();
+        isTouchDragging = false;
+        return;
+      }
       e.stopPropagation();
       if (cur >= 0) {
         const f = FLOORS[cur];
@@ -317,6 +327,12 @@
   const emailHotspotEl = $('emailHotspot');
   if (emailHotspotEl) {
     emailHotspotEl.addEventListener('click', e => {
+      if (isTouchDragging || (performance.now() - lastDragTime < 350)) {
+        e.preventDefault();
+        e.stopPropagation();
+        isTouchDragging = false;
+        return;
+      }
       e.stopPropagation();
     });
   }
@@ -1086,6 +1102,7 @@
   }, { passive: false });
 
   let touchStartX = null, touchStartY = null;
+  let touchOriginX = null, touchOriginY = null;
 
   stage.addEventListener('touchstart', e => {
     const creditModal = $('creditModal');
@@ -1094,9 +1111,16 @@
       touchStartY = null;
       return;
     }
-    const isInteractive = e.target.closest('button,a,.contactLayer,.cipherModal,.creditModal');
-    touchStartX = isInteractive ? null : e.touches[0].clientX;
-    touchStartY = isInteractive ? null : e.touches[0].clientY;
+    const isBlockingUI = e.target.closest('.contactLayer, .cipherModal, .creditModal, .cipherHintModal, .lab__header, .lab__rail, .atomBubble, button');
+    if (isBlockingUI) {
+      touchStartX = null;
+      touchStartY = null;
+      return;
+    }
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchOriginX = touchStartX;
+    touchOriginY = touchStartY;
   }, { passive: true });
 
   stage.addEventListener('touchmove', e => {
@@ -1107,6 +1131,14 @@
     const y = e.touches[0].clientY;
     const dx = touchStartX - x;
     const dy = touchStartY - y;
+
+    if (touchOriginX != null && touchOriginY != null) {
+      const dist = Math.hypot(x - touchOriginX, y - touchOriginY);
+      if (dist > 8) {
+        isTouchDragging = true;
+        lastDragTime = performance.now();
+      }
+    }
 
     if (state === 'hero') {
       if (scrollCue) scrollCue.classList.add('is-hidden');
@@ -1233,7 +1265,94 @@
     }
   }, { passive: true });
 
-  stage.addEventListener('touchend', () => { touchStartX = null; touchStartY = null; }, { passive: true });
+  ['touchend', 'touchcancel'].forEach(ev => {
+    stage.addEventListener(ev, () => {
+      touchStartX = null;
+      touchStartY = null;
+      touchOriginX = null;
+      touchOriginY = null;
+      setTimeout(() => {
+        isTouchDragging = false;
+      }, 150);
+    }, { passive: true });
+  });
+
+  // Desktop mouse drag-to-pan support
+  let isMouseDown = false;
+  let mouseStartX = null, mouseStartY = null;
+  let mouseOriginX = null, mouseOriginY = null;
+
+  stage.addEventListener('mousedown', e => {
+    if (e.button !== 0) return; // Primary left click only
+    const creditModal = $('creditModal');
+    if (creditModal && !creditModal.hidden) return;
+    const isBlockingUI = e.target.closest('.contactLayer, .cipherModal, .creditModal, .cipherHintModal, .lab__header, .lab__rail, .atomBubble, button');
+    if (isBlockingUI) return;
+
+    isMouseDown = true;
+    mouseStartX = e.clientX;
+    mouseStartY = e.clientY;
+    mouseOriginX = mouseStartX;
+    mouseOriginY = mouseStartY;
+  });
+
+  window.addEventListener('mousemove', e => {
+    if (!isMouseDown || mouseStartX == null || mouseStartY == null) return;
+    const x = e.clientX;
+    const y = e.clientY;
+    const dx = mouseStartX - x;
+    const dy = mouseStartY - y;
+
+    const dist = Math.hypot(x - mouseOriginX, y - mouseOriginY);
+    if (dist > 8) {
+      isTouchDragging = true;
+      lastDragTime = performance.now();
+    }
+
+    if (state === 'floor') {
+      if (cur === 0 || (plate && plate.classList.contains('is-end'))) {
+        const boxRatio = window.innerWidth / window.innerHeight;
+        const isLandscape = boxRatio >= 1.05;
+
+        if (isLandscape) {
+          const isHorizontal = Math.abs(dx) > Math.abs(dy);
+          if (isHorizontal && Math.abs(dx) > 0.8) {
+            platePanY = clamp01(platePanY + dx / (window.innerHeight * 1.5));
+            platePanX = 0.5;
+            const pVal = `50.0% ${(platePanY * 100).toFixed(1)}%`;
+            if (plate) plate.style.setProperty('--pos', pVal);
+            if (dollyLayer) dollyLayer.style.setProperty('--pos', pVal);
+            updateStageHotspot(0.5, platePanY);
+            if (cur === 2) updateAtomDollPosition(0.5, platePanY);
+            if (cur === 0) { seq.dirty = true; drawSeq(); }
+          }
+        } else {
+          const isHorizontalSwipe = Math.abs(dx) > Math.abs(dy);
+          if (isHorizontalSwipe && Math.abs(dx) > 0.8) {
+            platePanX = clamp01(platePanX + dx / (window.innerWidth * 1.2));
+            platePanY = 0.5;
+            const pVal = `${(platePanX * 100).toFixed(1)}% 50.0%`;
+            if (plate) plate.style.setProperty('--pos', pVal);
+            if (dollyLayer) dollyLayer.style.setProperty('--pos', pVal);
+            updateStageHotspot(platePanX, 0.5);
+            if (cur === 2) updateAtomDollPosition(platePanX, 0.5);
+            if (cur === 0) { seq.dirty = true; drawSeq(); }
+          }
+        }
+      }
+    }
+    mouseStartX = x;
+    mouseStartY = y;
+  });
+
+  window.addEventListener('mouseup', () => {
+    isMouseDown = false;
+    mouseStartX = null;
+    mouseStartY = null;
+    mouseOriginX = null;
+    mouseOriginY = null;
+    setTimeout(() => { isTouchDragging = false; }, 150);
+  });
 
   window.addEventListener('keydown', e => {
     usedKeyboard = true;
