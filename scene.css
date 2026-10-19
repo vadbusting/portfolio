@@ -106,11 +106,7 @@ html, body {
   opacity: 1;
   pointer-events: auto;
 }
-.stage[data-state=lobby] .layer--hero {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
+.stage[data-state=lobby] .layer--hero,
 .stage[data-state=floor] .layer--hero {
   opacity: 0 !important;
   visibility: hidden !important;
@@ -331,13 +327,6 @@ html[data-page-floor] .stage .cenotaph {
   opacity: 0 !important;
   visibility: hidden !important;
   display: none !important;
-  pointer-events: none !important;
-}
-
-.stage[data-state=floor] .cenotaph,
-.stage[data-state=lobby] .cenotaph {
-  opacity: 0 !important;
-  visibility: hidden !important;
   pointer-events: none !important;
 }
 
