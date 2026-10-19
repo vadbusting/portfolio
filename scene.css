@@ -132,6 +132,30 @@ html, body {
   opacity: 1;
 }
 
+/* --- Static image fallback when video playback fails or is disabled (?novideo=1) --- */
+.stage.is-video-fallback .layer--video {
+  opacity: 0 !important;
+  display: none !important;
+}
+.stage[data-state=floor]:not([data-floor="0"]).is-video-fallback .layer--plate {
+  opacity: 1 !important;
+  pointer-events: auto;
+}
+.stage.is-video-fallback .layer--plate img.b {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.stage.is-video-fallback .layer--plate.is-end img.b {
+  opacity: 1 !important;
+}
+.stage.is-hero-fallback .layer--hero video {
+  opacity: 0 !important;
+  display: none !important;
+}
+.stage.is-hero-fallback .layer--hero {
+  background: #07090e url('assets/scenes/hero_start.webp') center center / cover no-repeat !important;
+}
+
 /* ==========================================================================
    UI Overlays
    ========================================================================== */

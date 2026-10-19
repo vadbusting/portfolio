@@ -46,6 +46,17 @@
         try { dolly.currentTime = clamp01(floorQ) * dolly.duration; } catch (e) {}
       }
     });
+    dolly.addEventListener('error', () => {
+      videoBroken = true;
+      stage.classList.add('is-video-fallback');
+      if (plate) plate.classList.remove('no-fade');
+    });
+  }
+
+  if (heroVideo) {
+    heroVideo.addEventListener('error', () => {
+      stage.classList.add('is-hero-fallback');
+    });
   }
 
   const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -609,7 +620,9 @@
     if (dollyLayer) dollyLayer.style.setProperty('--pos', loopPosVal);
     if (plate) plate.style.setProperty('--pos', loopPosVal);
 
-    if (dolly && Number.isFinite(dolly.duration) && dolly.duration > 0) {
+    if (!canVideo()) {
+      if (plateB) plateB.style.opacity = clamp01(floorQ);
+    } else if (dolly && Number.isFinite(dolly.duration) && dolly.duration > 0) {
       const targetTime = clamp01(floorQ) * dolly.duration;
       if (!dolly.seeking && Math.abs(dolly.currentTime - targetTime) > 0.015) {
         try { dolly.currentTime = targetTime; } catch (e) {}
@@ -619,6 +632,7 @@
     // Settle at End Frame: high-res plateB (_end.webp) + show OPEN PAGE & hotspot
     if (floorQt >= 0.99 && floorQ >= 0.985 && !busy) {
       floorQ = floorQt = 1;
+      if (plateB) plateB.style.opacity = '1';
       if (dolly && Number.isFinite(dolly.duration)) {
         try { dolly.currentTime = dolly.duration; } catch (e) {}
       }
@@ -636,6 +650,7 @@
     // Settle back at Start Frame: video's first frame directly (currentTime = 0) + show SCROLL cue
     if (floorQt <= 0.001 && floorQ <= 0.005 && !busy) {
       floorQ = floorQt = 0;
+      if (plateB) plateB.style.opacity = '0';
       platePanX = 0.5;
       platePanY = 0.5;
       if (dollyLayer) dollyLayer.style.setProperty('--pos', '50.0% 50.0%');
@@ -854,10 +869,20 @@
       resetPlatePan();
       plate.classList.add('no-fade');
       plate.classList.remove('is-end');
-      if (dolly) {
-        dolly.pause();
-        try { dolly.currentTime = 0; } catch (e) {}
-        dolly.src = PATH.dolly(f.key);
+      if (plateB) plateB.style.opacity = opts.instant ? '1' : '0';
+      if (canVideo()) {
+        stage.classList.remove('is-video-fallback');
+        if (dolly) {
+          dolly.pause();
+          try { dolly.currentTime = 0; } catch (e) {}
+          dolly.src = PATH.dolly(f.key);
+        }
+      } else {
+        stage.classList.add('is-video-fallback');
+        if (dolly) {
+          dolly.pause();
+          dolly.removeAttribute('src');
+        }
       }
       dollyLayer.classList.remove('is-on');
       stage.classList.remove('is-waiting-scroll');
