@@ -89,4 +89,24 @@
   - [x] Chrome DevTools MCP 実機検証: コンソールエラー 0 件
   - [x] 5画面状態（PC Fluid, Mobile Portrait, Mobile Landscape, Tablet Portrait, Tablet Landscape）での表示崩れ・レイアウト破綻ゼロを実証
   - [x] `other.html`（ディスカバリー号3D回廊・白フェード）の完全動作を実証
+---
+
+# Task: #about 直接アクセス、フロア遷移、動画再生失敗時静止画フォールバック検証
+
+- [x] 1. #about 直接URLアクセスの実機検証
+  - [x] `http://localhost:3002/#about` 直接ナビゲーションで即座に `data-state="floor"` / `data-floor="0"` 描画を確認
+  - [x] レールボタン `1F ABOUT` アクティブ、OPEN PAGEボタン、芳名帳・プロフィール写真・QRコード正常表示
+  - [x] コンソールエラー 0 件
+- [x] 2. 全フロア遷移（1F〜5F, B1F）の実機検証
+  - [x] 1F -> 2F (PRESENTATION) -> 3F (LP) -> 4F (WEB) -> 5F (DIRECTION) -> 1F (ABOUT) 連続切り替えを実証
+  - [x] 各フロアでディップ暗転・扉前静止画表示・SCROLLキュー表示・ハッシュ変更・レール更新が完全動作
+  - [x] B???F (OTHER) クリック時にHAL 9000暗号モーダルが正常起動し、BACKボタンで復帰できることを実証
+  - [x] コンソールエラー 0 件
+- [x] 3. 動画再生失敗時の静止画フォールバック実装 & 実機検証
+  - [x] `heroVideo` / `dolly` の `error` イベントリスナー実装（`is-video-fallback` / `is-hero-fallback` 自動付与）
+  - [x] `scene.css` に静止画フォールバック制御を追加（ビデオ非表示化、`plate` 表示化、クロスフェード制御）
+  - [x] `?novideo=1` パラメータによる静止画モード動作検証（`dolly` 除去、`floor_start.webp` -> `${f.key}_end.webp` への安定表示）
+  - [x] ビデオ `error` イベント強制発火テスト: 即座に静止画フォールバックへ切り替わり、スクロールで `OPEN PAGE` / ポータルへ到達可能であることを完全実証
+  - [x] コンソールエラー 0 件
+
 
