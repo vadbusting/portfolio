@@ -12,7 +12,7 @@ echo "================================================="
 
 # Remove existing zip if any
 if [ -f "$DEST_PATH" ]; then
-  /usr/bin/trash "$DEST_PATH" 2>/dev/null || rm -f "$DEST_PATH"
+  /usr/bin/trash "$DEST_PATH" 2>/dev/null || true
 fi
 
 zip -r -q -X "$DEST_PATH" . -x "*.git*" -x "*__MACOSX*" -x "*.DS_Store*"

@@ -8,8 +8,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cormorant+Garamond:ital,wght@1,300;1,400&family=Dela+Gothic+One&family=Montserrat:wght@900&family=Syne:wght@800;900&family=Unbounded:wght@800;900&display=block" rel="stylesheet">
-<link rel="stylesheet" href="hero-v13.css?v=25">
-<link rel="stylesheet" href="scene.css?v=94">
+<link rel="stylesheet" href="hero-v13.css?v=26">
+<link rel="stylesheet" href="scene.css?v=99">
+<script>
+  // Immediate pre-paint detection of floor hash to suppress HERO flash
+  (function() {
+    var h = (location.hash || '').replace('#', '');
+    if (h && h !== 'top' && h !== 'hero') {
+      document.documentElement.setAttribute('data-page-floor', h);
+    }
+  })();
+</script>
 </head>
 <body>
 <main class="stage" id="stage" data-state="hero" aria-label="Portfolio">

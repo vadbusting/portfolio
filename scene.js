@@ -759,6 +759,7 @@
       }
       if (scrollCue) scrollCue.classList.remove('is-hidden');
     }
+    document.documentElement.removeAttribute('data-page-floor');
     history.replaceState(null, '', location.pathname + location.search);
     if (!opts.fromLobby) {
       setDip(false);
@@ -813,6 +814,7 @@
     updateAtomVisibility();
     if (scrollCue) scrollCue.classList.add('is-hidden');
     stage.classList.remove('is-waiting-scroll');
+    document.documentElement.removeAttribute('data-page-floor');
     history.replaceState(null, '', '#about');
   }
 
@@ -829,7 +831,7 @@
     }
     if (state !== 'lobby') {
       setDip(true);
-      await wait(250);
+      await wait(280);
       if (!alive(t)) return;
     }
     if (dolly) {
@@ -931,7 +933,7 @@
     }
 
     setDip(true);
-    await wait(240);
+    await wait(280);
     if (!alive(t)) return;
     reset();
     await loadPlates();
@@ -939,6 +941,7 @@
 
     setState('floor');
     plate.classList.remove('no-fade');
+    document.documentElement.removeAttribute('data-page-floor');
     setDip(false);
 
     // Freeze on Start Still Frame — waiting for scroll trigger
@@ -952,6 +955,7 @@
     floorArrivedTime = performance.now();
     setState('floor');
     stage.classList.remove('is-waiting-scroll');
+    document.documentElement.removeAttribute('data-page-floor');
     if (scrollCue) scrollCue.classList.add('is-hidden');
     resetPlatePan();
     showPortal(i);
