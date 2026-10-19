@@ -120,13 +120,7 @@
   }
 
   function getFloorHref(f) {
-    // Keep the leaf-page breakpoint aligned with device-detect.js. The
-    // cinematic entrance remains the same on every device.
-    const isMobile = window.innerWidth <= 920 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isMobile && f.key === 'about') {
-      return 'mobile/about.html';
-    }
-    return f.href;
+    return (f && f.href) ? f.href : '';
   }
 
   const FLOOR_HOTSPOTS = {
