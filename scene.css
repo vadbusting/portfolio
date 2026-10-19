@@ -40,8 +40,8 @@ html, body {
 /* --- Hero entrance layer --- */
 .layer--hero {
   background: #07090e;
-  opacity: 1 !important;
   z-index: 1;
+  transition: opacity 0.6s var(--ease, ease);
 }
 .heroOverlay {
   display: none !important;
@@ -49,8 +49,7 @@ html, body {
 
 /* --- Lobby frame sequence (Canvas) --- */
 .layer--seq {
-  background: #0a0807;
-  transition: opacity 0.8s ease;
+  background: transparent;
   z-index: 2;
 }
 .layer--seq canvas {
@@ -119,7 +118,8 @@ html, body {
 }
 .stage[data-state=lobby] .layer--seq,
 .stage[data-state=floor][data-floor="0"] .layer--seq {
-  opacity: 1;
+  opacity: 1 !important;
+  transition: none !important;
 }
 .stage[data-state=floor][data-floor="0"] .layer--plate {
   opacity: 0 !important;
@@ -325,9 +325,19 @@ html, body {
   transform: translate(-50%, -50%) scale(1) !important;
 }
 
-/* Pre-paint suppression when opening or returning directly to a floor */
+/* Pre-paint suppression ONLY during initial page load with direct floor hash */
 html[data-page-floor] .stage .layer--hero,
-html[data-page-floor] .stage .cenotaph {
+html[data-page-floor] .stage .cenotaph,
+html.is-floor-direct .stage .layer--hero,
+html.is-floor-direct .stage .cenotaph {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  display: none !important;
+  pointer-events: none !important;
+}
+
+.stage[data-state=floor] .cenotaph,
+.stage[data-state=lobby] .cenotaph {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
@@ -1696,9 +1706,9 @@ body.cipher-locked canvas {
 }
 
 /* ==========================================================================
-   Landscape Viewports (Centered CENOTAPH & Proportional Cinematic Typography)
+   Landscape Mobile Viewports (Handheld rotated landscape ONLY)
    ========================================================================== */
-@media (orientation: landscape) {
+@media (max-height: 540px) and (orientation: landscape) {
   .cenotaph {
     top: 50% !important;
     left: 50% !important;
@@ -1707,28 +1717,12 @@ body.cipher-locked canvas {
     max-width: none !important;
   }
   .cenotaph__title {
-    font-size: clamp(3.8rem, min(17.5vw, 32vh), 16rem) !important;
-    -webkit-text-stroke: clamp(4.5px, min(9.5px, 1.4vh), 9.5px) #ffffff !important;
+    font-size: clamp(3.2rem, min(19vw, 36vh), 12rem) !important;
+    -webkit-text-stroke: clamp(3.8px, 1.3vh, 8.5px) #ffffff !important;
   }
   .cenotaph__prefix,
   .cenotaph__for {
-    font-size: clamp(1.1rem, min(2.8vw, 4.8vh), 2.8rem) !important;
-  }
-}
-
-@media (max-height: 540px) and (orientation: landscape) {
-  .cenotaph {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) scale(1) !important;
-  }
-  .cenotaph__title {
-    font-size: clamp(2.8rem, min(15.5vw, 28vh), 10.5rem) !important;
-    -webkit-text-stroke: clamp(3.5px, 1.2vh, 7.5px) #ffffff !important;
-  }
-  .cenotaph__prefix,
-  .cenotaph__for {
-    font-size: clamp(0.95rem, min(2.2vw, 4.2vh), 1.6rem) !important;
+    font-size: clamp(1.05rem, min(2.8vw, 4.8vh), 2.2rem) !important;
   }
   .scrollCue {
     bottom: clamp(6px, 1.8vh, 14px) !important;

@@ -15,6 +15,25 @@ if [ -f "$DEST_PATH" ]; then
   /usr/bin/trash "$DEST_PATH" 2>/dev/null || true
 fi
 
+# Check that all filenames are NFC normalized (guard against macOS NFD issue)
+echo "ファイル名のUnicode正規化（NFC）チェック中..."
+python3 -c "
+import os, sys, unicodedata
+errors = []
+for root, dirs, files in os.walk('.'):
+    if any(x in root for x in ['.git', 'baseline_screenshots', 'after_screenshots']):
+        continue
+    for name in files + dirs:
+        if unicodedata.normalize('NFC', name) != name:
+            errors.append(os.path.join(root, name))
+if errors:
+    print('【エラー】NFD（濁点分離）のファイル名が検出されました:')
+    for e in errors:
+        print('  -', e)
+    sys.exit(1)
+print('✓ 全ファイル名がNFC（またはASCII）に正規化されています。')
+"
+
 zip -r -q -X "$DEST_PATH" . -x "*.git*" -x "*__MACOSX*" -x "*.DS_Store*"
 
 echo ""

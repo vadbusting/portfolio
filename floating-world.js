@@ -348,10 +348,10 @@ if (!stage || !canvas) {
   const textureLoader = new THREE.TextureLoader(loadingManager);
 
   const fallbackSources = applyIPadThinning([
-    'image/portfolio-ページ22 2 65.webp',
-    'image/portfolio-ページ22 2 66.webp',
-    'image/portfolio-ページ22 2 67.webp',
-    'image/portfolio-ページ22 2 68.webp',
+    'image/portfolio_page_22_2_65.webp',
+    'image/portfolio_page_22_2_66.webp',
+    'image/portfolio_page_22_2_67.webp',
+    'image/portfolio_page_22_2_68.webp',
   ].map(normalizeAssetPath));
 
 const analysisCanvas = document.createElement('canvas');

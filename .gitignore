@@ -15,3 +15,6 @@
 # Scratch & Cache
 __pycache__/
 scratch/
+task.md
+baseline_screenshots/
+after_screenshots/
