@@ -1,5 +1,4 @@
-(() => {
-// THREE is loaded globally via a separate script tag in HTML
+import * as THREE from './assets/vendor/three.module.js';
 
 THREE.Cache.enabled = true;
 
@@ -709,5 +708,3 @@ const isMonochromeImage = (image) => {
     });
   })();
 }
-
-})();
