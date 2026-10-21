@@ -72,6 +72,9 @@
   plate.appendChild(plateB);
 
   if (dolly) {
+    ['play', 'playing'].forEach(ev => {
+      dolly.addEventListener(ev, () => { try { dolly.pause(); } catch (e) {} });
+    });
     dolly.addEventListener('loadedmetadata', () => {
       dolly.pause();
       if (state === 'floor' && Number.isFinite(dolly.duration) && dolly.duration > 0) {
@@ -89,52 +92,38 @@
   }
 
   if (heroVideo) {
-    // Switch heroVideo to mobile all-intra video on mobile/tablet and warm Blob cache
+    ['play', 'playing'].forEach(ev => {
+      heroVideo.addEventListener(ev, () => { try { heroVideo.pause(); } catch (e) {} });
+    });
+    // Switch heroVideo to mobile all-intra video on mobile/tablet
     const desiredHeroSrc = PATH.heroVideo;
     if (heroVideo.getAttribute('src') !== desiredHeroSrc) {
       heroVideo.src = desiredHeroSrc;
       heroVideo.load();
     }
-    preloadVideoBlob(desiredHeroSrc).then(blobUrl => {
-      if (blobUrl && blobUrl !== desiredHeroSrc && state === 'hero' && heroQ === 0 && heroQt === 0) {
-        heroVideo.src = blobUrl;
-        heroVideo.load();
-      }
-    });
 
     heroVideo.addEventListener('error', () => {
       stage.classList.add('is-hero-fallback');
     });
 
-    // Mobile Safari / Chrome video prime & arm (strictly paused after unlock)
-    let heroArmed = false;
-    const armHeroVideo = () => {
-      if (heroArmed || !heroVideo) return;
-      heroArmed = true;
+    // Strict scrub-only initialization: never call .play(), only pause & sync currentTime
+    const syncHeroFrame = () => {
+      if (!heroVideo) return;
       try {
-        const p = heroVideo.play();
-        if (p && typeof p.then === 'function') {
-          p.then(() => {
-            heroVideo.pause();
-            if (state === 'hero') {
-              const dur = (Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) ? heroVideo.duration : 10.0;
-              try { heroVideo.currentTime = clamp01(heroQ) * dur; } catch (e) {}
-            }
-          }).catch(() => {});
-        } else {
-          heroVideo.pause();
+        heroVideo.pause();
+        if (state === 'hero') {
+          const dur = (Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) ? heroVideo.duration : 10.0;
+          heroVideo.currentTime = Math.max(0.001, clamp01(heroQ) * dur);
         }
       } catch (e) {}
     };
 
     if (heroVideo.readyState >= 1) {
-      armHeroVideo();
+      syncHeroFrame();
     } else {
-      heroVideo.addEventListener('loadedmetadata', armHeroVideo, { once: true });
-      heroVideo.addEventListener('canplay', armHeroVideo, { once: true });
+      heroVideo.addEventListener('loadedmetadata', syncHeroFrame, { once: true });
+      heroVideo.addEventListener('loadeddata', syncHeroFrame, { once: true });
     }
-    window.addEventListener('touchstart', armHeroVideo, { once: true, passive: true });
-    window.addEventListener('pointerdown', armHeroVideo, { once: true, passive: true });
   }
 
   const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -473,13 +462,18 @@
     return 0.5;
   }
 
+  function getSeqPanY() {
+    if (state === 'floor' && cur === 0) return platePanY;
+    return 0.5;
+  }
+
   function cover(img, a = 1) {
     const cw = seqCv.width, ch = seqCv.height, iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
     if (!iw || !ih) return;
     const s = Math.max(cw / iw, ch / ih);
     const w = iw * s, h = ih * s;
     const px = getSeqPanX();
-    const py = 0.5;
+    const py = getSeqPanY();
     const ox = (cw - w) * px;
     const oy = (ch - h) * py;
     seqCtx.globalAlpha = a;
@@ -962,22 +956,15 @@
           dolly.src = getVideoSrc(dollyUrl);
           dolly.load();
           preloadVideoBlob(dollyUrl);
-          const primeDolly = () => {
+          const syncDollyFrame = () => {
             try {
-              const p = dolly.play();
-              if (p && typeof p.then === 'function') {
-                p.then(() => {
-                  dolly.pause();
-                  const dur = (Number.isFinite(dolly.duration) && dolly.duration > 0) ? dolly.duration : 0;
-                  try { dolly.currentTime = (floorQt > 0 && dur > 0) ? clamp01(floorQ) * dur : 0; } catch (e) {}
-                }).catch(() => {});
-              } else {
-                dolly.pause();
-              }
+              dolly.pause();
+              const dur = (Number.isFinite(dolly.duration) && dolly.duration > 0) ? dolly.duration : 0;
+              dolly.currentTime = (floorQt > 0 && dur > 0) ? clamp01(floorQ) * dur : 0.001;
             } catch (e) {}
           };
-          if (dolly.readyState >= 1) primeDolly();
-          else dolly.addEventListener('canplay', primeDolly, { once: true });
+          if (dolly.readyState >= 1) syncDollyFrame();
+          else dolly.addEventListener('loadedmetadata', syncDollyFrame, { once: true });
         }
       } else {
         stage.classList.add('is-video-fallback');
@@ -1093,18 +1080,20 @@
         const isLandscape = boxRatio >= 1.05;
 
         if (isLandscape) {
-          // --- 横長時 (Landscape: 左右スクロールで切れてる上下を表示 / 上下スクロールバックで巻き戻し) ---
+          // --- 横長時 (Landscape: PC横長では左右スクロールで切れてる上下を表示 / モバイル横画面時は固定 / 上下スクロールバックで巻き戻し) ---
           const isHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
 
           if (isHorizontal) {
+            // モバイル横位置（ランドスケープ）では左右スクロールでの上下画面表示を行わない
+            const isMobileLandscape = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth <= 950 && window.innerHeight <= 560;
             // PC正規表示（1024px以上かつ標準16:9比率のデスクトップ）のみ左右スクロールによるパンを抑止（画面全体に収まっているため）
-            // それ以外の横長環境（ウルトラワイド、上下が切れるスリット表示、モバイル横位置等）では左右スクロールで上下を表示
+            // それ以外のPC横長環境（ウルトラワイド、上下が切れるスリット表示等）では左右スクロールで上下を表示
             const isStandardPC = !('ontouchstart' in window) && window.innerWidth >= 1024 && boxRatio <= 2.1;
-            if (isStandardPC) {
+            if (isStandardPC || isMobileLandscape) {
               return;
             }
 
-            // 正規以外の横長環境では「左右スクロール」で切れている「上下」を表示 (platePanY 0.0〜1.0)
+            // 正規以外のPC横長環境では「左右スクロール」で切れている「上下」を表示 (platePanY 0.0〜1.0)
             if (Math.abs(e.deltaX) > 0.5) {
               platePanY = clamp01(platePanY + e.deltaX / (window.innerHeight * 1.5));
             }
@@ -1247,25 +1236,10 @@
         const isLandscape = boxRatio >= 1.05;
 
         if (isLandscape) {
-          // --- 横長スワイプ (Landscape: 左右スワイプで切れてる上下を表示 / 上下スワイプで巻き戻し) ---
+          // --- 横長スワイプ (Landscape: 左右スワイプでの上下画面表示は行わず中央固定 / 上下スワイプで巻き戻し) ---
           const isHorizontal = Math.abs(dx) > Math.abs(dy);
 
           if (isHorizontal) {
-            // 左右スワイプで上下を表示 (platePanY 0.0〜1.0)
-            if (Math.abs(dx) > 0.8) {
-              platePanY = clamp01(platePanY + dx / (window.innerHeight * 1.5));
-            }
-            platePanX = 0.5; // 水平位置は中央固定
-
-            const pVal = `50.0% ${(platePanY * 100).toFixed(1)}%`;
-            if (plate) plate.style.setProperty('--pos', pVal);
-            if (dollyLayer) dollyLayer.style.setProperty('--pos', pVal);
-            updateStageHotspot(0.5, platePanY);
-            if (cur === 2) updateAtomDollPosition(0.5, platePanY);
-            if (cur === 0) {
-              seq.dirty = true;
-              drawSeq();
-            }
             touchStartY = y;
             touchStartX = x;
             return;
@@ -1605,8 +1579,18 @@
     if (state === 'floor') {
       const boxRatio = window.innerWidth / window.innerHeight;
       const isLandscape = boxRatio >= 1.05;
-      if (isLandscape) {
-        // 横長: 水平50%固定、垂直はplatePanYを反映
+      const isMobileLandscape = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth <= 950 && window.innerHeight <= 560 && isLandscape;
+      if (isMobileLandscape) {
+        // モバイル横位置のみ: 水平・垂直とも50%中央固定
+        platePanX = 0.5;
+        platePanY = 0.5;
+        const pVal = '50.0% 50.0%';
+        if (plate) plate.style.setProperty('--pos', pVal);
+        if (dollyLayer) dollyLayer.style.setProperty('--pos', pVal);
+        updateStageHotspot(0.5, 0.5);
+        if (cur === 2) updateAtomDollPosition(0.5, 0.5);
+      } else if (isLandscape) {
+        // PC横長: 水平50%固定、垂直はplatePanYを反映
         platePanX = 0.5;
         const pVal = `50.0% ${(platePanY * 100).toFixed(1)}%`;
         if (plate) plate.style.setProperty('--pos', pVal);
