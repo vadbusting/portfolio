@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#12141a">
+<title>PORTFOLIO</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%230a0a0a%22/><text x=%2250%22 y=%2268%22 font-family=%22sans-serif%22 font-size=%2255%22 font-weight=%22bold%22 fill=%22%23ffffff%22 text-anchor=%22middle%22>T</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cormorant+Garamond:ital,wght@1,300;1,400&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="scene.css?v=120">
+<script>
+  // Immediate pre-paint detection of floor hash to suppress HERO flash
+  (function() {
+    var h = (location.hash || '').replace('#', '');
+    if (h && h !== 'top' && h !== 'hero') {
+      document.documentElement.setAttribute('data-page-floor', h);
+    }
+  })();
+</script>
+</head>
+<body>
+<main class="stage" id="stage" data-state="hero" aria-label="Portfolio">
+
+  <!-- 背景レイヤー（HERO実写映像 → ロビー連番 → フロア静止画 → 各階ドリー動画 → 場面転換ディップ） -->
+  <div class="layer layer--hero" id="heroLayer">
+    <video id="heroVideo" src="assets/video/hero_entrance.mp4" muted playsinline webkit-playsinline preload="auto" aria-hidden="true"></video>
+    <div class="heroOverlay" aria-hidden="true"></div>
+  </div>
+  <div class="layer layer--seq" id="seqLayer"><canvas id="seq" aria-hidden="true"></canvas><i class="seqScrim" aria-hidden="true"></i></div>
+  <div class="layer layer--plate" id="plate"><img id="plateImg" alt="" decoding="async"></div>
+  <div class="layer layer--video" id="dollyLayer"><video id="dolly" muted playsinline webkit-playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video></div>
+  <div class="layer layer--dip" id="dip"></div>
+
+  <!-- UIオーバーレイ -->
+  <div class="lab" id="lab" data-stage="0">
+    <header class="lab__header">
+      <div class="lab__header-left">
+        <a class="lab__brand" href="#top" id="brand">PORTFOLIO</a>
+      </div>
+      <div class="lab__header-right">
+        <button type="button" class="lab__credit" id="headerCreditBtn" aria-label="制作クレジットを表示" hidden>CREDIT</button>
+      </div>
+    </header>
+    
+    <!-- 映画風メインタイトル: A CENOTAPH (for) （Archivo Black・鋭利白縁・Nスパイク精密トリム） -->
+    <div class="cenotaph" id="cenotaph" aria-label="A CENOTAPH (for)">
+      <span class="cenotaph__prefix">A</span>
+      <h1 class="cenotaph__title">CE<span class="cenotaph__n">N</span>O<span class="cenotaph__t">T</span><span class="cenotaph__a">A</span>PH</h1>
+      <span class="cenotaph__for">(for)</span>
+    </div>
+
+    <!-- 画面最下段のスクロール促進キュー -->
+    <div class="scrollCue" id="scrollCue" aria-hidden="true">
+      <span>SCROLL</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 10l5 5 5-5"/></svg>
+    </div>
+
+    <!-- フロア選択レール（右側: 5F〜1F 降順 + 細い罫線 + 最下層 B???F） -->
+    <nav class="lab__rail" id="rail" aria-label="研究所の各階">
+      <button type="button" class="rail__btn" data-stage-jump="5"><span>5F</span><b>DIRECTION</b></button>
+      <button type="button" class="rail__btn" data-stage-jump="4"><span>4F</span><b>WEB</b></button>
+      <button type="button" class="rail__btn" data-stage-jump="3"><span>3F</span><b>LP</b></button>
+      <button type="button" class="rail__btn" data-stage-jump="2"><span>2F</span><b>PRESENTATION</b></button>
+      <button type="button" class="rail__btn" data-stage-jump="1"><span>1F</span><b>ABOUT</b></button>
+      <div class="rail__divider" aria-hidden="true"></div>
+      <button type="button" class="rail__btn rail__btn--secret" data-stage-jump="6"><span>B???F</span><b>OTHER</b></button>
+    </nav>
+
+    <!-- 3F アトム人形インタラクションレイヤー（マスタ写真上に完全同期・足元透過乗算影付き） -->
+    <div class="atomLayer" id="atomLayer" hidden>
+      <div class="atomDollWrap" id="atomDollWrap" role="button" aria-label="アトム人形" tabindex="0">
+        <div class="atomShadow" aria-hidden="true"></div>
+        <img src="assets/scenes/atom_doll_trimmed.png?v=71" id="atomDoll" class="atomDoll" alt="アトム人形" draggable="false">
+        <div class="atomBubble" id="atomBubble" hidden>
+          <span class="atomBubbleArrow"></span>
+          <div class="atomBubbleContent">
+            <span class="atomBubbleLabel">KEYWORD:</span>
+            <span class="atomBubbleKeyword" id="atomKeyword">hungryart</span>
+            <button type="button" class="atomCopyBtn" id="atomCopyBtn" title="クリップボードにコピー" aria-label="キーワードをコピー">
+              <svg class="copyIcon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 認証モーダル (Secured Access Terminal UI) -->
+    <!-- 認証モーダル (HAL 9000 Console Terminal UI) -->
+    <div class="cipherModal" id="cipherModal" hidden aria-modal="true" role="dialog">
+      <div class="cipherModal__backdrop" id="cipherModalBackdrop"></div>
+      <div class="auth-card hal-console" id="authCard">
+        <!-- HAL 9000 Optical Eye -->
+        <div class="hal-eye-wrapper" id="halEyeWrapper">
+          <img src="assets/hal_eye.jpg" class="hal-eye-img" id="halEyeImg" alt="HAL 9000 Eye">
+          <img src="assets/hal_eye_green.png" class="hal-eye-img hal-eye-img--green" id="halEyeImgGreen" alt="HAL 9000 Eye Unlocked">
+          <div class="hal-eye-focal" id="halEyeFocal"></div>
+          <div class="hal-eye-green-glow" id="halEyeGreenGlow"></div>
+        </div>
+
+        <h2 class="auth-title">System Verification</h2>
+        <p class="auth-desc">アクセス権限を確認します。<br>指定のキーワードを入力してください。</p>
+
+        <form id="cipherForm" class="auth-form" onsubmit="return false;">
+          <label class="field-label" for="keyInput">KEYWORD:</label>
+          <input 
+            type="password" 
+            id="keyInput" 
+            class="input-field" 
+            placeholder="" 
+            inputmode="text"
+            autocomplete="off"
+            required
+          >
+          <button type="button" class="btn btn-hint" id="cipherHintBtn">ヒント</button>
+          <button type="submit" class="btn btn-auth" id="btn">認証</button>
+          <button type="button" class="btn btn-back" id="cipherCancel">戻る</button>
+        </form>
+      </div>
+
+      <!-- ヒント ポップアップモーダル (SEARCH FOR CLUES) -->
+      <div class="cipherHintModal" id="cipherHintModal" hidden aria-modal="true" role="dialog" aria-label="ヒント">
+        <div class="cipherHintModal__backdrop" id="cipherHintBackdrop"></div>
+        <div class="cipherHintModal__dialog">
+          <button type="button" class="cipherHintModal__close" id="cipherHintClose" aria-label="ヒントを閉じる">✕</button>
+          <div class="cipherHintModal__header">
+            <span class="cipherHintModal__tag">SEARCH FOR CLUES</span>
+            <h3 class="cipherHintModal__title">HINT</h3>
+          </div>
+          <ul class="cipherHintModal__list">
+            <li>2003年4月7日誕生</li>
+            <li>高度なAI=電子頭脳</li>
+            <li>3Fでそれに触る</li>
+          </ul>
+          <button type="button" class="cipherHintModal__okBtn" id="cipherHintOkBtn">了解</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 各階作品 直接クリック用透明ホットスポット (枠線・バッジ一切なし) -->
+    <a class="stageHotspot" id="stageHotspot" href="#" aria-label="作品を開く" hidden></a>
+    <!-- 1F 静止画内メールアドレス直接クリック用ホットスポット -->
+    <a class="emailHotspot" id="emailHotspot" href="mailto:vadbusting@gmail.com" title="vadbusting@gmail.com" aria-label="メールを送信" hidden></a>
+
+    <!-- 制作クレジット ポップアップモーダル -->
+    <div class="creditModal" id="creditModal" hidden aria-modal="true" role="dialog" aria-label="制作クレジット">
+      <div class="creditModal__backdrop" id="creditModalBackdrop"></div>
+      <div class="creditModal__dialog">
+        <button type="button" class="creditModal__close" id="creditModalClose" aria-label="閉じる">
+          <span class="closeCross">✕</span>
+          <div class="hireMeBubble" id="hireMeBubble" aria-hidden="true">
+            <span class="hireMeBubbleArrow"></span>
+            Hire me!
+          </div>
+        </button>
+        <div class="creditModal__content">
+          <p class="creditModal__title">PORTFOLIO</p>
+          <div class="creditModal__section">
+            <span class="creditModal__role">[ DIRECTION ]</span>
+            <span class="creditModal__val">TESHIMA TAKASHI</span>
+          </div>
+          <div class="creditModal__section">
+            <span class="creditModal__role">[ ENVIRONMENT ]</span>
+            <span class="creditModal__val">macOS</span>
+          </div>
+          <div class="creditModal__section">
+            <span class="creditModal__role">[ SOFTWARE &amp; TOOLS ]</span>
+            <span class="creditModal__val">HTML5 / CSS3 / JavaScript</span>
+            <span class="creditModal__val">Three.js / Canvas 2D</span>
+            <span class="creditModal__val">Generative AI (Video / Image / LLM)</span>
+            <span class="creditModal__val">Adobe Creative Cloud</span>
+            <span class="creditModal__val">FFmpeg / WebP / H.264</span>
+          </div>
+          <div class="creditModal__section">
+            <span class="creditModal__role">[ SYSTEM FEATURES ]</span>
+            <span class="creditModal__val">Dual-Engine Scrubbing (Canvas 2D &amp; Video)</span>
+            <span class="creditModal__val">6-Floor Dolly-in Cinematic Architecture</span>
+            <span class="creditModal__val">Realtime Passcode Cipher &amp; 3D Morphing Canvas</span>
+            <span class="creditModal__val">3D Floating Spatial Gallery</span>
+            <span class="creditModal__val">Pure Responsive Fluid Layout</span>
+          </div>
+          <div class="creditModal__section">
+            <span class="creditModal__role">[ CAST ]</span>
+            <span class="creditModal__val">ASIMO</span>
+            <span class="creditModal__val">ROBITA</span>
+            <p class="creditModal__ai">and Thankyou All AI.</p>
+          </div>
+          <div class="creditModal__footer">
+            <p class="creditModal__copy">&copy; TESHIMA TAKASHI laboratorium</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 各階ポータル（作品リンク） -->
+    <aside class="lab__portal" id="portal" aria-hidden="true">
+      <h2 id="portalTitle">ABOUT</h2>
+      <a id="portalLink" href="about.html" tabindex="-1">OPEN PAGE</a>
+    </aside>
+  </div>
+</main>
+<script src="scene.js?v=120"></script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ABOUT</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%230a0a0a%22/><text x=%2250%22 y=%2268%22 font-family=%22sans-serif%22 font-size=%2255%22 font-weight=%22bold%22 fill=%22%23ffffff%22 text-anchor=%22middle%22>T</text></svg>">
+    <script>
+        (function () {
+            var baseEl = document.querySelector('base[data-auto-base]');
+            if (!baseEl) {
+                var href = window.location.href.split('#')[0].split('?')[0];
+                if (!href.endsWith('/')) {
+                    if (href.includes('.')) {
+                        href = href.replace(/[^/]*$/, '');
+                    } else {
+                        href += '/';
+                    }
+                }
+                baseEl = document.createElement('base');
+                baseEl.setAttribute('data-auto-base', 'true');
+                baseEl.href = href;
+                document.head.appendChild(baseEl);
+            }
+
+            var applyNormalizedSources = function () {
+                var nodes = document.querySelectorAll('[data-normalize-src]');
+                nodes.forEach(function (node) {
+                    var raw = node.getAttribute('data-normalize-src');
+                    if (typeof raw !== 'string' || !raw) return;
+                    var normalized = typeof raw.normalize === 'function' ? raw.normalize('NFC') : raw;
+                    if (node.getAttribute('src') !== normalized) {
+                        node.setAttribute('src', normalized);
+                    }
+                });
+            };
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', applyNormalizedSources, { once: true });
+            } else {
+                applyNormalizedSources();
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Shippori+Mincho:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="header-item"><a href="index.html#about" style="text-decoration: none; color: inherit;">BACK</a></div>
+    </header>
+
+    <main class="main-content">
+        <div class="hero-content">
+            <h1 class="hero-title">ABOUT</h1>
+            <div class="about-text">
+                <p><strong>経歴</strong></p>
+                <p><strong>2000年</strong> 広告デザイン専門学校コピーライティングコース 卒業</p>
+                <p><strong>2000年</strong> 出版社にて編集・ライター業務に従事</p>
+                <p><strong>2000年</strong> SP会社にてDTPデザイナーとして従事</p>
+                <p><strong>2002年</strong> デザイン事務所にてグラフィックデザイナーとして従事</p>
+                <p><strong>2006年</strong> 個人事業開業 ディレクター（ナショナルクライアント案件等）</p>
+                <p><strong>2021年</strong> 広告代理店にてディレクター（ローカルエリア）として従事</p>
+                <p><strong>2026年</strong> Web制作会社にてディレクターとして進行管理</p>
+
+                <p style="margin-top: 2rem;"><strong>スキルセット</strong></p>
+                <p>プロジェクトマネジメント ／ 企画・コンセプト ／ 進行管理・品質管理 ／ 印刷知識・校正 ／ クリエイティブディレクション ／ コミュニケーション・調整力 ／ ドキュメンテーション</p>
+
+                <p style="margin-top: 2rem;"><strong>スタンス</strong></p>
+                <p><strong>本質を追求する:</strong> 無駄を排除し、本当に必要な価値に集中します。</p>
+                <p><strong>明確なコミュニケーション:</strong> 情報を分かりやすく伝え、関係者全員が同じ方向を向けるよう努めます。</p>
+                <p><strong>誠実な進行:</strong> 常に正直であり、透明性の高いプロジェクト進行を心がけます。</p>
+                <p><strong>細部へのこだわり:</strong> 全体像だけでなく、細部の品質にも徹底的にこだわります。</p>
+                <p><strong>持続可能な成果:</strong> 長期的に価値を生み出す成果を目指します。</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

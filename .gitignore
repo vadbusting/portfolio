@@ -1,0 +1,20 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Editor & Backup
+*.bak
+*.swp
+*~
+
+# Local logs
+*.log
+
+# Scratch & Cache
+__pycache__/
+scratch/
+task.md
+baseline_screenshots/
+after_screenshots/

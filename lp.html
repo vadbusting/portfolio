@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>LP</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%230a0a0a%22/><text x=%2250%22 y=%2268%22 font-family=%22sans-serif%22 font-size=%2255%22 font-weight=%22bold%22 fill=%22%23ffffff%22 text-anchor=%22middle%22>T</text></svg>"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
+<!-- GSAP & ScrollTrigger for High-End Web Performance Animations -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<link rel="stylesheet" href="lp.css"/>
+</head>
+<body>
+
+<!-- Custom Cursor (Vettvangur Premium Style) -->
+<div class="custom-cursor" id="customCursor">
+  <div class="cursor-orb"></div>
+</div>
+
+<!-- Scroll Progress Bar -->
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scrollProgressBar"></div>
+</div>
+
+<!-- Luxury Side Accent Bar Navigation (見出し帯と同じアイコン帯デザイン) -->
+<div class="side-dots-nav">
+  <div class="side-dot" data-target="ai" data-label="AI・セキュリティコンサル" onclick="scrollToSection('#slide-3')">
+    <div class="side-icon-block"><i class="fa-solid fa-shield-halved"></i></div>
+    <span class="side-label">AI・セキュリティコンサル</span>
+  </div>
+  <div class="side-dot" data-target="web" data-label="Web制作・運用" onclick="scrollToSection('#slide-8')">
+    <div class="side-icon-block"><i class="fa-solid fa-laptop-code"></i></div>
+    <span class="side-label">Web制作・運用</span>
+  </div>
+  <div class="side-dot" data-target="dir" data-label="制作進行ディレクション" onclick="scrollToSection('#slide-10')">
+    <div class="side-icon-block"><i class="fa-solid fa-diagram-project"></i></div>
+    <span class="side-label">制作進行ディレクション</span>
+  </div>
+  <div class="side-dot" data-target="oem" data-label="OEM製品・印刷物" onclick="scrollToSection('#slide-12')">
+    <div class="side-icon-block"><i class="fa-solid fa-print"></i></div>
+    <span class="side-label">OEM製品・印刷物</span>
+  </div>
+  <div class="side-dot" data-target="dev" data-label="開発支援" onclick="scrollToSection('#slide-14')">
+    <div class="side-icon-block"><i class="fa-solid fa-gears"></i></div>
+    <span class="side-label">開発支援</span>
+  </div>
+  <div class="side-dot" data-target="ball" data-label="originalsoccerball.com" onclick="scrollToSection('#slide-16')">
+    <div class="side-icon-block"><i class="fa-solid fa-futbol"></i></div>
+    <span class="side-label">originalsoccerball.com</span>
+  </div>
+  <div class="side-dot" data-target="about" data-label="ABOUT" onclick="scrollToSection('#slide-17')">
+    <div class="side-icon-block"><i class="fa-solid fa-user"></i></div>
+    <span class="side-label">ABOUT</span>
+  </div>
+</div>
+
+<!-- Ambient Environment Glow Background -->
+<div class="ambient-glow" id="ambientGlow"></div>
+
+<!-- Site-wide Conformal Droste Canvas (サイト全面背景として固定配置) -->
+<canvas id="escherCanvas"></canvas>
+
+<!-- LP Fixed Header -->
+<header class="lp-header">
+  <a href="index.html#lp" class="lp-back-btn" id="lpBackBtn"><i class="fa-solid fa-arrow-left"></i> BACK</a>
+</header>
+
+<!-- Floating Scroll Top Button -->
+<button class="scroll-top-btn" id="scrollTopBtn"><i class="fa-solid fa-chevron-up"></i></button>
+
+<div class="presentation-wrapper">
+<div class="slide-deck" id="slideDeck">
+
+<!-- ══ SLIDE 1: COVER (2D logarithmic particles) ══ -->
+<div class="slide active title-slide" id="slide-1">
+  <div class="cover-top">
+    <h1 class="cover-h1">
+      <span class="cover-sub-title">セキュア意識の高い「ＡＩ実務」✕「制作進行ディレクション」で</span>
+      現場実務の最適化を図る。
+    </h1>
+  </div>
+  <div class="cover-bottom">
+    <div class="cover-author">TAK<span class="hl">A</span>SHI TESH<span class="hl">I</span>MA</div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 2: 業務内容 ══ -->
+<div class="slide" id="slide-2">
+  <div class="slide-header">
+    <h2 class="slide-title">業務内容</h2>
+  </div>
+  <div class="slide-body">
+    <div class="toc-grid">
+      <a href="#slide-3" class="toc-item theme-ai-item">
+        <div class="toc-icon-wrap theme-ai-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="toc-content">
+          <h3>AI・セキュリティコンサル</h3>
+          <p>BtoB下請け向け：情報漏洩対策、ローカルLLM設定、簡易RAGの提案・構築</p>
+        </div>
+      </a>
+      <a href="#slide-8" class="toc-item theme-web-item">
+        <div class="toc-icon-wrap theme-web-icon"><i class="fa-solid fa-laptop-code"></i></div>
+        <div class="toc-content">
+          <h3>Web制作・運用</h3>
+          <p>LP・WebページのAI制作。ホスティングサーバー構築・公開、月額運用管理。AI効率化レクチャー</p>
+        </div>
+      </a>
+      <a href="#slide-10" class="toc-item theme-dir-item">
+        <div class="toc-icon-wrap theme-dir-icon"><i class="fa-solid fa-diagram-project"></i></div>
+        <div class="toc-content">
+          <h3>制作進行ディレクション</h3>
+          <p>進行状況の確認サポート。AI活用フロー設計、月額サポート</p>
+        </div>
+      </a>
+      <a href="#slide-12" class="toc-item theme-oem-item">
+        <div class="toc-icon-wrap theme-oem-icon"><i class="fa-solid fa-print"></i></div>
+        <div class="toc-content">
+          <h3>オフライン・OEM制作</h3>
+          <p>名刺、チラシ、看板等のOEM制作。ローカルDTP環境による規格適合チェックとデータ入稿調整</p>
+        </div>
+      </a>
+      <a href="#slide-14" class="toc-item theme-dev-item">
+        <div class="toc-icon-wrap theme-dev-icon"><i class="fa-solid fa-gears"></i></div>
+        <div class="toc-content">
+          <h3>開発支援</h3>
+          <p>AIを活用した社内インナーアプリ・クライアント向け簡易アプリの開発サポート</p>
+        </div>
+      </a>
+      <a href="#slide-16" class="toc-item theme-ball-item">
+        <div class="toc-icon-wrap theme-ball-icon"><i class="fa-solid fa-futbol"></i></div>
+        <div class="toc-content">
+          <h3>オリジナルサッカーボール.com運営</h3>
+          <p>originalsoccerball.com</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 3: AI導入のジレンマ ══ -->
+<div class="slide is-full-bleed" id="slide-3">
+  <div class="s-band theme-ai">
+    <div class="s-icon-block"><i class="fa-solid fa-shield-halved"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">AI・セキュリティコンサル</span>
+      <h2 class="s-title">AI導入における致命的なジレンマ</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2col">
+      <div class="text-side">
+        <h3>「AIで業務を効率化したい。<br>しかし、機密情報は外に出せない」</h3>
+        <p>製造業、卸売、制作会社など、BtoB下請け企業様の現場では深刻なジレンマが起きています。</p>
+        <p>製品図面や見積り基準などをクラウドAIに入力することは、情報漏洩リスクを伴うため、導入に踏み切れないのが実情です。</p>
+        <ul>
+          <li>製品図面データ・設計情報</li>
+          <li>詳細な見積情報・原価データ</li>
+          <li>顧客の個人情報・機密データ</li>
+        </ul>
+      </div>
+      <div class="graphics-panel">
+        <img src="image/slide3_ai_dilemma.png" alt="AI導入のジレンマ" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 4: 従来アプローチの限界 ══ -->
+<div class="slide" id="slide-4">
+  <div class="s-band theme-ai">
+    <div class="s-icon-block"><i class="fa-solid fa-shield-halved"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">AI・セキュリティコンサル</span>
+      <h2 class="s-title">限界を迎える従来のアプローチ</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <p style="margin-bottom:20px; font-size:14px; font-weight:500; color:var(--t0);">AIを導入できない現場では、従来の人海戦術と外注依存が続いています。</p>
+    <div class="tiles-container">
+      <div class="tile">
+        <div class="icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
+        <h3>外注依存の発生</h3>
+        <p>日々の制作からWeb更新まで外部への依存が続き、細かいコストが膨張し続けています。</p>
+      </div>
+      <div class="tile">
+        <div class="icon"><i class="fa-solid fa-business-time"></i></div>
+        <h3>属人的な手作業による遅延</h3>
+        <p>確認作業や属人的な手作業が残り、現場の負担と進行の遅れを招きます。</p>
+      </div>
+      <div class="tile">
+        <div class="icon"><i class="fa-solid fa-network-wired"></i></div>
+        <h3>要件定義・進行のパンク</h3>
+        <p>複数の外注先を束ねる伝言ゲームにより、プロジェクトの進行管理自体が破綻しやすくなります。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 5: 私のアプローチ ══ -->
+<div class="slide" id="slide-5">
+  <div class="s-band theme-ai">
+    <div class="s-icon-block"><i class="fa-solid fa-shield-halved"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">AI・セキュリティコンサル</span>
+      <h2 class="s-title">私のアプローチ</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2col-equal">
+      <div class="tile" style="border-top-color: var(--t3);">
+        <h3 style="font-size:18px; color:var(--t0); margin-bottom:12px;">現場の課題</h3>
+        <p style="font-size:13.5px; line-height:1.8;">長期のBtoBであるほど、属人的な手作業や確認作業にお困りのはずです。進行遅延や管理のパンクを招く原因を解決しようにも、適切な解決策が見つからないのが実情です。</p>
+      </div>
+      <div class="tile highlight">
+        <h3 style="font-size:18px; margin-bottom:12px;">スモールスタートで堅実に改善</h3>
+        <p style="font-size:13.5px; line-height:1.8;">大掛かりなシステム導入ではなく、現場のコストや管理工数を圧迫する要因をAIで見直します。制作進行の時間短縮を図りながら、チーム本来のポテンシャルを最大化します。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 6: クローズドAI環境 ══ -->
+<div class="slide is-full-bleed" id="slide-6">
+  <div class="s-band theme-ai">
+    <div class="s-icon-block"><i class="fa-solid fa-shield-halved"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">AI・セキュリティコンサル</span>
+      <h2 class="s-title">手元で動かすクローズドAI環境</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2col">
+      <div class="text-side">
+        <h3>閉じられた安全なAI環境の構築</h3>
+        <p>手元のローカル環境や、管理されたクローズドなデータ構造を適切に選択し、外部にデータを送信しない仕組みを整備します。</p>
+        <p>機密情報を扱う現場でも安心してAIによる効率化の恩恵を受けることが可能になります。</p>
+        <ul>
+          <li>自社の見積りや図面を安全に読み込み</li>
+          <li>情報漏洩リスクを抑えた実務の自動化・補助</li>
+          <li>簡易RAG設定による独自知識のフル活用</li>
+        </ul>
+      </div>
+      <div class="graphics-panel">
+        <img src="image/slide6_closed_ai.png" alt="クローズドAI環境" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 7: BEFORE / AFTER ══ -->
+<div class="slide" id="slide-7">
+  <div class="s-band theme-ai">
+    <div class="s-icon-block"><i class="fa-solid fa-shield-halved"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">AI・セキュリティコンサル</span>
+      <h2 class="s-title">業務フローの再構築</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="flow-container">
+      <div class="flow-card">
+        <h3>複雑な伝言ゲーム</h3>
+        <div class="flow-steps">
+          <div class="flow-step-item">営業・ディレクター・外注デザイナー・外注コーダー・サーバー会社など、複数の外注先を束ねることでコミュニケーションロスが連鎖します。</div>
+          <div class="flow-step-item">進行の遅延や品質のばらつきが避けられない状態が続きます。</div>
+          <div class="flow-step-item">担当者変更のたびに引継ぎコストが発生し、属人的な依存が慢性化します。</div>
+        </div>
+      </div>
+      <div class="flow-card after">
+        <h3>スマートな実務体制へ</h3>
+        <div class="flow-steps">
+          <div class="flow-step-item">「ローカルAI」による効率化、「静的ホスティング」によるインフラ最適化、「ローカルDTP環境」による実務補助を組み合わせます。</div>
+          <div class="flow-step-item">進行とインフラ調整を適切にサポートするフローへ移行し、コスト抑制とスピードアップを支援します。</div>
+          <div class="flow-step-item">仕組みとして機能するフローを構築し、属人依存から脱却します。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 8: Web制作・運用 概要 ══ -->
+<div class="slide is-full-bleed" id="slide-8">
+  <div class="s-band theme-web">
+    <div class="s-icon-block"><i class="fa-solid fa-laptop-code"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">Web制作・運用</span>
+      <h2 class="s-title">AI × 静的サーバーホスティングで実現するスマートなWeb制作・運用</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2col">
+      <div class="text-side">
+        <h3>コストを抑え、アジャイルに構築・運用</h3>
+        <p>過剰に高機能なWebシステムやCMSは排します。AIツールを活用し、実用的なLP・Webページ・バナーを迅速に制作します。</p>
+        <p>公開先には静的サーバーホスティング等のモダンなホスティングを活用。サーバー維持費を抑え、継続しやすい月額運用体制を構築します。</p>
+        <ul>
+          <li>AI活用による制作スピード向上とコスト抑制</li>
+          <li>ホスティング公開による維持コストの最小化</li>
+          <li>更新・運用管理の包括サポート</li>
+          <li>チーム向けAI業務効率化レクチャーの提供</li>
+        </ul>
+      </div>
+      <div class="graphics-panel">
+        <img src="image/slide8_web_production.png" alt="Web制作・運用" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 9: コスト構造最適化 ══ -->
+<div class="slide" id="slide-9">
+  <div class="s-band theme-web">
+    <div class="s-icon-block"><i class="fa-solid fa-laptop-code"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">Web制作・運用</span>
+      <h2 class="s-title">Web運用コスト構造の最適化</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="flow-container">
+      <div class="flow-card">
+        <h3>旧来の運用コスト構造</h3>
+        <div class="flow-steps">
+          <div class="flow-step-item"><strong>高額なサーバー・CMS費用：</strong>レンタルサーバーの月額費用に加え、CMSのセキュリティ更新が継続的なコストと工数を発生させます。</div>
+          <div class="flow-step-item"><strong>外注依存の更新フロー：</strong>テキスト1行の修正でも制作会社への発注が必要となり、スピードとコストの両面で非効率です。</div>
+          <div class="flow-step-item"><strong>属人的な保守体制：</strong>担当者変更のたびに引継ぎコストが発生し、長期的な運用品質が安定しません。</div>
+        </div>
+      </div>
+      <div class="flow-card after">
+        <h3>最適化された運用体制</h3>
+        <div class="flow-steps">
+          <div class="flow-step-item"><strong>静的ホスティングによる最小化された運用コスト：</strong>静的ホスティングの活用でサーバー費を削減。シンプルな構成で管理工数も抑えます。</div>
+          <div class="flow-step-item"><strong>AI活用で更新フローの補助：</strong>テキスト修正からバナー制作補助までスピーディに対応可能です。</div>
+          <div class="flow-step-item"><strong>月額での包括サポート：</strong>月次更新・レポーティング・レクチャーを含む明確な月額契約で安定した継続運用を実現します。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 10: ディレクション概要 ══ -->
+<div class="slide is-full-bleed" id="slide-10">
+  <div class="s-band theme-dir">
+    <div class="s-icon-block"><i class="fa-solid fa-diagram-project"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">制作進行ディレクション</span>
+      <h2 class="s-title">要件の整理から納品進行まで——AIを補助に用いた進行調整サポート</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2col">
+      <div class="text-side">
+        <h3>進行状況の確認・関係者間スケジュール調整をサポート</h3>
+        <p>要件の整理からデータ入稿進行・テストアップ時の確認調整まで、制作プロジェクトの進行調整を引き受けます。</p>
+        <p>スケジュール調整や関係者間の連絡の橋渡しを月額契約でサポートします。AIを補助的に用いて要件を整理し、現場のペースに沿った円滑な進行をサポートします。</p>
+        <ul>
+          <li>要件整理から納品進行までのスケジュール調整サポート</li>
+          <li>AIを補助に用いた要件・仕様の整理</li>
+          <li>月額契約による継続的な進行管理の代行</li>
+          <li>入稿・テストアップへの進行サポート</li>
+        </ul>
+      </div>
+      <div class="graphics-panel">
+        <img src="image/slide10_direction_hub.png" alt="制作進行ディレクション" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 11: 5ステップフロー ══ -->
+<div class="slide" id="slide-11">
+  <div class="s-band theme-dir">
+    <div class="s-icon-block"><i class="fa-solid fa-diagram-project"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">制作進行ディレクション</span>
+      <h2 class="s-title">制作進行フロー——5ステップでの確認サポート</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <p style="text-align:center; margin-bottom:40px; font-size:17px; color:var(--t1); line-height:1.8; font-weight:500;">
+      AIツールを要件整理の補助に用いることで、現場のペースに沿った効率的な管理・進行をサポートします。
+    </p>
+    <div class="timeline-box">
+      <div class="timeline-line-bg"></div>
+      <div class="timeline-step"><div class="timeline-node"></div><h4>Step 01</h4><p class="step-title">要件整理</p><p class="step-sub">Define Requirements</p></div>
+      <div class="timeline-step"><div class="timeline-node"></div><h4>Step 02</h4><p class="step-title">AI補助・効率化</p><p class="step-sub">AI Implementation</p></div>
+      <div class="timeline-step"><div class="timeline-node"></div><h4>Step 03</h4><p class="step-title">制作進行</p><p class="step-sub">Production Progress</p></div>
+      <div class="timeline-step"><div class="timeline-node"></div><h4>Step 04</h4><p class="step-title">確認・入稿</p><p class="step-sub">Review &amp; Submit</p></div>
+      <div class="timeline-step"><div class="timeline-node"></div><h4>Step 05</h4><p class="step-title">維持・運用</p><p class="step-sub">Maintenance</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 12: OEM制作概要 ══ -->
+<div class="slide is-full-bleed" id="slide-12">
+  <div class="s-band theme-oem">
+    <div class="s-icon-block"><i class="fa-solid fa-print"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">オフライン・OEM制作</span>
+      <h2 class="s-title">規格適合チェックとデータ調整</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2col">
+      <div class="text-side">
+        <h3>名刺から看板まで——オフラインOEM実務の進行調整</h3>
+        <p>名刺、チラシ、パンフレット、看板等のオフラインクリエイティブに関するOEM制作進行を引き受けます。</p>
+        <p>業界標準のローカル制作環境を活用し、正確な印刷入稿データの作成と校正実務をサポート。直接的な進行管理で、スムーズな納品を支援します。</p>
+        <ul>
+          <li>名刺・チラシ・パンフレット・看板等の各種印刷対応への橋渡し</li>
+          <li>業界標準DTPツールによる正確な入稿データチェック</li>
+          <li>校正・修正対応を含む進行管理サポート</li>
+          <li>印刷所等との直接的な窓口調整</li>
+        </ul>
+      </div>
+      <div class="graphics-panel">
+        <img src="image/slide12_oem_print.png" alt="オフライン・OEM制作" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 13: OEM対応範囲 ══ -->
+<div class="slide" id="slide-13">
+  <div class="s-band theme-oem">
+    <div class="s-icon-block"><i class="fa-solid fa-print"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">オフライン・OEM制作</span>
+      <h2 class="s-title">対応範囲——印刷・OEM制作アイテム</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="oem-grid">
+      <div class="oem-card">
+        <div class="oem-icon"><i class="fa-solid fa-id-card"></i></div>
+        <h4>名刺・カード類</h4>
+        <p>両面対応、特殊仕様の名刺・ショップカード等の入稿データ作成</p>
+      </div>
+      <div class="oem-card">
+        <div class="oem-icon"><i class="fa-solid fa-file-image"></i></div>
+        <h4>チラシ・フライヤー</h4>
+        <p>A4〜B2等、各種サイズの販促チラシ・フライヤーのデザインと入稿</p>
+      </div>
+      <div class="oem-card">
+        <div class="oem-icon"><i class="fa-solid fa-book-open"></i></div>
+        <h4>パンフレット・冊子</h4>
+        <p>会社案内・製品カタログ等の多ページ冊子のレイアウトと入稿対応</p>
+      </div>
+      <div class="oem-card">
+        <div class="oem-icon"><i class="fa-solid fa-sign-hanging"></i></div>
+        <h4>看板・サイン</h4>
+        <p>屋外・屋内サイン・バナースタンド等の大判印刷用データ作成</p>
+      </div>
+      <div class="oem-card">
+        <div class="oem-icon"><i class="fa-solid fa-image"></i></div>
+        <h4>バナー・ポスター</h4>
+        <p>Web用バナーから店頭ポスターまで幅広いフォーマットに対応</p>
+      </div>
+      <div class="oem-card">
+        <div class="oem-icon"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+        <h4>校正・入稿管理</h4>
+        <p>業界標準DTPツールによる正確な色校正・入稿規格確認を含む進行管理サポート</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 14: 開発支援概要 ══ -->
+<div class="slide is-full-bleed" id="slide-14">
+  <div class="s-band theme-dev">
+    <div class="s-icon-block"><i class="fa-solid fa-gears"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">開発支援</span>
+      <h2 class="s-title">AIコード生成を活用した、現場に特化した実用ツールの構築サポート</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2col">
+      <div class="text-side">
+        <h3>高額な外注なしで、現場専用ツールを形にする</h3>
+        <p>AIのコード生成・支援能力を引き出し、現場の日常業務を便利にする社内インナーアプリの構築をサポートします。</p>
+        <p>クライアントへの販売用簡易アプリも、高額なシステム外注を通すことなく、AIとディレクションを組み合わせて実現します。</p>
+        <ul>
+          <li>手元業務フローに特化した専用インナーアプリ・マクロの作成支援</li>
+          <li>動作要件の厳密な定義とAIによる高速プロトタイピング</li>
+          <li>クライアント向け販売用簡易ソフトウェアの開発サポート</li>
+          <li>外注会社への高額依頼を避けたコスト効率の高い開発サポート</li>
+        </ul>
+      </div>
+      <div class="graphics-panel">
+        <img src="image/slide14_dev_support.png" alt="開発支援" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 15: 3フェーズプロセス ══ -->
+<div class="slide" id="slide-15">
+  <div class="s-band theme-dev">
+    <div class="s-icon-block"><i class="fa-solid fa-gears"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">開発支援</span>
+      <h2 class="s-title">開発支援——3フェーズのサポートプロセス</h2>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="tiles-container">
+      <div class="tile">
+        <div class="icon"><i class="fa-solid fa-list-check"></i></div>
+        <h3>Phase 1：要件整理・仕様策定</h3>
+        <p>「何を、どのように動かすか」を明確にします。現場ヒアリングをもとにAIが実現できる範囲で現実的な仕様を整理し、過剰な開発を防ぎます。</p>
+      </div>
+      <div class="tile">
+        <div class="icon"><i class="fa-solid fa-rocket"></i></div>
+        <h3>Phase 2：AI高速プロトタイピング</h3>
+        <p>AIコード生成ツールを活用して短期間で動作するプロトタイプを構築。試行錯誤のサイクルを高速化し、早期に動作確認できる環境を実現します。</p>
+      </div>
+      <div class="tile">
+        <div class="icon"><i class="fa-solid fa-circle-check"></i></div>
+        <h3>Phase 3：テスト・導入サポート</h3>
+        <p>動作検証・修正を経て導入をサポートします。現場で使えるまで徹底フォローします。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 16: オリジナルサッカーボール.com ══ -->
+<div class="slide" id="slide-16">
+  <div class="s-band theme-ball">
+    <div class="s-icon-block"><i class="fa-solid fa-futbol"></i></div>
+    <div class="s-title-group">
+      <span class="s-category-label">originalsoccerball.com</span>
+      <h2 class="s-title">オリジナルサッカーボール.comの運営</h2>
+    </div>
+  </div>
+  <div class="slide-body" style="padding-top: 36px;">
+    <div class="grid-2col" style="height: 100%;">
+      <div class="text-side" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%;">
+        <a href="https://originalsoccerball.com/" target="_blank" style="font-size:24px; font-weight:700; color:var(--acc); border-bottom:2px solid var(--acc); padding-bottom:6px; letter-spacing:.02em;">
+          originalsoccerball.com <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:18px; margin-left: 8px;"></i>
+        </a>
+      </div>
+      <div class="graphics-panel" style="height:320px;">
+        <img src="image/originalsoccerball_screen.png" alt="オリジナルサッカーボール.com" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 17: ディレクターのルーツ ══ -->
+<div class="slide" id="slide-17">
+  <div class="roots-full">
+    <div class="roots-left">
+      <h2 style="font-size:27px; font-weight:700; color:var(--t0); font-family:'Noto Sans JP', sans-serif; border-left:5px solid var(--acc-d); padding-left:20px; margin-bottom:22px;">ディレクターのルーツ</h2>
+      <p style="font-size:14px; line-height:1.9; color:var(--t0); margin-bottom:12px;">私のディレクションの根本思想。ロジックによる機能美を追求したデザイン制作・物理的なプロダクト制作をルーツとしております。</p>
+      <div class="quote-box">
+        "Form follows function."<br>
+        <span style="font-size:13px; color:var(--t2); font-family:'Noto Sans JP', sans-serif; font-style:normal; font-weight:normal;">（形態は機能に従う）</span>
+      </div>
+      <p style="font-size:14px; line-height:1.9; color:var(--t2);">培われたデジタル領域とAIの活用においてもこの考えを適用しています。<br>無駄な装飾や過剰なシステムを排し、「本当に現場で機能する実務品質」だけを研ぎ澄まして提供いたします。</p>
+    </div>
+    <div class="roots-right">
+      <img src="image/IMG_0913.jpeg" alt="ディレクターのルーツ" />
+    </div>
+  </div>
+</div>
+
+<!-- ══ SLIDE 18: ABOUT ══ -->
+<div class="slide" id="slide-18">
+  <div class="slide-header">
+    <h2 class="slide-title">ABOUT</h2>
+  </div>
+  <div class="slide-body">
+    <div class="about-grid">
+      <div>
+        <h3 style="font-size:15px; color:var(--t0); margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; letter-spacing:.06em; font-weight: 700;">略歴</h3>
+        <div class="career-timeline">
+          <div class="career-item"><span class="career-year">2000年</span><span class="career-desc">広告デザイン専門学校コピーライティングコース 卒業</span></div>
+          <div class="career-item"><span class="career-year">2000年</span><span class="career-desc">出版社にて編集・ライター業務に従事</span></div>
+          <div class="career-item"><span class="career-year">2000年</span><span class="career-desc">SP会社にてDTPデザイナーとして従事</span></div>
+          <div class="career-item"><span class="career-year">2002年</span><span class="career-desc">デザイン事務所にてグラフィックデザイナーとして従事</span></div>
+          <div class="career-item"><span class="career-year">2006年</span><span class="career-desc">個人事業開業 ディレクター（ナショナルクライアント案件等）</span></div>
+          <div class="career-item"><span class="career-year">2021年</span><span class="career-desc">広告代理店にてディレクター（ローカルエリア）として従事</span></div>
+          <div class="career-item"><span class="career-year">2026年</span><span class="career-desc">Web制作会社にてディレクターとして進行管理</span></div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:15px; color:var(--t0); margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; letter-spacing:.06em; font-weight: 700;">プロフェッショナルスキル</h3>
+        <ul class="stance-list">
+          <li><strong>コピーライティング・編集：</strong>出版・SP・Webを通じて、論理的で伝わるテキストを構築します。</li>
+          <li><strong>DTPデザイン：</strong>業界標準DTPツールを用いた入稿データ作成、校正、進行管理の実務をサポートします。</li>
+          <li><strong>Webディレクション＆進行管理：</strong>要件の整理から進行状況の確認、連絡調整までをサポートします。</li>
+          <li><strong>セキュアAI構築補助：</strong>各種クローズドツールを安全を考慮した形で実務の補助へ組み込みます。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /slide-deck -->
+</div><!-- /presentation-wrapper -->
+
+<script src="lp.js"></script>
+</body>
+</html>
