@@ -91,29 +91,94 @@
     });
   }
 
+  let heroUnlocking = false;
+  let heroUnlocked = false;
+  function unlockHeroDecoder() {
+    if (heroUnlocked || heroUnlocking || !heroVideo) return;
+    heroUnlocking = true;
+    try {
+      heroVideo.muted = true;
+      heroVideo.playbackRate = 0.0001;
+      const finishUnlock = () => {
+        heroUnlocking = false;
+        heroUnlocked = true;
+        try {
+          heroVideo.pause();
+          heroVideo.playbackRate = 1;
+          const dur = (Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) ? heroVideo.duration : 10.0;
+          const t = state === 'hero' ? Math.max(0.001, Math.min(dur - 0.04, clamp01(heroQ) * dur)) : (cur === 0 ? dur * 0.96 : 0.001);
+          if (Math.abs(heroVideo.currentTime - t) > 0.02) heroVideo.currentTime = t;
+        } catch (e) {}
+      };
+      const timer = setTimeout(finishUnlock, 24);
+      const p = heroVideo.play();
+      if (p && typeof p.then === 'function') {
+        p.then(() => { clearTimeout(timer); finishUnlock(); }).catch(() => { clearTimeout(timer); heroUnlocking = false; });
+      } else {
+        clearTimeout(timer);
+        finishUnlock();
+      }
+    } catch (e) {
+      heroUnlocking = false;
+    }
+  }
+
   if (heroVideo) {
-    ['play', 'playing'].forEach(ev => {
-      heroVideo.addEventListener(ev, () => { try { heroVideo.pause(); } catch (e) {} });
+    ['play', 'playing', 'timeupdate'].forEach(ev => {
+      heroVideo.addEventListener(ev, () => {
+        if (!heroUnlocking && !heroVideo.paused) {
+          try { heroVideo.pause(); } catch (e) {}
+        }
+      });
     });
-    // Switch heroVideo to mobile all-intra video on mobile/tablet
+    // Switch heroVideo to mobile all-intra video on mobile/tablet and preload into RAM Blob
     const desiredHeroSrc = PATH.heroVideo;
     if (heroVideo.getAttribute('src') !== desiredHeroSrc) {
       heroVideo.src = desiredHeroSrc;
       heroVideo.load();
     }
+    preloadVideoBlob(desiredHeroSrc).then(blobUrl => {
+      if (blobUrl && blobUrl !== desiredHeroSrc && heroVideo.src !== blobUrl) {
+        const applyBlob = () => {
+          if (heroRaf || isTouchDragging) return false;
+          const prevTime = heroVideo.currentTime || 0.001;
+          heroUnlocked = false;
+          heroVideo.src = blobUrl;
+          heroVideo.load();
+          const restore = () => {
+            try {
+              stage.classList.remove('is-hero-fallback');
+              heroVideo.pause();
+              const dur = (Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) ? heroVideo.duration : 10.0;
+              const target = state === 'hero' ? Math.max(0.001, Math.min(dur - 0.04, clamp01(heroQ) * dur)) : (cur === 0 ? dur * 0.96 : prevTime);
+              heroVideo.currentTime = target;
+            } catch (e) {}
+          };
+          if (heroVideo.readyState >= 1) restore();
+          else heroVideo.addEventListener('loadedmetadata', restore, { once: true });
+          return true;
+        };
+        if (!applyBlob()) {
+          const iv = setInterval(() => { if (applyBlob()) clearInterval(iv); }, 120);
+          setTimeout(() => clearInterval(iv), 5000);
+        }
+      }
+    });
 
     heroVideo.addEventListener('error', () => {
       stage.classList.add('is-hero-fallback');
     });
 
-    // Strict scrub-only initialization: never call .play(), only pause & sync currentTime
     const syncHeroFrame = () => {
       if (!heroVideo) return;
       try {
+        stage.classList.remove('is-hero-fallback');
         heroVideo.pause();
+        const dur = (Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) ? heroVideo.duration : 10.0;
         if (state === 'hero') {
-          const dur = (Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) ? heroVideo.duration : 10.0;
-          heroVideo.currentTime = Math.max(0.001, clamp01(heroQ) * dur);
+          heroVideo.currentTime = Math.max(0.001, Math.min(dur - 0.04, clamp01(heroQ) * dur));
+        } else if (state === 'floor' && cur === 0) {
+          heroVideo.currentTime = dur * 0.96;
         }
       } catch (e) {}
     };
@@ -124,6 +189,8 @@
       heroVideo.addEventListener('loadedmetadata', syncHeroFrame, { once: true });
       heroVideo.addEventListener('loadeddata', syncHeroFrame, { once: true });
     }
+    window.addEventListener('touchstart', unlockHeroDecoder, { passive: true });
+    window.addEventListener('pointerdown', unlockHeroDecoder, { passive: true });
   }
 
   const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -563,17 +630,41 @@
   });
 
   /* ---------------- Dual Scrub Engine (HERO & Floor Video Scrubbing) ---------------- */
-  let heroQ = 0, heroQt = 0, heroRaf = 0, heroLast = 0;
-  let floorQ = 0, floorQt = 0, floorRaf = 0, floorLast = 0;
+  let heroQ = 0, heroQt = 0, heroRaf = 0, heroLast = 0, lastHeroSeekTime = 0;
+  let floorQ = 0, floorQt = 0, floorRaf = 0, floorLast = 0, lastFloorSeekTime = 0;
+
+  function updateCenotaphByTime(t) {
+    if (!cenotaph) return;
+    if (t < 4.2) {
+      cenotaph.style.opacity = '1';
+      cenotaph.style.filter = 'none';
+      cenotaph.style.transform = 'translate(-50%, -50%) scale(1)';
+      cenotaph.style.pointerEvents = 'auto';
+    } else if (t <= 5.2) {
+      const p = (t - 4.2) / 1.0;
+      const alpha = Math.max(0, 1 - p);
+      cenotaph.style.opacity = alpha.toFixed(4);
+      cenotaph.style.filter = `blur(${(p * 8).toFixed(1)}px)`;
+      cenotaph.style.transform = 'translate(-50%, -50%) scale(1)';
+      cenotaph.style.pointerEvents = alpha > 0.1 ? 'auto' : 'none';
+    } else {
+      cenotaph.style.opacity = '0';
+      cenotaph.style.pointerEvents = 'none';
+      cenotaph.style.filter = 'blur(8px)';
+      cenotaph.style.transform = 'translate(-50%, -50%) scale(1)';
+    }
+  }
 
   if (heroVideo) {
     heroVideo.addEventListener('seeked', () => {
-      if (state === 'hero' && !heroRaf) {
+      if (state === 'hero') {
         const dur = (Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) ? heroVideo.duration : 10.0;
-        const targetTime = clamp01(heroQ) * dur;
-        if (Math.abs(heroVideo.currentTime - targetTime) > 0.03) {
+        const targetTime = Math.max(0.001, Math.min(dur - 0.04, clamp01(heroQ) * dur));
+        if (Math.abs(heroVideo.currentTime - targetTime) > 0.025) {
+          lastHeroSeekTime = performance.now();
           try { heroVideo.currentTime = targetTime; } catch (e) {}
         }
+        updateCenotaphByTime(heroVideo.currentTime);
       }
     });
   }
@@ -601,40 +692,24 @@
     }
 
     const dur = (heroVideo && Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) ? heroVideo.duration : 10.0;
-    const targetTime = clamp01(heroQ) * dur;
+    const targetTime = Math.max(0.001, Math.min(dur - 0.04, clamp01(heroQ) * dur));
 
     if (heroVideo && Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) {
-      if (!heroVideo.paused) heroVideo.pause();
+      if (!heroUnlocking && !heroVideo.paused) heroVideo.pause();
       if (heroVideo.hasAttribute('poster') && targetTime > 0.05 && heroVideo.readyState >= 2) {
         heroVideo.removeAttribute('poster');
       }
-      if (!heroVideo.seeking && Math.abs(heroVideo.currentTime - targetTime) > 0.012) {
+      if ((!heroVideo.seeking || (now - lastHeroSeekTime > 60)) && Math.abs(heroVideo.currentTime - targetTime) > 0.012) {
+        lastHeroSeekTime = now;
         try { heroVideo.currentTime = targetTime; } catch (e) {}
       }
     }
 
-    // Cinematic CENOTAPH movie title: visible as approaching gate, fades out smoothly as passing through the gate (~4.2s to 5.2s)
-    if (cenotaph) {
-      const t = targetTime;
-      if (t < 4.2) {
-        cenotaph.style.opacity = '1';
-        cenotaph.style.filter = 'none';
-        cenotaph.style.transform = 'translate(-50%, -50%) scale(1)';
-        cenotaph.style.pointerEvents = 'auto';
-      } else if (t <= 5.2) {
-        const p = (t - 4.2) / 1.0;
-        const alpha = Math.max(0, 1 - p);
-        cenotaph.style.opacity = alpha.toFixed(4);
-        cenotaph.style.filter = `blur(${(p * 8).toFixed(1)}px)`;
-        cenotaph.style.transform = 'translate(-50%, -50%) scale(1)';
-        cenotaph.style.pointerEvents = alpha > 0.1 ? 'auto' : 'none';
-      } else {
-        cenotaph.style.opacity = '0';
-        cenotaph.style.pointerEvents = 'none';
-        cenotaph.style.filter = 'blur(8px)';
-        cenotaph.style.transform = 'translate(-50%, -50%) scale(1)';
-      }
-    }
+    // Cinematic CENOTAPH movie title synced with actual video frame when available
+    const effectiveTime = (heroVideo && heroVideo.readyState >= 2 && Number.isFinite(heroVideo.duration) && heroVideo.duration > 0 && !stage.classList.contains('is-hero-fallback'))
+      ? heroVideo.currentTime
+      : targetTime;
+    updateCenotaphByTime(effectiveTime);
 
     if (heroQt <= 0.01 && heroQ <= 0.02) {
       if (scrollCue) scrollCue.classList.remove('is-hidden');
@@ -654,7 +729,9 @@
     } else {
       heroRaf = 0;
       if (heroVideo && Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) {
+        lastHeroSeekTime = now;
         try { heroVideo.currentTime = targetTime; } catch (e) {}
+        updateCenotaphByTime(heroVideo.currentTime);
       }
     }
   }
@@ -786,20 +863,37 @@
     setRail(-1);
     cur = -1;
     dollyLayer.classList.remove('is-on');
+    plate.classList.add('no-fade');
     plate.classList.remove('is-end');
+    if (plateB) plateB.style.opacity = '0';
     stage.classList.remove('is-waiting-scroll');
     seq.last = 0;
     seq.auto = false;
     seq.q = 0;
     seq.qt = 0;
-    seq.dirty = true;
+    seq.dirty = false;
+    if (seqCtx && seqCv) {
+      seqCtx.clearRect(0, 0, seqCv.width, seqCv.height);
+    }
     setState('hero');
 
     if (opts.fromLobby) {
-      heroQ = heroQt = 0.98;
-      if (heroVideo && Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) {
+      heroQ = 0.96;
+      heroQt = typeof opts.initialQt === 'number' ? clamp01(opts.initialQt) : 0.90;
+      if (heroVideo) {
+        const cachedBlob = videoBlobCache.get(PATH.heroVideo);
+        if (cachedBlob && heroVideo.src !== cachedBlob) {
+          heroVideo.src = cachedBlob;
+          heroVideo.load();
+        }
         if (heroVideo.hasAttribute('poster')) heroVideo.removeAttribute('poster');
-        try { heroVideo.currentTime = heroVideo.duration * 0.98; } catch (e) {}
+        const setLobbyBackTime = () => {
+          const dur = (Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) ? heroVideo.duration : 10.0;
+          lastHeroSeekTime = performance.now();
+          try { heroVideo.currentTime = dur * heroQ; } catch (e) {}
+        };
+        if (heroVideo.readyState >= 1) setLobbyBackTime();
+        else heroVideo.addEventListener('loadedmetadata', setLobbyBackTime, { once: true });
       }
       if (cenotaph) {
         cenotaph.style.opacity = '0';
@@ -811,7 +905,7 @@
       heroQ = heroQt = 0;
       if (heroVideo) {
         heroVideo.pause();
-        try { heroVideo.currentTime = 0; } catch (e) {}
+        try { heroVideo.currentTime = 0.001; } catch (e) {}
       }
       if (cenotaph) {
         cenotaph.style.opacity = '1';
@@ -861,6 +955,12 @@
       plate.style.setProperty('--pos', '50.0% 50.0%');
     }
     if (dollyLayer) dollyLayer.classList.remove('is-on');
+    if (heroVideo) {
+      heroVideo.pause();
+      if (Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) {
+        try { heroVideo.currentTime = heroVideo.duration * 0.96; } catch (e) {}
+      }
+    }
     seqLoad();
     seq.q = seq.qt = 1;
     seq.dirty = true;
@@ -1120,7 +1220,8 @@
               if (cur === 2) updateAtomDollPosition(0.5, 0.5);
 
               if (cur === 0) {
-                goHero({ fromLobby: true });
+                const initQt = Math.min(0.90, 0.96 + e.deltaY / 2400);
+                goHero({ fromLobby: true, initialQt: initQt });
                 return;
               }
               if (scrollCue) scrollCue.classList.add('is-hidden');
@@ -1156,7 +1257,8 @@
             // 上下スクロール (垂直操作: 上スクロールでスクロールバック / 巻き戻し)
             if (e.deltaY < -15) {
               if (cur === 0) {
-                goHero({ fromLobby: true });
+                const initQt = Math.min(0.90, 0.96 + e.deltaY / 2400);
+                goHero({ fromLobby: true, initialQt: initQt });
                 return;
               }
               if (scrollCue) scrollCue.classList.add('is-hidden');
@@ -1216,8 +1318,11 @@
 
     if (state === 'hero') {
       if (scrollCue) scrollCue.classList.add('is-hidden');
-      // タッチはホイールと同等の緩やかさ・1イベントあたりの上限でHEROアニメを飛ばさない
-      heroNudge(Math.max(-0.012, Math.min(0.012, dy / (innerHeight * 5))));
+      // 前進スワイプはタイトル演出のため緩やか・巻き戻しスワイプは2F〜5Fと同等の自然な追従速度
+      const step = dy < 0
+        ? Math.max(-0.028, dy / (innerHeight * 3.0))
+        : Math.min(0.012, dy / (innerHeight * 5));
+      heroNudge(step);
       touchStartY = y;
       touchStartX = x;
     } else if (state === 'lobby') {
@@ -1245,7 +1350,7 @@
             return;
           } else {
             // 垂直スワイプ: 上下操作 (スクロールバック / 巻き戻し)
-            if (dy < -20) {
+            if (dy < -12) {
               platePanX = 0.5;
               platePanY = 0.5;
               if (plate) plate.style.setProperty('--pos', '50.0% 50.0%');
@@ -1253,22 +1358,23 @@
               updateStageHotspot(0.5, 0.5);
               if (cur === 2) updateAtomDollPosition(0.5, 0.5);
 
-              if (cur === 0) {
-                touchStartY = null;
-                touchStartX = null;
-                goHero({ fromLobby: true });
-                return;
-              }
               touchStartY = y;
               touchStartX = x;
+              if (cur === 0) {
+                const initQt = Math.min(0.90, 0.96 + dy / (innerHeight * 3.0));
+                goHero({ fromLobby: true, initialQt: initQt });
+                return;
+              }
               if (scrollCue) scrollCue.classList.add('is-hidden');
               stage.classList.remove('is-waiting-scroll');
               floorQt = Math.min(0.90, floorQt + dy / (innerHeight * 3.0));
               startFloorLoop();
               return;
             }
-            touchStartY = y;
-            touchStartX = x;
+            if (dy > 0) {
+              touchStartY = y;
+              touchStartX = x;
+            }
             return;
           }
         } else {
@@ -1296,23 +1402,31 @@
             return;
           } else {
             // 垂直スワイプ: 上下操作 (スクロールバック / 巻き戻し)
-            if (dy < -20) {
-              if (cur === 0) {
-                touchStartY = null;
-                touchStartX = null;
-                goHero({ fromLobby: true });
-                return;
-              }
+            if (dy < -12) {
+              platePanX = 0.5;
+              platePanY = 0.5;
+              if (plate) plate.style.setProperty('--pos', '50.0% 50.0%');
+              if (dollyLayer) dollyLayer.style.setProperty('--pos', '50.0% 50.0%');
+              updateStageHotspot(0.5, 0.5);
+              if (cur === 2) updateAtomDollPosition(0.5, 0.5);
+
               touchStartY = y;
               touchStartX = x;
+              if (cur === 0) {
+                const initQt = Math.min(0.90, 0.96 + dy / (innerHeight * 3.0));
+                goHero({ fromLobby: true, initialQt: initQt });
+                return;
+              }
               if (scrollCue) scrollCue.classList.add('is-hidden');
               stage.classList.remove('is-waiting-scroll');
               floorQt = Math.min(0.90, floorQt + dy / (innerHeight * 3.0));
               startFloorLoop();
               return;
             }
-            touchStartY = y;
-            touchStartX = x;
+            if (dy > 0) {
+              touchStartY = y;
+              touchStartX = x;
+            }
             return;
           }
         }

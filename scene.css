@@ -149,10 +149,17 @@ button {
   pointer-events: auto;
 }
 .stage[data-state=lobby] .layer--hero,
-.stage[data-state=floor] .layer--hero {
-  opacity: 0 !important;
-  visibility: hidden !important;
+.stage[data-state=floor][data-floor="0"] .layer--hero {
+  opacity: 1;
   pointer-events: none !important;
+}
+.stage[data-state=floor]:not([data-floor="0"]) .layer--hero {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.stage[data-state=hero] .layer--seq {
+  opacity: 0 !important;
+  transition: none !important;
 }
 .stage[data-state=lobby] .layer--seq,
 .stage[data-state=floor][data-floor="0"] .layer--seq {
@@ -367,7 +374,10 @@ button {
 }
 
 /* Pre-paint suppression ONLY during initial page load with direct floor hash */
-html[data-page-floor] .stage .layer--hero,
+html[data-page-floor] .stage .layer--hero {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
 html[data-page-floor] .stage .cenotaph {
   opacity: 0 !important;
   visibility: hidden !important;
