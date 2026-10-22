@@ -157,7 +157,9 @@ button {
   opacity: 0 !important;
   pointer-events: none !important;
 }
-.stage[data-state=hero] .layer--seq {
+.stage[data-state=hero] .layer--seq,
+.stage[data-state=hero] .layer--plate,
+.stage[data-state=hero] .layer--video {
   opacity: 0 !important;
   transition: none !important;
 }
@@ -636,7 +638,7 @@ body.cipher-locked canvas {
 .atomLayer {
   position: absolute;
   inset: 0;
-  z-index: 6;
+  z-index: 60;
   pointer-events: none;
 }
 .atomLayer[hidden] {
@@ -1613,6 +1615,8 @@ body.cipher-locked canvas {
   width: 100%;
   max-height: calc(86vh - 68px);
   overflow-y: auto;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
   padding-right: 2px;
 }
 
@@ -1765,30 +1769,123 @@ body.cipher-locked canvas {
   }
 }
 
-@media (max-height: 510px) and (orientation: landscape) {
+@media (max-height: 560px) and (orientation: landscape) {
   .lab__header {
-    height: 44px;
+    height: 40px;
+    padding: 0 max(20px, var(--sa-r)) 0 max(20px, var(--sa-l));
   }
   .lab__rail {
     top: 50% !important;
     bottom: auto !important;
-    right: 12px !important;
+    right: max(12px, var(--sa-r)) !important;
     transform: translateY(-50%) !important;
-    gap: 2px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    gap: 4px !important;
+  }
+  .lab__rail button {
+    padding: 4px 8px !important;
+    min-height: 28px !important;
+    min-width: 44px !important;
+    width: auto !important;
+    justify-content: center !important;
+  }
+  .lab__rail button span {
+    font-size: 9.5px !important;
+  }
+  .lab__rail button b {
+    display: none !important;
+  }
+  .rail__divider {
+    margin: 1px 0 !important;
+  }
+  .rail__btn--secret {
+    margin-top: 2px !important;
+    padding-top: 4px !important;
   }
   .lab__portal {
-    top: 48% !important;
-    left: 24px !important;
-    bottom: auto !important;
-    width: 36vw !important;
-    transform: translateY(-30%);
+    top: auto !important;
+    bottom: max(16px, var(--sa-b)) !important;
+    left: max(20px, var(--sa-l)) !important;
+    width: auto !important;
+    max-width: 220px !important;
+    padding-top: 10px !important;
+    transform: translateY(8px);
   }
   .lab__portal.is-visible {
-    transform: translateY(-48%);
+    transform: translateY(0);
   }
   .lab__portal h2 {
-    font-size: 16px !important;
+    font-size: 15px !important;
+    margin: 6px 0 10px !important;
   }
+  .lab__portal a {
+    padding: 8px 13px !important;
+    font-size: 9.5px !important;
+  }
+  .atomBubble {
+    left: auto !important;
+    right: 0 !important;
+    transform: none !important;
+    font-size: 11px !important;
+    padding: 6px 10px !important;
+  }
+  .atomBubbleArrow {
+    left: auto !important;
+    right: 18px !important;
+    transform: none !important;
+  }
+  .creditModal {
+    padding: 8px max(16px, var(--sa-r)) 8px max(16px, var(--sa-l)) !important;
+  }
+  .creditModal__dialog {
+    width: min(420px, 84vw) !important;
+    max-height: calc(100dvh - 16px) !important;
+    padding: 16px 22px 12px !important;
+    overflow: hidden !important;
+  }
+  .creditModal__close {
+    top: 8px !important;
+    right: 10px !important;
+  }
+  .hireMeBubble {
+    bottom: auto !important;
+    top: 50% !important;
+    right: calc(100% + 6px) !important;
+    transform: translateY(-50%) !important;
+  }
+  .hireMeBubbleArrow {
+    display: none !important;
+  }
+  .creditModal__content {
+    max-height: calc(100dvh - 48px) !important;
+    gap: 6px !important;
+  }
+  .creditModal__title {
+    margin-bottom: 2px !important;
+    font-size: 10.5px !important;
+  }
+  .creditModal__role {
+    font-size: 8px !important;
+  }
+  .creditModal__val {
+    font-size: 9.5px !important;
+    line-height: 1.35 !important;
+  }
+  .creditModal__footer {
+    margin-top: 2px !important;
+    padding-top: 6px !important;
+  }
+}
+
+.stage:has(.creditModal:not([hidden])) .lab__header,
+.stage:has(.creditModal:not([hidden])) .lab__rail,
+.stage:has(.creditModal:not([hidden])) .lab__portal,
+.stage:has(.creditModal:not([hidden])) .atomLayer {
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 /* ==========================================================================
@@ -1843,14 +1940,21 @@ body.cipher-locked canvas {
 
 
 /* --- Safe area (notch / rounded corners / home indicator) ---
-   Full-bleed layers (video, canvas, backgrounds) keep covering the whole screen incl. behind the notch;
-   only the UI container is inset so buttons and text never sit under the cutout. */
+   Keep .lab at full 100%x100% stage coordinates so background-synced hotspots (atomDollWrap, stageHotspot, emailHotspot)
+   have zero coordinate offset; apply safe-area insets only to UI chrome elements. */
 :root{--sa-t:env(safe-area-inset-top,0px);--sa-r:env(safe-area-inset-right,0px);--sa-b:env(safe-area-inset-bottom,0px);--sa-l:env(safe-area-inset-left,0px)}
 .stage .lab {
-  inset: auto;
-  top: var(--sa-t);
-  right: var(--sa-r);
-  bottom: var(--sa-b);
-  left: var(--sa-l);
-  height: auto;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.lab__header {
+  padding-left: max(clamp(20px, 3.5vw, 48px), var(--sa-l));
+  padding-right: max(clamp(20px, 3.5vw, 48px), var(--sa-r));
+}
+.lab__rail {
+  right: max(clamp(12px, 2.75vw, 44px), var(--sa-r));
+}
+.lab__portal {
+  left: max(clamp(20px, 3.8vw, 64px), var(--sa-l));
 }
