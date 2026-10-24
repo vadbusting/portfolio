@@ -211,7 +211,7 @@ button {
   display: none !important;
 }
 .stage.is-hero-fallback .layer--hero {
-  background: #07090e url('assets/scenes/hero_start.webp') center center / cover no-repeat !important;
+  background: #07090e url('assets/scenes/hero_start.webp?v=130') center center / cover no-repeat !important;
 }
 
 /* ==========================================================================
@@ -634,7 +634,7 @@ body.cipher-locked canvas {
   user-select: none !important;
 }
 
-/* --- 3F アトム人形インタラクション（マスター写真上に完全一致で接地・足元乗算影） --- */
+/* --- B2F アトム人形インタラクション（マスター写真上に完全一致で接地・足元乗算影） --- */
 .atomLayer {
   position: absolute;
   inset: 0;
@@ -1704,7 +1704,7 @@ body.cipher-locked canvas {
     -webkit-text-stroke: 0.045em #ffffff;
   }
   
-  /* 3F アトム吹き出しの画面端はみ出し防止 */
+  /* B2F アトム吹き出しの画面端はみ出し防止 */
   .atomBubble {
     left: auto !important;
     right: 0 !important;

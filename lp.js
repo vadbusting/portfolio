@@ -15,7 +15,6 @@ function scrollToSection(targetId) {
 document.addEventListener("DOMContentLoaded", () => {
   const slides = document.querySelectorAll('.slide');
   const ambientGlow = document.getElementById('ambientGlow');
-  const navLinks = document.querySelectorAll('.lp-nav-link');
   const sideDots = document.querySelectorAll('.side-dot');
   const scrollTopBtn = document.getElementById('scrollTopBtn');
   const scrollProgressBar = document.getElementById('scrollProgressBar');
@@ -452,7 +451,7 @@ function initEscherConformalGrid() {
   }
   
   draw();
-  // Robust Back button handler returning directly to 3F LP
+  // Robust Back button handler returning directly to B2F LP
   const lpBack = document.getElementById('lpBackBtn');
   if (lpBack) {
     lpBack.addEventListener('click', (e) => {

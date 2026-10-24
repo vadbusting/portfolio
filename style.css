@@ -204,35 +204,6 @@ body.floating-world-page .main-header .header-item a:hover {
     color: #000000 !important;
     border: none !important;
 }
-}
-
-/* --- Button Container & Cool Buttons --- */
-.button-container {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 12px;
-    z-index: 1000;
-}
-
-.cool-btn {
-    background-color: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--fg-color);
-    padding: 8px 16px;
-    text-decoration: none;
-    font-size: 0.8rem;
-    font-weight: 700;
-    transition: all 0.3s ease;
-}
-
-.cool-btn:hover {
-    background-color: var(--accent-color);
-    color: var(--bg-color);
-    border-color: var(--accent-color);
-}
 
 /* --- Accessibility Helpers --- */
 .sr-only {

@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cormorant+Garamond:ital,wght@1,300;1,400&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="scene.css?v=128">
+<link rel="stylesheet" href="scene.css?v=130">
 <script>
   // Immediate pre-paint detection of floor hash to suppress HERO flash
   (function() {
@@ -25,7 +25,17 @@
 
   <!-- 背景レイヤー（HERO実写映像 → ロビー連番 → フロア静止画 → 各階ドリー動画 → 場面転換ディップ） -->
   <div class="layer layer--hero" id="heroLayer">
-    <video id="heroVideo" src="assets/video/hero_entrance.mp4" muted playsinline webkit-playsinline preload="auto" aria-hidden="true"></video>
+    <video id="heroVideo" muted playsinline webkit-playsinline preload="auto" aria-hidden="true"></video>
+    <script>
+      /* HERO動画は、HTML解析の時点で端末に合う方を選んで即ダウンロード開始する
+         （スマホ・タブレットに PC用8MBを先に取りに行かせない）。判定は scene.js の isMobileOrTablet() と同じ。 */
+      (function () {
+        var v = document.getElementById('heroVideo');
+        var m = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) ||
+                (window.matchMedia && window.matchMedia('(max-width: 1024px)').matches);
+        v.src = m ? 'assets/video/hero_entrance_mobile.mp4?v=130' : 'assets/video/hero_entrance.mp4?v=130';
+      })();
+    </script>
     <div class="heroOverlay" aria-hidden="true"></div>
   </div>
   <div class="layer layer--seq" id="seqLayer"><canvas id="seq" aria-hidden="true"></canvas><i class="seqScrim" aria-hidden="true"></i></div>
@@ -57,22 +67,22 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 10l5 5 5-5"/></svg>
     </div>
 
-    <!-- フロア選択レール（右側: 5F〜1F 降順 + 細い罫線 + 最下層 B???F） -->
+    <!-- フロア選択レール（右側: 1F〜B4F 昇順（1Fが最上段）+ 細い罫線 + 最下層 B???F） -->
     <nav class="lab__rail" id="rail" aria-label="研究所の各階">
-      <button type="button" class="rail__btn" data-stage-jump="5"><span>5F</span><b>DIRECTION</b></button>
-      <button type="button" class="rail__btn" data-stage-jump="4"><span>4F</span><b>WEB</b></button>
-      <button type="button" class="rail__btn" data-stage-jump="3"><span>3F</span><b>LP</b></button>
-      <button type="button" class="rail__btn" data-stage-jump="2"><span>2F</span><b>PRESENTATION</b></button>
       <button type="button" class="rail__btn" data-stage-jump="1"><span>1F</span><b>ABOUT</b></button>
+      <button type="button" class="rail__btn" data-stage-jump="2"><span>B1F</span><b>PRESENTATION</b></button>
+      <button type="button" class="rail__btn" data-stage-jump="3"><span>B2F</span><b>LP</b></button>
+      <button type="button" class="rail__btn" data-stage-jump="4"><span>B3F</span><b>WEB</b></button>
+      <button type="button" class="rail__btn" data-stage-jump="5"><span>B4F</span><b>DIRECTION</b></button>
       <div class="rail__divider" aria-hidden="true"></div>
       <button type="button" class="rail__btn rail__btn--secret" data-stage-jump="6"><span>B???F</span><b>OTHER</b></button>
     </nav>
 
-    <!-- 3F アトム人形インタラクションレイヤー（マスタ写真上に完全同期・足元透過乗算影付き） -->
+    <!-- B2F アトム人形インタラクションレイヤー（マスタ写真上に完全同期・足元透過乗算影付き） -->
     <div class="atomLayer" id="atomLayer" hidden>
       <div class="atomDollWrap" id="atomDollWrap" role="button" aria-label="アトム人形" tabindex="0">
         <div class="atomShadow" aria-hidden="true"></div>
-        <img src="assets/scenes/atom_doll_trimmed.png?v=71" id="atomDoll" class="atomDoll" alt="アトム人形" draggable="false">
+        <img src="assets/scenes/atom_doll_trimmed.png?v=130" id="atomDoll" class="atomDoll" alt="アトム人形" draggable="false">
         <div class="atomBubble" id="atomBubble" hidden>
           <span class="atomBubbleArrow"></span>
           <div class="atomBubbleContent">
@@ -131,7 +141,7 @@
           <ul class="cipherHintModal__list">
             <li>2003年4月7日誕生</li>
             <li>高度なAI=電子頭脳</li>
-            <li>3Fでそれに触る</li>
+            <li>B2Fでそれに触る</li>
           </ul>
           <button type="button" class="cipherHintModal__okBtn" id="cipherHintOkBtn">了解</button>
         </div>
@@ -200,6 +210,6 @@
     </aside>
   </div>
 </main>
-<script src="scene.js?v=128"></script>
+<script src="scene.js?v=130"></script>
 </body>
 </html>

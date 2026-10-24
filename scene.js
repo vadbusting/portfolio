@@ -3,7 +3,7 @@
  *   ↓ (Slow smooth scroll down / touch swipe down)
  * LOBBY (1F: ABOUT - Scroll-scrubbed Canvas Sequence)
  *   ↓ (Arrive at guidebook)
- * FLOOR SELECT (01 ABOUT, 02 PRESENTATION, 03 LP, 04 WEB, 05 DIRECTION, B???F OTHER [RESTRICTED])
+ * FLOOR SELECT (1F ABOUT, B1F PRESENTATION, B2F LP, B3F WEB, B4F DIRECTION, B???F OTHER [RESTRICTED])
  *   ↓ (Instant jump into real 1080p dolly video clips, landing on OPEN PAGE)
  */
 (function () {
@@ -12,11 +12,11 @@
   /* ---------------- Configuration ---------------- */
   const FLOORS = [
     { key: 'about',        no: '1F',    name: 'ABOUT',        href: 'about.html',            lobby: true },
-    { key: 'presentation', no: '2F',    name: 'PRESENTATION', href: 'presentation.html?v=76', pos: '50% 50%' },
-    { key: 'lp',           no: '3F',    name: 'LP',           href: 'lp.html?v=76',           pos: '50% 50%' },
-    { key: 'web',          no: '4F',    name: 'WEB',          href: 'https://www.originalsoccerball.com/', external: true, pos: '50% 50%' },
-    { key: 'direction',    no: '5F',    name: 'DIRECTION',    href: 'https://new.express.adobe.com/webpage/XRy2MzIpmkxug', external: true, pos: '50% 50%' },
-    { key: 'other',        no: 'B1F',   name: 'OTHER',        href: 'other.html',            pos: '50% 50%', secret: true }
+    { key: 'presentation', no: 'B1F',   name: 'PRESENTATION', href: 'presentation.html?v=130', pos: '50% 50%' },
+    { key: 'lp',           no: 'B2F',   name: 'LP',           href: 'lp.html?v=130',           pos: '50% 50%' },
+    { key: 'web',          no: 'B3F',   name: 'WEB',          href: 'https://www.originalsoccerball.com/', external: true, pos: '50% 50%' },
+    { key: 'direction',    no: 'B4F',   name: 'DIRECTION',    href: 'https://new.express.adobe.com/webpage/XRy2MzIpmkxug', external: true, pos: '50% 50%' },
+    { key: 'other',        no: 'B???F', name: 'OTHER',        href: 'other.html',            pos: '50% 50%', secret: true }
   ];
 
   const isMobileOrTablet = () =>
@@ -28,12 +28,27 @@
     plate: (k, s) => s === 'start' ? 'assets/scenes/floor_start.webp' : `assets/scenes/${k}_${s}.webp`,
     dolly: k => isMobileOrTablet() ? `assets/video/${k}_dolly_mobile.mp4` : `assets/video/${k}_dolly.mp4`,
     lobbyEnd: 'assets/scenes/lobby_end.webp',
-    heroVideo: isMobileOrTablet() ? 'assets/video/hero_entrance_mobile.mp4' : 'assets/video/hero_entrance.mp4'
+    heroVideo: isMobileOrTablet() ? 'assets/video/hero_entrance_mobile.mp4?v=130' : 'assets/video/hero_entrance.mp4?v=130'
   };
 
-  // In-memory Blob cache for instant zero-latency scrubbing
+  // In-memory Blob cache with active eviction and revokeObjectURL to protect iOS RAM
   const videoBlobCache = new Map();
   const videoBlobPending = new Map();
+  const MAX_BLOB_CACHE = 2;
+
+  function storeVideoBlob(url, blobUrl) {
+    if (videoBlobCache.size >= MAX_BLOB_CACHE) {
+      for (const [cachedUrl, cachedBlob] of videoBlobCache.entries()) {
+        if (heroVideo && heroVideo.src === cachedBlob) continue;
+        if (dolly && dolly.src === cachedBlob) continue;
+        try { URL.revokeObjectURL(cachedBlob); } catch (e) {}
+        videoBlobCache.delete(cachedUrl);
+        break;
+      }
+    }
+    videoBlobCache.set(url, blobUrl);
+  }
+
   function preloadVideoBlob(url) {
     if (!url || videoBlobCache.has(url)) return Promise.resolve(videoBlobCache.get(url));
     if (videoBlobPending.has(url)) return videoBlobPending.get(url);
@@ -44,7 +59,7 @@
       })
       .then(blob => {
         const blobUrl = URL.createObjectURL(blob);
-        videoBlobCache.set(url, blobUrl);
+        storeVideoBlob(url, blobUrl);
         videoBlobPending.delete(url);
         return blobUrl;
       })
@@ -254,19 +269,19 @@
       x: 1452 / 2752, y: 263 / 1536, w: 965 / 2752, h: 1051 / 1536,
       clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
     },
-    // 2F: 壁掛けモニタ画面 (2752x1536 master coords: 888, 334, 974, 571)
+    // B1F: 壁掛けモニタ画面 (2752x1536 master coords: 888, 334, 974, 571)
     1: {
       x: 888 / 2752, y: 334 / 1536, w: 974 / 2752, h: 571 / 1536
     },
-    // 3F: ノートPC画面 (2752x1536 master coords: 1045, 670, 675, 430)
+    // B2F: ノートPC画面 (2752x1536 master coords: 1045, 670, 675, 430)
     2: {
       x: 1045 / 2752, y: 670 / 1536, w: 675 / 2752, h: 430 / 1536
     },
-    // 4F: スタジオディスプレイ画面 (2752x1536 master coords: 642, 178, 1468, 826)
+    // B3F: スタジオディスプレイ画面 (2752x1536 master coords: 642, 178, 1468, 826)
     3: {
       x: 642 / 2752, y: 178 / 1536, w: 1468 / 2752, h: 826 / 1536
     },
-    // 5F: 開いた本＆カラフルスモーク全体 (2752x1536 master coords: 896, 590, 1464, 494)
+    // B4F: 開いた本＆カラフルスモーク全体 (2752x1536 master coords: 896, 590, 1464, 494)
     4: {
       x: 896 / 2752, y: 590 / 1536, w: 1464 / 2752, h: 494 / 1536,
       clipPath: 'polygon(0.0% 39.7%, 32.8% 0.0%, 55.6% 9.7%, 88.1% 29.6%, 100.0% 41.7%, 76.8% 100.0%, 33.6% 62.0%)'
@@ -1006,7 +1021,7 @@
     setDip(false);
   }
 
-  // Jump directly to Floor i (2F〜5F, B???F)
+  // Jump directly to Floor i (B1F〜B4F, B???F)
   async function goFloor(i, opts) {
     opts = opts || {};
     if (i < 0 || i >= FLOORS.length) return;
@@ -1318,7 +1333,7 @@
 
     if (state === 'hero') {
       if (scrollCue) scrollCue.classList.add('is-hidden');
-      // 前進スワイプはタイトル演出のため緩やか・巻き戻しスワイプは2F〜5Fと同等の自然な追従速度
+      // 前進スワイプはタイトル演出のため緩やか・巻き戻しスワイプはB1F〜B4Fと同等の自然な追従速度
       const step = dy < 0
         ? Math.max(-0.028, dy / (innerHeight * 3.0))
         : Math.min(0.012, dy / (innerHeight * 5));
@@ -1585,7 +1600,7 @@
 
   window.addEventListener('pointerdown', () => { usedKeyboard = false; }, { passive: true });
 
-  /* ---------------- 3F アトム人形インタラクション (マスター写真上のアトムに完全同期した透明ホットスポット & 自動フェード消去吹き出し) ---------------- */
+  /* ---------------- B2F アトム人形インタラクション (マスター写真上のアトムに完全同期した透明ホットスポット & 自動フェード消去吹き出し) ---------------- */
   const atomLayer = document.getElementById('atomLayer');
   const atomDollWrap = document.getElementById('atomDollWrap');
   const atomBubble = document.getElementById('atomBubble');
@@ -1609,7 +1624,7 @@
 
   function updateAtomVisibility() {
     if (!atomLayer) return;
-    // 3F (LP floor) is cur === 2, ONLY visible when arrived at the desk end plate
+    // B2F (LP floor) is cur === 2, ONLY visible when arrived at the desk end plate
     if (state === 'floor' && cur === 2 && plate && plate.classList.contains('is-end')) {
       atomLayer.hidden = false;
       updateAtomDollPosition();
@@ -2009,6 +2024,48 @@
       cenotaph.style.transform = 'translate(-50%, -50%) scale(1)';
     }
   }
+
+  // Prevent accidental pinch-to-zoom on iOS Safari that causes viewport clipping
+  document.addEventListener('gesturestart', (e) => {
+    e.preventDefault();
+  }, { passive: false });
+
+  // Reliable video pause & sync on tab switch / background / bfcache navigation
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (heroVideo && !heroVideo.paused) {
+        try { heroVideo.pause(); } catch (e) {}
+      }
+      if (dolly && !dolly.paused) {
+        try { dolly.pause(); } catch (e) {}
+      }
+    } else {
+      if (state === 'hero' && heroVideo) {
+        syncHeroFrame();
+      }
+    }
+  });
+
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) {
+      if (heroVideo && !heroVideo.paused) {
+        try { heroVideo.pause(); } catch (e) {}
+      }
+      if (dolly && !dolly.paused) {
+        try { dolly.pause(); } catch (e) {}
+      }
+      if (state === 'hero' && heroVideo) {
+        syncHeroFrame();
+      }
+    }
+  });
+
+  window.addEventListener('beforeunload', () => {
+    for (const blobUrl of videoBlobCache.values()) {
+      try { URL.revokeObjectURL(blobUrl); } catch (e) {}
+    }
+    videoBlobCache.clear();
+  });
 
   addEventListener('hashchange', () => {
     const k = location.hash.replace('#', '');

@@ -1311,9 +1311,6 @@ a:hover { color: #888; }
   .slide {
     overflow: clip !important;
   }
-  .lp-nav {
-    display: none; /* Hide header nav links on tablet/mobile */
-  }
 
   .presentation-wrapper {
     overflow: visible !important;
