@@ -104,99 +104,14 @@ function scale() {
 
 // ── ESCHER CONFORMAL SPIRAL GRID (DROSTE EFFECT) ON 2D CANVAS ──
 function initEscherConformalGrid() {
-  const canvas = document.getElementById('escherCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-
-  let rotationOffset = 0;
-  let targetRotation = 0;
-  let scaleFactor = 1.0;
-  let targetScale = 1.0;
-
-  function resizeCanvas() {
-    canvas.width = canvas.clientWidth || 1280;
-    canvas.height = canvas.clientHeight || 440;
-  }
-  escherResize = resizeCanvas;
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
-
-  const coverTop = document.querySelector('.cover-top');
-  if (coverTop) {
-    coverTop.addEventListener('mousemove', (e) => {
-      const rect = coverTop.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-
-      targetRotation = x * Math.PI * 0.75;
-      targetScale = 1.0 + y * 0.25;
+  if (typeof window.initEscherConformalGrid === 'function') {
+    const instance = window.initEscherConformalGrid({
+      canvasId: 'escherCanvas',
+      useWindowSize: false,
+      triggerSelector: '.cover-top'
     });
-
-    coverTop.addEventListener('mouseleave', () => {
-      targetRotation = 0;
-      targetScale = 1.0;
-    });
+    if (instance) escherResize = instance.resize;
   }
-
-  let time = 0;
-
-  function draw() {
-    time += 1.0;
-
-    rotationOffset += (targetRotation - rotationOffset) * 0.08;
-    scaleFactor += (targetScale - scaleFactor) * 0.08;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const cx = canvas.width - 150;
-    const cy = 150;
-
-    const numSpirals = 22;
-    const p = 0.55;
-    const q = 1.0 / p;
-    const maxRadius = Math.max(canvas.width, canvas.height) * 1.5;
-
-    ctx.lineWidth = 1.5;
-
-    const autoSpin = time * 0.002;
-    const autoScale = 0.95 + Math.sin(time * 0.004) * 0.05;
-
-    for (let i = 0; i < numSpirals; i++) {
-      const startAngle = (i / numSpirals) * Math.PI * 2 + rotationOffset + autoSpin;
-      ctx.beginPath();
-      ctx.strokeStyle = `rgba(255, 255, 255, ${0.03 + (1 - i / numSpirals) * 0.16})`;
-
-      for (let theta = 0; theta < 22; theta += 0.04) {
-        const r = 1.5 * Math.exp(p * theta) * scaleFactor * autoScale;
-        if (r > maxRadius) break;
-        const x = cx + r * Math.cos(theta + startAngle);
-        const y = cy + r * Math.sin(theta + startAngle);
-        if (theta === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-    }
-
-    for (let i = 0; i < numSpirals; i++) {
-      const startAngle = (i / numSpirals) * Math.PI * 2 - rotationOffset - autoSpin;
-      ctx.beginPath();
-      ctx.strokeStyle = `rgba(255, 255, 255, ${0.03 + (1 - i / numSpirals) * 0.16})`;
-
-      for (let theta = 0; theta < 22; theta += 0.04) {
-        const r = 1.5 * Math.exp(q * theta) * scaleFactor * autoScale;
-        if (r > maxRadius) break;
-        const x = cx + r * Math.cos(-theta + startAngle);
-        const y = cy + r * Math.sin(-theta + startAngle);
-        if (theta === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-    }
-
-    requestAnimationFrame(draw);
-  }
-
-  draw();
 }
 
 window.addEventListener('resize', scale);

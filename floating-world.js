@@ -1,4 +1,6 @@
 import * as THREE from './assets/vendor/three.module.js';
+import { PORTFOLIO_IMAGES } from './assets/data/portfolio-images.js';
+import { Device } from './assets/js/device.js';
 
 THREE.Cache.enabled = true;
 
@@ -20,15 +22,7 @@ const normalizeAssetPath = (value) =>
     ? value.normalize('NFC')
     : value);
 
-const detectIPad = () => {
-  const ua = navigator.userAgent || '';
-  const hasTouch = 'ontouchstart' in window || (navigator.maxTouchPoints || 0) > 0;
-  const isIPadUA = /ipad/i.test(ua);
-  const isTouchMac = /macintosh/i.test(ua) && hasTouch;
-  return isIPadUA || isTouchMac;
-};
-
-const isIPad = detectIPad();
+const isIPad = Device.isIPad;
 
 window.scrollTo(0, 0);
 document.documentElement.scrollTop = 0;
@@ -919,7 +913,8 @@ const isMonochromeImage = (image) => {
   });
 
   (() => {
-    const normalizedSources = (window.PORTFOLIO_IMAGES || [])
+    const rawList = PORTFOLIO_IMAGES && PORTFOLIO_IMAGES.length > 0 ? PORTFOLIO_IMAGES : (window.PORTFOLIO_IMAGES || []);
+    const normalizedSources = rawList
       .map(normalizeAssetPath)
       .filter(Boolean);
     const sources = normalizedSources.length > 0 ? normalizedSources : fallbackSources;
