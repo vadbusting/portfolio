@@ -646,7 +646,7 @@
 
   /* ---------------- Dual Scrub Engine (HERO & Floor Video Scrubbing) ---------------- */
   let heroQ = 0, heroQt = 0, heroRaf = 0, heroLast = 0, lastHeroSeekTime = 0;
-  let floorQ = 0, floorQt = 0, floorRaf = 0, floorLast = 0, lastFloorSeekTime = 0;
+  let floorQ = 0, floorQt = 0, floorRaf = 0, floorLast = 0;
 
   function updateCenotaphByTime(t) {
     if (!cenotaph) return;
@@ -1933,10 +1933,6 @@
       if (cipherModal && !cipherModal.hidden) closeCipherModal();
       const creditModal = $('creditModal');
       if (creditModal && !creditModal.hidden) closeCreditModal();
-    }
-    // 'H' key toggles hotspot visualization live on index.html
-    if ((e.key === 'h' || e.key === 'H') && !e.target.closest('input, textarea')) {
-      if (stage) stage.classList.toggle('is-debug-hotspots');
     }
   });
 

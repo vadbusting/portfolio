@@ -7,7 +7,6 @@ const canvas = document.getElementById('floating-canvas');
 const lightbox = document.getElementById('floating-lightbox');
 const lightboxImage = lightbox?.querySelector('.floating-lightbox__image');
 const lightboxCloseControls = lightbox?.querySelectorAll('[data-lightbox-close]');
-const loaderOverlay = document.getElementById('floating-loader');
 const lastPointerScreen = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 const layoutMetrics = { maxExtent: 0 };
 let initialScrollHandled = false;
@@ -31,8 +30,6 @@ const detectIPad = () => {
 
 const isIPad = detectIPad();
 
-const applyIPadThinning = (list) => list;
-
 window.scrollTo(0, 0);
 document.documentElement.scrollTop = 0;
 document.body.scrollTop = 0;
@@ -40,11 +37,6 @@ let loaderRevealed = false;
 let loaderFallback;
 
 if (!stage || !canvas) {
-  console.warn('Floating world stage not found; skipping three.js setup.');
-  if (loaderOverlay) {
-    loaderOverlay.classList.add('is-hidden');
-    loaderOverlay.setAttribute('aria-hidden', 'true');
-  }
   document.body.classList.remove('is-loading');
 } else {
   const loadingManager = new THREE.LoadingManager();
@@ -547,12 +539,12 @@ if (!stage || !canvas) {
 
   const textureLoader = new THREE.TextureLoader(loadingManager);
 
-  const fallbackSources = applyIPadThinning([
+  const fallbackSources = [
     'image/portfolio_page_22_2_65.webp',
     'image/portfolio_page_22_2_66.webp',
     'image/portfolio_page_22_2_67.webp',
     'image/portfolio_page_22_2_68.webp',
-  ].map(normalizeAssetPath));
+  ].map(normalizeAssetPath);
 
 const analysisCanvas = document.createElement('canvas');
 const analysisCtx = analysisCanvas.getContext('2d', { willReadFrequently: true }) || null;
@@ -927,11 +919,9 @@ const isMonochromeImage = (image) => {
   });
 
   (() => {
-    const normalizedSources = applyIPadThinning(
-      (window.PORTFOLIO_IMAGES || [])
-        .map(normalizeAssetPath)
-        .filter(Boolean)
-    );
+    const normalizedSources = (window.PORTFOLIO_IMAGES || [])
+      .map(normalizeAssetPath)
+      .filter(Boolean);
     const sources = normalizedSources.length > 0 ? normalizedSources : fallbackSources;
 
     // Hide loader immediately — no waiting
