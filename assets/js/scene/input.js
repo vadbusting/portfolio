@@ -4,12 +4,12 @@
  * and responsive orientation / layout resize observers.
  */
 
-import { clamp01, PATH } from './config.js';
+import { PATH } from './config.js';
 import {
   $, stage, plate, plateA, plateB, dollyLayer, scrollCue,
   cipherModal, creditModal
 } from './dom.js';
-import { runtime } from './state.js';
+import { runtime, clamp01 } from './state.js';
 import { heroNudge, floorNudge, startFloorLoop } from './scrub-engine.js';
 import { seq, seqNudge, seqSize, drawSeq } from './lobby.js';
 import { updateStageHotspot } from './hotspots.js';

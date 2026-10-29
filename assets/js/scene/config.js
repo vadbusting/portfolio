@@ -3,6 +3,8 @@
  */
 import { Device } from '../device.js';
 
+export const clamp01 = (v) => Math.min(1, Math.max(0, v));
+
 export const FLOORS = Object.freeze([
   { key: 'about',        no: '1F',    name: 'ABOUT',        href: 'about.html',            lobby: true },
   { key: 'presentation', no: 'B1F',   name: 'PRESENTATION', href: 'presentation.html?v=130', pos: '50% 50%' },
