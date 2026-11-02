@@ -18,7 +18,7 @@ export const PATH = Object.freeze({
   plate: (k, s) => s === 'start' ? 'assets/scenes/floor_start.webp' : `assets/scenes/${k}_${s}.webp`,
   dolly: (k) => Device.isMobileOrTablet() ? `assets/video/${k}_dolly_mobile.mp4` : `assets/video/${k}_dolly.mp4`,
   lobbyEnd: 'assets/scenes/lobby_end.webp',
-  heroVideo: Device.isMobileOrTablet() ? 'assets/video/hero_entrance_mobile.mp4?v=130' : 'assets/video/hero_entrance.mp4?v=130'
+  heroVideo: Device.isMobileOrTablet() ? 'assets/video/hero_entrance_mobile.mp4?v=132' : 'assets/video/hero_entrance.mp4?v=132'
 });
 
 export const MASTER_W = 2752;

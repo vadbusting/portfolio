@@ -211,7 +211,7 @@ button {
   display: none !important;
 }
 .stage.is-hero-fallback .layer--hero {
-  background: #07090e url('assets/scenes/hero_start.webp?v=130') center center / cover no-repeat !important;
+  background: #07090e url('assets/scenes/hero_start.webp?v=132') center center / cover no-repeat !important;
 }
 
 /* ==========================================================================
