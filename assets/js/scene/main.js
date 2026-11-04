@@ -3,12 +3,12 @@
  * Bootstraps modules, event listeners, lifecycle observers, and URL hash routing.
  */
 
-import { FLOORS } from './config.js';
+import { FLOORS, PATH } from './config.js';
 import {
   $, stage, rail, heroVideo, cenotaph, dolly, keyInput
 } from './dom.js';
-import { runtime, setState } from './state.js';
-import { videoBlobCache } from './blob-cache.js';
+import { runtime, setState, canVideo, lightNet } from './state.js';
+import { videoBlobCache, preloadVideoBlob } from './blob-cache.js';
 import { seqSize, seqLoad } from './lobby.js';
 import { syncHeroFrame } from './scrub-engine.js';
 import { initHotspotListeners } from './hotspots.js';
@@ -29,8 +29,20 @@ export function initScene() {
   initModalListeners();
   initInputListeners();
 
-  // Rail floor buttons navigation
+  // Rail floor buttons navigation & hover preload
   if (rail) {
+    rail.addEventListener('pointerenter', e => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      const targetIdx = +b.dataset.stageJump - 1;
+      if (targetIdx >= 0 && targetIdx < FLOORS.length) {
+        const f = FLOORS[targetIdx];
+        if (f && f.key && !f.lobby && !f.external) {
+          preloadVideoBlob(PATH.dolly(f.key));
+        }
+      }
+    }, { capture: true, passive: true });
+
     rail.addEventListener('click', e => {
       const b = e.target.closest('button');
       if (!b) return;
@@ -159,6 +171,21 @@ export function initScene() {
       cenotaph.style.filter = 'none';
       cenotaph.style.transform = 'translate(-50%, -50%) scale(1)';
     }
+  }
+
+  // Preload HERO video into in-memory Blob for zero-latency instant scrubbing
+  if (canVideo() && !lightNet()) {
+    preloadVideoBlob(PATH.heroVideo).then(blobUrl => {
+      if (heroVideo && blobUrl && blobUrl.startsWith('blob:') && heroVideo.src !== blobUrl && !stage.classList.contains('is-hero-fallback')) {
+        const curT = heroVideo.currentTime;
+        const isPaused = heroVideo.paused;
+        heroVideo.src = blobUrl;
+        try { heroVideo.currentTime = curT; } catch (e) {}
+        if (!isPaused && runtime.state === 'hero') {
+          try { heroVideo.pause(); } catch (e) {}
+        }
+      }
+    }).catch(() => {});
   }
 }
 

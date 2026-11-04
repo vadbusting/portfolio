@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cormorant+Garamond:ital,wght@1,300;1,400&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="scene.css?v=132">
+<link rel="stylesheet" href="scene.css?v=133">
 <script>
   // Immediate pre-paint detection of floor hash to suppress HERO flash
   (function() {
@@ -25,7 +25,7 @@
 
   <!-- 背景レイヤー（HERO実写映像 → ロビー連番 → フロア静止画 → 各階ドリー動画 → 場面転換ディップ） -->
   <div class="layer layer--hero" id="heroLayer">
-    <video id="heroVideo" muted playsinline webkit-playsinline preload="auto" aria-hidden="true"></video>
+    <video id="heroVideo" muted playsinline webkit-playsinline preload="auto" poster="assets/scenes/hero_start.webp?v=133" aria-hidden="true"></video>
     <script>
       /* HERO動画は、HTML解析の時点で端末に合う方を選んで即ダウンロード開始する
          （スマホ・タブレットに PC用8MBを先に取りに行かせない）。判定は scene.js の isMobileOrTablet() と同じ。 */
@@ -33,7 +33,7 @@
         var v = document.getElementById('heroVideo');
         var m = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) ||
                 (window.matchMedia && window.matchMedia('(max-width: 1024px)').matches);
-        v.src = m ? 'assets/video/hero_entrance_mobile.mp4?v=132' : 'assets/video/hero_entrance.mp4?v=132';
+        v.src = m ? 'assets/video/hero_entrance_mobile.mp4?v=133' : 'assets/video/hero_entrance.mp4?v=133';
       })();
     </script>
     <div class="heroOverlay" aria-hidden="true"></div>

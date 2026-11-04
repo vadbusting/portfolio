@@ -219,6 +219,8 @@ export async function goFloor(i, opts = {}) {
   }
   const f = FLOORS[i];
   runtime.cur = i;
+  const stageEl = document.getElementById('stage');
+  if (stageEl) stageEl.dataset.floor = String(i);
   setRail(i);
   warm(i);
   warm(i + 1);

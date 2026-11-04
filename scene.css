@@ -81,7 +81,7 @@ button {
 
 /* --- Hero entrance layer --- */
 .layer--hero {
-  background: #07090e;
+  background: #07090e url('assets/scenes/hero_start.webp?v=133') center center / cover no-repeat;
   z-index: 1;
   transition: opacity 0.6s var(--ease, ease);
 }
@@ -168,6 +168,10 @@ button {
   opacity: 1 !important;
   transition: none !important;
 }
+.stage[data-state=floor]:not([data-floor="0"]) .layer--seq {
+  opacity: 0 !important;
+  transition: none !important;
+}
 .stage[data-state=floor][data-floor="0"] .layer--plate {
   opacity: 0;
   pointer-events: none;
@@ -211,7 +215,7 @@ button {
   display: none !important;
 }
 .stage.is-hero-fallback .layer--hero {
-  background: #07090e url('assets/scenes/hero_start.webp?v=132') center center / cover no-repeat !important;
+  background: #07090e url('assets/scenes/hero_start.webp?v=133') center center / cover no-repeat !important;
 }
 
 /* ==========================================================================

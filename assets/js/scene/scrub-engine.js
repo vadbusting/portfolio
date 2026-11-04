@@ -226,6 +226,15 @@ if (dolly) {
       try { dolly.currentTime = clamp01(runtime.floorQ) * dolly.duration; } catch (e) {}
     }
   });
+  dolly.addEventListener('seeked', () => {
+    if (runtime.state === 'floor' && !runtime.floorRaf) {
+      const dur = (Number.isFinite(dolly.duration) && dolly.duration > 0) ? dolly.duration : 10.0;
+      const targetTime = clamp01(runtime.floorQ) * dur;
+      if (Math.abs(dolly.currentTime - targetTime) > 0.03) {
+        try { dolly.currentTime = targetTime; } catch (e) {}
+      }
+    }
+  });
   dolly.addEventListener('error', () => {
     const s = dolly.currentSrc || dolly.getAttribute('src');
     if (!s || s === window.location.href || s === 'about:blank') return;
@@ -242,6 +251,23 @@ if (heroVideo) {
         try { heroVideo.pause(); } catch (e) {}
       }
     });
+  });
+  heroVideo.addEventListener('seeked', () => {
+    if (runtime.state === 'hero') {
+      const dur = (Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) ? heroVideo.duration : 10.0;
+      const targetTime = Math.max(0.001, Math.min(dur - 0.04, clamp01(runtime.heroQ) * dur));
+      if (Math.abs(heroVideo.currentTime - targetTime) > 0.025) {
+        runtime.lastHeroSeekTime = performance.now();
+        try { heroVideo.currentTime = targetTime; } catch (e) {}
+      }
+      updateCenotaphByTime(heroVideo.currentTime);
+    }
+  });
+  heroVideo.addEventListener('error', () => {
+    const s = heroVideo.currentSrc || heroVideo.getAttribute('src');
+    if (!s || s === window.location.href || s === 'about:blank') return;
+    runtime.videoBroken = true;
+    if (stage) stage.classList.add('is-hero-fallback');
   });
   if (heroVideo.readyState >= 1) {
     syncHeroFrame();
