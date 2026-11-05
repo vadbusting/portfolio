@@ -615,11 +615,13 @@ const isMonochromeImage = (image) => {
     }
   };
 
+  const getScrollY = () => window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+
   const resizeRenderer = () => {
     const sceneElement = canvas.parentElement || stage;
     const rect = sceneElement.getBoundingClientRect();
-    const width = Math.max(1, Math.round(stage.clientWidth || window.innerWidth));
-    // Use the actual CSS scene height so mobile Chrome's dynamic viewport is respected.
+    const width = Math.max(1, Math.round(rect.width || window.visualViewport?.width || window.innerWidth));
+    // Use the actual CSS scene height so mobile Chrome/Safari dynamic viewport is respected.
     const height = Math.max(1, Math.round(rect.height || window.visualViewport?.height || window.innerHeight));
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
@@ -629,19 +631,21 @@ const isMonochromeImage = (image) => {
 
   const computeStageMetrics = () => {
     const rect = stage.getBoundingClientRect();
-    const top = window.scrollY + rect.top;
-    const maxScroll = Math.max(1, stage.offsetHeight - window.innerHeight);
+    const top = getScrollY() + rect.top;
+    const vh = window.visualViewport?.height || window.innerHeight;
+    const maxScroll = Math.max(1, stage.offsetHeight - vh);
     stageMetrics = { top, maxScroll };
   };
 
   const onScroll = () => {
+    const curScrollY = getScrollY();
     const scrollGuide = document.querySelector('.scroll-guide');
-    if (scrollGuide && window.scrollY > 10) {
+    if (scrollGuide && curScrollY > 10) {
       scrollGuide.classList.add('is-hidden');
     }
     
     const progress = THREE.MathUtils.clamp(
-      (window.scrollY - stageMetrics.top) / stageMetrics.maxScroll,
+      (curScrollY - stageMetrics.top) / stageMetrics.maxScroll,
       0,
       1
     );
@@ -690,7 +694,7 @@ const isMonochromeImage = (image) => {
   };
 
   const updatePlanes = () => {
-    const isAtTop = window.scrollY < 20;
+    const isAtTop = getScrollY() < 20;
     stackGroup.children.forEach((mesh) => {
       const worldZ = mesh.userData.baseZ + state.groupZ;
       if (isAtTop || worldZ < -36 || worldZ > 7.0) {
@@ -859,8 +863,15 @@ const isMonochromeImage = (image) => {
   let pointerDownInfo = null;
   let lastLightboxOpenAt = 0;
 
-  canvas.addEventListener('pointermove', updatePointerFromEvent, { passive: true });
-  canvas.addEventListener('pointerdown', (event) => {
+  const isInteractiveOverlayTarget = (event) =>
+    Boolean(event?.target?.closest?.('.main-header, .floating-lightbox'));
+
+  window.addEventListener('pointermove', (event) => {
+    if (isInteractiveOverlayTarget(event)) return;
+    updatePointerFromEvent(event);
+  }, { passive: true });
+  window.addEventListener('pointerdown', (event) => {
+    if (isInteractiveOverlayTarget(event)) return;
     if (event.button !== undefined && event.button !== 0) return;
     pointerDownInfo = {
       x: event.clientX,
@@ -870,7 +881,11 @@ const isMonochromeImage = (image) => {
     };
   }, { passive: true });
 
-  canvas.addEventListener('pointerup', (event) => {
+  window.addEventListener('pointerup', (event) => {
+    if (isInteractiveOverlayTarget(event)) {
+      pointerDownInfo = null;
+      return;
+    }
     if (!pointerDownInfo) return;
     const dist = Math.hypot(event.clientX - pointerDownInfo.x, event.clientY - pointerDownInfo.y);
     const elapsed = performance.now() - pointerDownInfo.time;
@@ -886,7 +901,8 @@ const isMonochromeImage = (image) => {
     }
   }, { passive: true });
 
-  canvas.addEventListener('click', (event) => {
+  window.addEventListener('click', (event) => {
+    if (isInteractiveOverlayTarget(event)) return;
     if (performance.now() - lastLightboxOpenAt < 450) return;
     const hitSrc = findHitSrcAt(event.clientX, event.clientY);
     if (hitSrc) {

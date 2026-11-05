@@ -151,6 +151,14 @@ export function closeCipherModal() {
   if (runtime.callbacks.onLayoutOrOrientationChange) {
     runtime.callbacks.onLayoutOrOrientationChange();
   }
+  [60, 150, 300, 500].forEach((delay) => {
+    setTimeout(() => {
+      resetViewportZoomAndScroll();
+      if (runtime.callbacks.onLayoutOrOrientationChange) {
+        runtime.callbacks.onLayoutOrOrientationChange();
+      }
+    }, delay);
+  });
 }
 
 export function handleCipherUnlock() {

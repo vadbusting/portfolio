@@ -16,7 +16,7 @@ import { updateStageHotspot } from './hotspots.js';
 import { updateAtomDollPosition } from './atom.js';
 import {
   updateCreditBtnVisibility, updateCreditBtnPosition,
-  closeCreditModal, closeCipherModal
+  closeCreditModal, closeCipherModal, resetViewportZoomAndScroll
 } from './modals.js';
 import { goHero, jump } from './navigation.js';
 
@@ -27,6 +27,7 @@ let mouseStartX = null, mouseStartY = null;
 let mouseOriginX = null, mouseOriginY = null;
 
 export function onLayoutOrOrientationChange() {
+  resetViewportZoomAndScroll();
   seq.dirty = true;
   seqSize();
   if (runtime.state === 'lobby' || (runtime.state === 'floor' && runtime.cur === 0)) {
@@ -71,6 +72,8 @@ export function onLayoutOrOrientationChange() {
   updateCreditBtnVisibility();
   updateCreditBtnPosition();
 }
+
+runtime.callbacks.onLayoutOrOrientationChange = onLayoutOrOrientationChange;
 
 export function initInputListeners() {
   /* ---------------- Wheel Handling ---------------- */
@@ -134,7 +137,7 @@ export function initInputListeners() {
               }
               if (scrollCue) scrollCue.classList.add('is-hidden');
               stage.classList.remove('is-waiting-scroll');
-              runtime.floorQ.qt = Math.min(0.90, runtime.floorQ.qt + e.deltaY / 2400);
+              runtime.floorQt = Math.min(0.90, runtime.floorQt + e.deltaY / 2400);
               startFloorLoop();
               return;
             }
@@ -168,7 +171,7 @@ export function initInputListeners() {
               }
               if (scrollCue) scrollCue.classList.add('is-hidden');
               stage.classList.remove('is-waiting-scroll');
-              runtime.floorQ.qt = Math.min(0.90, runtime.floorQ.qt + e.deltaY / 2400);
+              runtime.floorQt = Math.min(0.90, runtime.floorQt + e.deltaY / 2400);
               startFloorLoop();
               return;
             }
@@ -265,7 +268,7 @@ export function initInputListeners() {
               }
               if (scrollCue) scrollCue.classList.add('is-hidden');
               stage.classList.remove('is-waiting-scroll');
-              runtime.floorQ.qt = Math.min(0.90, runtime.floorQ.qt + dy / (window.innerHeight * 3.0));
+              runtime.floorQt = Math.min(0.90, runtime.floorQt + dy / (window.innerHeight * 3.0));
               startFloorLoop();
               return;
             }
@@ -314,7 +317,7 @@ export function initInputListeners() {
               }
               if (scrollCue) scrollCue.classList.add('is-hidden');
               stage.classList.remove('is-waiting-scroll');
-              runtime.floorQ.qt = Math.min(0.90, runtime.floorQ.qt + dy / (window.innerHeight * 3.0));
+              runtime.floorQt = Math.min(0.90, runtime.floorQt + dy / (window.innerHeight * 3.0));
               startFloorLoop();
               return;
             }
@@ -486,6 +489,10 @@ export function initInputListeners() {
 
   /* ---------------- Layout & Orientation Observers ---------------- */
   window.addEventListener('resize', onLayoutOrOrientationChange, { passive: true });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', onLayoutOrOrientationChange, { passive: true });
+    window.visualViewport.addEventListener('scroll', resetViewportZoomAndScroll, { passive: true });
+  }
 
   const handleOrientation = () => {
     [0, 60, 150, 300, 500].forEach(delay => {
