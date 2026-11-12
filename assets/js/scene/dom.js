@@ -54,3 +54,17 @@ export const authCard = $('authCard');
 export const halEyeFocal = $('halEyeFocal');
 export const halEyeGreenGlow = $('halEyeGreenGlow');
 export const halEyeImgGreen = $('halEyeImgGreen');
+
+// BRAUN Audio System Layers
+export const braunHotspot = $('braunHotspot');
+export const braunModal = $('braunModal');
+export const braunModalClose = $('braunModalClose');
+export const braunPlayerClose = $('braunPlayerClose');
+export const braunModalBackdrop = $('braunModalBackdrop');
+export const braunIframe = $('braunIframe');
+
+// STARSON YouTube Layers
+export const ballHotspot = $('ballHotspot');
+export const starsonModal = $('starsonModal');
+export const starsonModalClose = $('starsonModalClose');
+export const starsonIframe = $('starsonIframe');

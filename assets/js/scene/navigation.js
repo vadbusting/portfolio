@@ -16,6 +16,8 @@ import { seq, seqLoad, drawSeq, startSeqLoop } from './lobby.js';
 import { startHeroLoop } from './scrub-engine.js';
 import { showPortal, hidePortal, loadImg, setPos, updateStageHotspot } from './hotspots.js';
 import { updateAtomVisibility } from './atom.js';
+import { updateBraunVisibility } from './braun-player.js';
+import { updateStarsonVisibility } from './starson-player.js';
 import { updateCreditBtnVisibility, isSecretUnlocked, openCipherModal } from './modals.js';
 
 const warmed = new Set();
@@ -162,6 +164,8 @@ export function arriveLobbyEnd() {
   updateStageHotspot();
   updateCreditBtnVisibility();
   updateAtomVisibility();
+  updateBraunVisibility();
+  updateStarsonVisibility();
   if (scrollCue) scrollCue.classList.add('is-hidden');
   const stage = document.getElementById('stage');
   if (stage) stage.classList.remove('is-waiting-scroll');
@@ -273,6 +277,8 @@ export async function goFloor(i, opts = {}) {
     if (stage) stage.classList.remove('is-waiting-scroll');
     if (scrollCue) scrollCue.classList.add('is-hidden');
     updateAtomVisibility();
+    updateBraunVisibility();
+    updateStarsonVisibility();
   };
 
   const loadPlates = () => Promise.all([
@@ -330,6 +336,8 @@ export function arrive(i, t) {
   setRail(i);
   runtime.busy = false;
   updateAtomVisibility();
+  updateBraunVisibility();
+  updateStarsonVisibility();
   updateStageHotspot();
   updateCreditBtnVisibility();
   if (runtime.usedKeyboard && portalLink) {

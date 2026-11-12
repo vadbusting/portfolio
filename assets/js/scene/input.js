@@ -14,6 +14,8 @@ import { heroNudge, floorNudge, startFloorLoop } from './scrub-engine.js';
 import { seq, seqNudge, seqSize, drawSeq } from './lobby.js';
 import { updateStageHotspot } from './hotspots.js';
 import { updateAtomDollPosition } from './atom.js';
+import { updateBraunHotspotPosition, updateBraunVisibility } from './braun-player.js';
+import { updateStarsonHotspotPosition, updateStarsonVisibility } from './starson-player.js';
 import {
   updateCreditBtnVisibility, updateCreditBtnPosition,
   closeCreditModal, closeCipherModal, resetViewportZoomAndScroll
@@ -47,6 +49,8 @@ export function onLayoutOrOrientationChange() {
       if (dollyLayer) dollyLayer.style.setProperty('--pos', pVal);
       updateStageHotspot(0.5, 0.5);
       if (runtime.cur === 2) updateAtomDollPosition(0.5, 0.5);
+      if (runtime.cur === 2 || runtime.cur === 3) updateBraunHotspotPosition(0.5, 0.5);
+      if (runtime.cur === 3) updateStarsonHotspotPosition(0.5, 0.5);
     } else if (isLandscape) {
       runtime.platePanX = 0.5;
       const pVal = `50.0% ${(runtime.platePanY * 100).toFixed(1)}%`;
@@ -54,6 +58,8 @@ export function onLayoutOrOrientationChange() {
       if (dollyLayer) dollyLayer.style.setProperty('--pos', pVal);
       updateStageHotspot(0.5, runtime.platePanY);
       if (runtime.cur === 2) updateAtomDollPosition(0.5, runtime.platePanY);
+      if (runtime.cur === 2 || runtime.cur === 3) updateBraunHotspotPosition(0.5, runtime.platePanY);
+      if (runtime.cur === 3) updateStarsonHotspotPosition(0.5, runtime.platePanY);
     } else {
       runtime.platePanY = 0.5;
       const pVal = `${(runtime.platePanX * 100).toFixed(1)}% 50.0%`;
@@ -61,6 +67,8 @@ export function onLayoutOrOrientationChange() {
       if (dollyLayer) dollyLayer.style.setProperty('--pos', pVal);
       updateStageHotspot(runtime.platePanX, 0.5);
       if (runtime.cur === 2) updateAtomDollPosition(runtime.platePanX, 0.5);
+      if (runtime.cur === 2 || runtime.cur === 3) updateBraunHotspotPosition(runtime.platePanX, 0.5);
+      if (runtime.cur === 3) updateStarsonHotspotPosition(runtime.platePanX, 0.5);
     }
 
     if (runtime.cur === 0) {
@@ -69,6 +77,7 @@ export function onLayoutOrOrientationChange() {
       if (plate) plate.classList.add('is-end');
     }
   }
+  updateBraunVisibility();
   updateCreditBtnVisibility();
   updateCreditBtnPosition();
 }
@@ -116,6 +125,8 @@ export function initInputListeners() {
             if (dollyLayer) dollyLayer.style.setProperty('--pos', pVal);
             updateStageHotspot(0.5, runtime.platePanY);
             if (runtime.cur === 2) updateAtomDollPosition(0.5, runtime.platePanY);
+            if (runtime.cur === 2 || runtime.cur === 3) updateBraunHotspotPosition(0.5, runtime.platePanY);
+            if (runtime.cur === 3) updateStarsonHotspotPosition(0.5, runtime.platePanY);
             if (runtime.cur === 0) {
               seq.dirty = true;
               drawSeq();
@@ -129,6 +140,8 @@ export function initInputListeners() {
               if (dollyLayer) dollyLayer.style.setProperty('--pos', '50.0% 50.0%');
               updateStageHotspot(0.5, 0.5);
               if (runtime.cur === 2) updateAtomDollPosition(0.5, 0.5);
+              if (runtime.cur === 2 || runtime.cur === 3) updateBraunHotspotPosition(0.5, 0.5);
+              if (runtime.cur === 3) updateStarsonHotspotPosition(0.5, 0.5);
 
               if (runtime.cur === 0) {
                 const initQt = Math.min(0.90, 0.96 + e.deltaY / 2400);
@@ -157,6 +170,8 @@ export function initInputListeners() {
             if (dollyLayer) dollyLayer.style.setProperty('--pos', pVal);
             updateStageHotspot(runtime.platePanX, 0.5);
             if (runtime.cur === 2) updateAtomDollPosition(runtime.platePanX, 0.5);
+            if (runtime.cur === 2 || runtime.cur === 3) updateBraunHotspotPosition(runtime.platePanX, 0.5);
+            if (runtime.cur === 3) updateStarsonHotspotPosition(runtime.platePanX, 0.5);
             if (runtime.cur === 0) {
               seq.dirty = true;
               drawSeq();
@@ -192,7 +207,7 @@ export function initInputListeners() {
       touchStartY = null;
       return;
     }
-    const isBlockingUI = e.target.closest('.contactLayer, .cipherModal, .creditModal, .cipherHintModal, .lab__header, .lab__rail, .atomBubble, button');
+    const isBlockingUI = e.target.closest('.contactLayer, .cipherModal, .creditModal, .cipherHintModal, .lab__header, .lab__rail, .atomBubble, .braunHotspot, .braunModal, .ballHotspot, .starsonModal, button');
     if (isBlockingUI) {
       touchStartX = null;
       touchStartY = null;
@@ -258,6 +273,8 @@ export function initInputListeners() {
               if (dollyLayer) dollyLayer.style.setProperty('--pos', '50.0% 50.0%');
               updateStageHotspot(0.5, 0.5);
               if (runtime.cur === 2) updateAtomDollPosition(0.5, 0.5);
+              if (runtime.cur === 2 || runtime.cur === 3) updateBraunHotspotPosition(0.5, 0.5);
+              if (runtime.cur === 3) updateStarsonHotspotPosition(0.5, 0.5);
 
               touchStartY = y;
               touchStartX = x;
@@ -292,6 +309,8 @@ export function initInputListeners() {
             if (dollyLayer) dollyLayer.style.setProperty('--pos', pVal);
             updateStageHotspot(runtime.platePanX, 0.5);
             if (runtime.cur === 2) updateAtomDollPosition(runtime.platePanX, 0.5);
+            if (runtime.cur === 2 || runtime.cur === 3) updateBraunHotspotPosition(runtime.platePanX, 0.5);
+            if (runtime.cur === 3) updateStarsonHotspotPosition(runtime.platePanX, 0.5);
             if (runtime.cur === 0) {
               seq.dirty = true;
               drawSeq();
@@ -307,6 +326,8 @@ export function initInputListeners() {
               if (dollyLayer) dollyLayer.style.setProperty('--pos', '50.0% 50.0%');
               updateStageHotspot(0.5, 0.5);
               if (runtime.cur === 2) updateAtomDollPosition(0.5, 0.5);
+              if (runtime.cur === 2 || runtime.cur === 3) updateBraunHotspotPosition(0.5, 0.5);
+              if (runtime.cur === 3) updateStarsonHotspotPosition(0.5, 0.5);
 
               touchStartY = y;
               touchStartX = x;
@@ -353,7 +374,7 @@ export function initInputListeners() {
   stage.addEventListener('mousedown', e => {
     if (e.button !== 0) return;
     if (creditModal && !creditModal.hidden) return;
-    const isBlockingUI = e.target.closest('.contactLayer, .cipherModal, .creditModal, .cipherHintModal, .lab__header, .lab__rail, .atomBubble, button');
+    const isBlockingUI = e.target.closest('.contactLayer, .cipherModal, .creditModal, .cipherHintModal, .lab__header, .lab__rail, .atomBubble, .braunHotspot, .braunModal, .ballHotspot, .starsonModal, button');
     if (isBlockingUI) return;
 
     isMouseDown = true;
@@ -391,6 +412,8 @@ export function initInputListeners() {
             if (dollyLayer) dollyLayer.style.setProperty('--pos', pVal);
             updateStageHotspot(0.5, runtime.platePanY);
             if (runtime.cur === 2) updateAtomDollPosition(0.5, runtime.platePanY);
+            if (runtime.cur === 2 || runtime.cur === 3) updateBraunHotspotPosition(0.5, runtime.platePanY);
+            if (runtime.cur === 3) updateStarsonHotspotPosition(0.5, runtime.platePanY);
             if (runtime.cur === 0) { seq.dirty = true; drawSeq(); }
           }
         } else {
@@ -403,6 +426,8 @@ export function initInputListeners() {
             if (dollyLayer) dollyLayer.style.setProperty('--pos', pVal);
             updateStageHotspot(runtime.platePanX, 0.5);
             if (runtime.cur === 2) updateAtomDollPosition(runtime.platePanX, 0.5);
+            if (runtime.cur === 2 || runtime.cur === 3) updateBraunHotspotPosition(runtime.platePanX, 0.5);
+            if (runtime.cur === 3) updateStarsonHotspotPosition(runtime.platePanX, 0.5);
             if (runtime.cur === 0) { seq.dirty = true; drawSeq(); }
           }
         }

@@ -13,6 +13,8 @@ import { seqSize, seqLoad } from './lobby.js';
 import { syncHeroFrame } from './scrub-engine.js';
 import { initHotspotListeners } from './hotspots.js';
 import { initAtomListeners } from './atom.js';
+import { initBraunPlayer } from './braun-player.js';
+import { initStarsonPlayer } from './starson-player.js';
 import {
   initModalListeners, isSecretUnlocked, openCipherModal,
   resetViewportZoomAndScroll
@@ -26,6 +28,8 @@ export function initScene() {
   // Initialize modular subsystems
   initHotspotListeners();
   initAtomListeners();
+  initBraunPlayer();
+  initStarsonPlayer();
   initModalListeners();
   initInputListeners();
 

@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cormorant+Garamond:ital,wght@1,300;1,400&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="scene.css?v=134">
+  <link rel="stylesheet" href="scene.css?v=141">
 <script>
   // Immediate pre-paint detection of floor hash to suppress HERO flash
   (function() {
@@ -152,6 +152,95 @@
     <!-- 1F 静止画内メールアドレス直接クリック用ホットスポット -->
     <a class="emailHotspot" id="emailHotspot" href="mailto:vadbusting@gmail.com" title="vadbusting@gmail.com" aria-label="メールを送信" hidden></a>
 
+    <!-- B2F / B3F BRAUN オーディオ機器ホットスポット (完全透明・枠線・文字一切なし) -->
+    <a class="braunHotspot" id="braunHotspot" role="button" aria-label="BRAUN Audio System" tabindex="0" hidden></a>
+
+    <!-- B3F STARSON サッカーボール ホットスポット (完全透明・枠線・文字一切なし) -->
+    <a class="ballHotspot" id="ballHotspot" role="button" aria-label="STARSON Ball" tabindex="0" hidden></a>
+
+    <!-- BRAUN 2アルバム選択 & SoundCloud公式フローティングプレイヤー (画面左下・非ブロッキング・透過シック) -->
+    <div class="braunModal" id="braunModal" aria-label="Audio Player">
+      <div class="braunModal__dialog">
+        <!-- ステップ1: アルバム2枚選択ビュー -->
+        <div class="braunSelectView" id="braunSelectView">
+          <div class="braunSelectHeader">
+            <span class="braunSelectTitle">SELECT ALBUM</span>
+            <button type="button" class="braunCloseBtn" id="braunModalClose" aria-label="閉じる">✕</button>
+          </div>
+          <div class="braunAlbumList">
+            <button type="button" class="braunAlbumCard" data-album="noallies">
+              <div class="braunAlbumCard__cover">
+                <img src="assets/audio/no_allies_cover.jpg" alt="NO ALLIES" class="braunAlbumCard__img" draggable="false">
+              </div>
+              <div class="braunAlbumCard__info">
+                <span class="braunAlbumCard__title">NO ALLIES</span>
+                <span class="braunAlbumCard__meta">9 Tracks</span>
+              </div>
+            </button>
+            <button type="button" class="braunAlbumCard" data-album="paperscraps">
+              <div class="braunAlbumCard__cover">
+                <img src="assets/audio/paper_scraps_cover.jpg" alt="PAPER SCRAPS" class="braunAlbumCard__img" draggable="false">
+              </div>
+              <div class="braunAlbumCard__info">
+                <span class="braunAlbumCard__title">PAPER SCRAPS</span>
+                <span class="braunAlbumCard__meta">8 Tracks</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- ステップ2: 公式SoundCloudプレイヤービュー (事前プリロード・即時自動再生対応) -->
+        <div class="braunPlayerView is-hidden" id="braunPlayerView">
+          <div class="braunPlayerHeader">
+            <button type="button" class="braunBackBtn" id="braunBackBtn">← ALBUMS</button>
+            <span class="braunCurrentAlbum" id="braunCurrentAlbum">NO ALLIES</span>
+            <button type="button" class="braunCloseBtn" id="braunPlayerClose" aria-label="閉じる">✕</button>
+          </div>
+          <div class="braunIframeWrap">
+            <iframe id="braunIframeNoAllies"
+              class="braunIframe"
+              width="100%"
+              height="600"
+              scrolling="no"
+              frameborder="no"
+              allow="autoplay; encrypted-media"
+              src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/jugend-34903360/sets/noallies&color=%23111111&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false">
+            </iframe>
+            <iframe id="braunIframePaperScraps"
+              class="braunIframe is-hidden"
+              width="100%"
+              height="600"
+              scrolling="no"
+              frameborder="no"
+              allow="autoplay; encrypted-media"
+              src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/jugend-34903360/sets/paperscraps&color=%23111111&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false">
+            </iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STARSON YouTube フローティングプレイヤー (50%透過ダークシック・ドラッグ移動対応) -->
+    <div class="starsonModal" id="starsonModal" hidden aria-label="STARSON Video Player">
+      <div class="starsonModal__dialog">
+        <div class="starsonHeader">
+          <span class="starsonTitle">STARSON</span>
+          <button type="button" class="braunCloseBtn" id="starsonModalClose" aria-label="閉じる">✕</button>
+        </div>
+        <div class="starsonIframeWrap">
+          <iframe id="starsonIframe"
+            width="100%"
+            height="100%"
+            src=""
+            title="STARSON"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+            allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+    </div>
+
     <!-- 制作クレジット ポップアップモーダル -->
     <div class="creditModal" id="creditModal" hidden aria-modal="true" role="dialog" aria-label="制作クレジット">
       <div class="creditModal__backdrop" id="creditModalBackdrop"></div>
@@ -209,6 +298,8 @@
     </aside>
   </div>
 </main>
-<script type="module" src="scene.js?v=134"></script>
+<script src="https://w.soundcloud.com/player/api.js" defer></script>
+<script src="https://www.youtube.com/iframe_api" defer></script>
+<script type="module" src="scene.js?v=144"></script>
 </body>
 </html>

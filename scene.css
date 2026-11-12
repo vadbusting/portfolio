@@ -1967,3 +1967,423 @@ body.cipher-locked canvas {
 .lab__portal {
   left: max(clamp(20px, 3.8vw, 64px), var(--sa-l));
 }
+
+/* ==========================================================================
+   BRAUN Audio Console & Floor Hotspot (B2F / B3F)
+   Ultra-minimalist: invisible hitbox (no borders/tooltips), 2-album chooser,
+   and compact official SoundCloud embed player (50% translucent chic).
+   ========================================================================== */
+.braunHotspot {
+  position: absolute;
+  z-index: 45;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+  user-select: none !important;
+}
+
+/* --- BRAUN Floating Audio Dock (フロア表示・レールと完全同一の50%透過ダークシック・角丸なし・影なし) --- */
+.braunModal {
+  position: fixed;
+  left: clamp(20px, 3.8vw, 64px);
+  bottom: clamp(20px, 3.8vw, 48px);
+  z-index: 85;
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+  width: 290px;
+  max-width: calc(100vw - 32px);
+}
+
+.braunModal.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* 背景オーバーレイは完全に非表示・非遮断 */
+.braunModal__backdrop {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+.braunModal__dialog {
+  position: relative;
+  width: 100%;
+  background: rgba(18, 18, 18, 0.5) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.braunSelectHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 8px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.braunSelectTitle {
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  color: #ffffff;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.braunCloseBtn {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  padding: 2px 6px !important;
+  cursor: pointer !important;
+  transition: color 0.2s ease !important;
+}
+
+.braunCloseBtn:hover {
+  color: #ffffff !important;
+}
+
+/* View 1: Album List */
+.braunAlbumList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.braunAlbumCard {
+  background: rgba(18, 18, 18, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-left: 2px solid transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 8px 10px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px !important;
+  cursor: pointer !important;
+  transition: background 0.25s, border-left-color 0.2s !important;
+  text-align: left !important;
+  user-select: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.braunAlbumCard:hover,
+.braunAlbumCard:focus-visible {
+  background: rgba(48, 48, 52, 0.5) !important;
+  border-left-color: #ffffff !important;
+}
+
+.braunAlbumCard__cover {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: hidden;
+  background: #000;
+}
+
+.braunAlbumCard__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.braunAlbumCard__info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.braunAlbumCard__title {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.braunAlbumCard__meta {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+
+/* View 2: Player Header & Iframe Tracklist */
+.braunPlayerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 8px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.braunModal.is-dragging,
+.braunModal.is-dragging .braunSelectHeader,
+.braunModal.is-dragging .braunPlayerHeader {
+  cursor: grabbing !important;
+}
+
+.braunBackBtn {
+  background: rgba(18, 18, 18, 0.5) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  font-size: 9.5px !important;
+  letter-spacing: 0.16em !important;
+  cursor: pointer !important;
+  padding: 4px 8px !important;
+  transition: background 0.2s ease !important;
+  line-height: 1 !important;
+}
+
+.braunBackBtn:hover {
+  background: rgba(48, 48, 52, 0.5) !important;
+}
+
+.braunCurrentAlbum {
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+  text-transform: uppercase;
+}
+
+.braunSelectView,
+.braunPlayerView {
+  width: 100%;
+  transition: opacity 0.2s ease;
+}
+
+.braunSelectView.is-hidden,
+.braunPlayerView.is-hidden {
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.braunIframeWrap {
+  width: 100%;
+  height: 275px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: #000;
+}
+
+.braunIframe {
+  width: 100%;
+  height: 600px;
+  margin-top: -168px;
+  border: none;
+  border-radius: 0 !important;
+  display: block;
+}
+
+.braunIframe.is-hidden {
+  position: absolute !important;
+  left: -9999px !important;
+  top: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Mobile & Tablet adjustments */
+@media (max-width: 780px) {
+  .braunModal {
+    left: 16px;
+    bottom: 16px;
+    width: min(290px, calc(100vw - 32px)) !important;
+  }
+  .braunIframeWrap {
+    height: min(275px, calc(100vh - 120px));
+  }
+}
+
+@media (max-height: 560px) and (orientation: landscape) {
+  .braunModal {
+    left: max(16px, var(--sa-l));
+    bottom: max(12px, var(--sa-b));
+    width: 260px !important;
+  }
+  .braunModal__dialog {
+    padding: 8px;
+  }
+  .braunAlbumCard {
+    padding: 6px 8px !important;
+    gap: 8px !important;
+  }
+  .braunAlbumCard__cover {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+  }
+  .braunIframeWrap {
+    height: min(200px, calc(100vh - 80px));
+  }
+}
+
+/* --- B3F STARSON Ball Hotspot --- */
+.ballHotspot {
+  position: absolute;
+  z-index: 60;
+  cursor: pointer;
+  border-radius: 50%;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
+}
+
+/* --- STARSON YouTube Floating Modal (50%透過ダークシック・角丸なし・影なし・ドラッグ可能) --- */
+.starsonModal {
+  position: fixed;
+  left: clamp(140px, 14vw, 260px);
+  bottom: clamp(220px, 28vh, 340px);
+  z-index: 86;
+  display: block;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  width: clamp(440px, 36vw, 580px);
+  max-width: calc(100vw - 32px);
+  touch-action: none;
+  user-select: none;
+}
+
+.starsonModal.is-active {
+  opacity: 1;
+}
+
+.starsonModal__dialog {
+  position: relative;
+  width: 100%;
+  background: rgba(18, 18, 18, 0.5) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.starsonHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 8px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.starsonModal.is-dragging,
+.starsonModal.is-dragging .starsonHeader {
+  cursor: grabbing !important;
+}
+
+.starsonTitle {
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.starsonIframeWrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: #000;
+  overflow: hidden;
+}
+
+.starsonIframeWrap iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+@media (max-width: 780px) {
+  .starsonModal {
+    left: 16px;
+    top: max(76px, var(--sa-t, 76px));
+    bottom: auto;
+    width: min(360px, calc(100vw - 32px));
+  }
+}
+
+@media (max-height: 560px) and (orientation: landscape) {
+  .starsonModal {
+    right: max(16px, var(--sa-r, 16px));
+    left: auto;
+    top: max(12px, var(--sa-t, 12px));
+    bottom: auto;
+    width: min(340px, 50vw);
+  }
+  .starsonModal__dialog {
+    padding: 8px;
+  }
+}
+

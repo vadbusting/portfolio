@@ -34,6 +34,10 @@ export const runtime = {
     updateCreditBtnVisibility: null,
     updateStageHotspot: null,
     updateAtomDollPosition: null,
+    updateBraunVisibility: null,
+    updateBraunHotspotPosition: null,
+    updateStarsonVisibility: null,
+    updateStarsonHotspotPosition: null,
     drawSeq: null,
     seq: null
   }
@@ -59,6 +63,7 @@ export function setState(s) {
   }
   if (runtime.callbacks.updateAtomVisibility) runtime.callbacks.updateAtomVisibility();
   if (runtime.callbacks.updateCreditBtnVisibility) runtime.callbacks.updateCreditBtnVisibility();
+  if (runtime.callbacks.updateBraunVisibility) runtime.callbacks.updateBraunVisibility();
 }
 
 export function setDip(on) {
@@ -83,6 +88,8 @@ export function resetPlatePan() {
   if (dollyLayer) dollyLayer.style.setProperty('--pos', posVal);
   if (runtime.callbacks.updateStageHotspot) runtime.callbacks.updateStageHotspot();
   if (runtime.callbacks.updateAtomDollPosition) runtime.callbacks.updateAtomDollPosition();
+  if (runtime.callbacks.updateBraunHotspotPosition) runtime.callbacks.updateBraunHotspotPosition();
+  if (runtime.callbacks.updateStarsonHotspotPosition) runtime.callbacks.updateStarsonHotspotPosition();
   if (runtime.callbacks.seq && runtime.cur === 0) {
     runtime.callbacks.seq.dirty = true;
     if (runtime.callbacks.drawSeq) runtime.callbacks.drawSeq();

@@ -137,6 +137,8 @@ export function floorLoop(now) {
     if (runtime.callbacks.updateStageHotspot) runtime.callbacks.updateStageHotspot();
     if (runtime.callbacks.updateCreditBtnVisibility) runtime.callbacks.updateCreditBtnVisibility();
     if (runtime.callbacks.updateAtomVisibility) runtime.callbacks.updateAtomVisibility();
+    if (runtime.callbacks.updateBraunVisibility) runtime.callbacks.updateBraunVisibility();
+    if (runtime.callbacks.updateStarsonVisibility) runtime.callbacks.updateStarsonVisibility();
   }
 
   const panX = 0.5 + (runtime.platePanX - 0.5) * clamp01(runtime.floorQ);
@@ -169,6 +171,8 @@ export function floorLoop(now) {
     if (stage) stage.classList.remove('is-waiting-scroll');
     if (runtime.callbacks.updateCreditBtnVisibility) runtime.callbacks.updateCreditBtnVisibility();
     if (runtime.callbacks.updateAtomVisibility) runtime.callbacks.updateAtomVisibility();
+    if (runtime.callbacks.updateBraunVisibility) runtime.callbacks.updateBraunVisibility();
+    if (runtime.callbacks.updateStarsonVisibility) runtime.callbacks.updateStarsonVisibility();
     runtime.floorRaf = 0;
     if (runtime.callbacks.arrive) runtime.callbacks.arrive(runtime.cur, runtime.token);
     return;
@@ -191,6 +195,8 @@ export function floorLoop(now) {
     if (runtime.callbacks.updateStageHotspot) runtime.callbacks.updateStageHotspot();
     if (runtime.callbacks.updateCreditBtnVisibility) runtime.callbacks.updateCreditBtnVisibility();
     if (runtime.callbacks.updateAtomVisibility) runtime.callbacks.updateAtomVisibility();
+    if (runtime.callbacks.updateBraunVisibility) runtime.callbacks.updateBraunVisibility();
+    if (runtime.callbacks.updateStarsonVisibility) runtime.callbacks.updateStarsonVisibility();
     runtime.floorRaf = 0;
     return;
   }
