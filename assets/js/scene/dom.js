@@ -67,4 +67,4 @@ export const braunIframe = $('braunIframe');
 export const ballHotspot = $('ballHotspot');
 export const starsonModal = $('starsonModal');
 export const starsonModalClose = $('starsonModalClose');
-export const starsonIframe = $('starsonIframe');
+export const starsonIframeWrap = $('starsonIframeWrap');

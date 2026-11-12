@@ -16,34 +16,7 @@ const BALL_COORDS = Object.freeze({
   h: 175 / MASTER_H
 });
 
-const YOUTUBE_URL = 'https://www.youtube.com/embed/jDQskNZH074?autoplay=1&rel=0&enablejsapi=1&vq=hd1080&playsinline=1';
-
-let ytPlayer = null;
-
-function initYtPlayer() {
-  if (window.YT && window.YT.Player && !ytPlayer) {
-    try {
-      ytPlayer = new window.YT.Player('starsonIframe', {
-        events: {
-          onReady: (event) => {
-            try {
-              event.target.setPlaybackQuality('hd1080');
-              event.target.setPlaybackQuality('highres');
-            } catch (_) {}
-          },
-          onStateChange: (event) => {
-            if (window.YT && window.YT.PlayerState && event.data === window.YT.PlayerState.PLAYING) {
-              try {
-                event.target.setPlaybackQuality('hd1080');
-                event.target.setPlaybackQuality('highres');
-              } catch (_) {}
-            }
-          }
-        }
-      });
-    } catch (_) {}
-  }
-}
+const YOUTUBE_URL = 'https://www.youtube.com/embed/jDQskNZH074?autoplay=1&rel=0&playsinline=1';
 
 export function updateStarsonHotspotPosition(px = runtime.platePanX, py = runtime.platePanY) {
   const hotspot = $('ballHotspot');
@@ -72,14 +45,10 @@ export function updateStarsonHotspotPosition(px = runtime.platePanX, py = runtim
 }
 
 export function stopStarsonVideo() {
-  if (ytPlayer && ytPlayer.stopVideo) {
-    try { ytPlayer.stopVideo(); } catch (_) {}
+  const wrap = $('starsonIframeWrap');
+  if (wrap) {
+    wrap.innerHTML = '';
   }
-  const iframe = $('starsonIframe');
-  if (iframe && iframe.src) {
-    iframe.src = '';
-  }
-  ytPlayer = null;
   const modal = $('starsonModal');
   if (modal && !modal.hidden) {
     modal.hidden = true;
@@ -89,7 +58,7 @@ export function stopStarsonVideo() {
 
 export function openStarsonModal() {
   const modal = $('starsonModal');
-  const iframe = $('starsonIframe');
+  const wrap = $('starsonIframeWrap');
   if (!modal) return;
 
   // Clear any inline drag coordinates on mobile so CSS media queries control placement
@@ -100,12 +69,20 @@ export function openStarsonModal() {
     modal.style.bottom = '';
   }
 
-  if (iframe) {
-    if (!iframe.src || iframe.src === 'about:blank' || iframe.src === window.location.href) {
-      iframe.src = YOUTUBE_URL;
-    }
-    setTimeout(initYtPlayer, 400);
+  if (wrap && !wrap.querySelector('iframe')) {
+    const iframe = document.createElement('iframe');
+    iframe.id = 'starsonIframe';
+    iframe.className = 'starsonIframe';
+    iframe.width = '100%';
+    iframe.height = '100%';
+    iframe.src = YOUTUBE_URL;
+    iframe.title = 'STARSON';
+    iframe.frameBorder = '0';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen';
+    iframe.allowFullscreen = true;
+    wrap.appendChild(iframe);
   }
+
   modal.hidden = false;
   void modal.offsetWidth;
   modal.classList.add('is-active');
@@ -119,7 +96,7 @@ export function updateStarsonVisibility() {
   const hotspot = $('ballHotspot');
   if (!hotspot) return;
 
-  const isB3 = runtime.state === 'floor' && runtime.cur === 3 && plate && plate.classList.contains('is-end');
+  const isB3 = runtime.state === 'floor' && runtime.cur === 3;
 
   if (isB3) {
     hotspot.hidden = false;
@@ -181,18 +158,6 @@ export function initStarsonPlayer() {
       }
     }
   });
-
-  const forceHd = () => {
-    if (ytPlayer && ytPlayer.setPlaybackQuality) {
-      try {
-        ytPlayer.setPlaybackQuality('hd1080');
-        ytPlayer.setPlaybackQuality('highres');
-      } catch (_) {}
-    }
-  };
-
-  document.addEventListener('fullscreenchange', forceHd);
-  document.addEventListener('webkitfullscreenchange', forceHd);
 
   updateStarsonVisibility();
 }
