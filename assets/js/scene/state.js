@@ -64,6 +64,7 @@ export function setState(s) {
   if (runtime.callbacks.updateAtomVisibility) runtime.callbacks.updateAtomVisibility();
   if (runtime.callbacks.updateCreditBtnVisibility) runtime.callbacks.updateCreditBtnVisibility();
   if (runtime.callbacks.updateBraunVisibility) runtime.callbacks.updateBraunVisibility();
+  if (runtime.callbacks.updateStarsonVisibility) runtime.callbacks.updateStarsonVisibility();
 }
 
 export function setDip(on) {

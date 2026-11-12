@@ -2368,9 +2368,12 @@ body.cipher-locked canvas {
 @media (max-width: 780px) {
   .starsonModal {
     left: 16px;
+    right: 16px;
+    margin: 0 auto;
     top: max(76px, var(--sa-t, 76px));
     bottom: auto;
     width: min(360px, calc(100vw - 32px));
+    max-width: calc(100vw - 32px);
   }
 }
 

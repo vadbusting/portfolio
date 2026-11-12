@@ -217,9 +217,15 @@ export function initBraunPlayer() {
   const backBtn = $('braunBackBtn');
 
   if (hotspot) {
+    let lastTriggerTime = 0;
     const handleTrigger = (e) => {
-      e.stopPropagation();
-      e.preventDefault();
+      const now = performance.now();
+      if (now - lastTriggerTime < 450) return;
+      lastTriggerTime = now;
+      if (e) {
+        e.stopPropagation();
+        if (e.cancelable) e.preventDefault();
+      }
       const modal = $('braunModal');
       if (modal && !modal.hidden && modal.classList.contains('is-active')) {
         closeBraunModal();
@@ -233,7 +239,7 @@ export function initBraunPlayer() {
         return;
       }
       handleTrigger(e);
-    });
+    }, { passive: false });
   }
 
   // Album card clicks

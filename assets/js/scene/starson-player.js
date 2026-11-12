@@ -16,7 +16,7 @@ const BALL_COORDS = Object.freeze({
   h: 175 / MASTER_H
 });
 
-const YOUTUBE_URL = 'https://www.youtube.com/embed/jDQskNZH074?rel=0&enablejsapi=1&vq=hd1080&playsinline=1';
+const YOUTUBE_URL = 'https://www.youtube.com/embed/jDQskNZH074?autoplay=1&rel=0&enablejsapi=1&vq=hd1080&playsinline=1';
 
 let ytPlayer = null;
 
@@ -50,10 +50,25 @@ export function updateStarsonHotspotPosition(px = runtime.platePanX, py = runtim
   if (!hotspot || runtime.cur !== 3) return;
 
   const cover = getCoverRect(MASTER_W, MASTER_H, window.innerWidth, window.innerHeight, px, py);
-  hotspot.style.left = `${cover.offsetX + BALL_COORDS.x * cover.renderW}px`;
-  hotspot.style.top = `${cover.offsetY + BALL_COORDS.y * cover.renderH}px`;
-  hotspot.style.width = `${BALL_COORDS.w * cover.renderW}px`;
-  hotspot.style.height = `${BALL_COORDS.h * cover.renderH}px`;
+  let left = cover.offsetX + BALL_COORDS.x * cover.renderW;
+  let top = cover.offsetY + BALL_COORDS.y * cover.renderH;
+  let width = BALL_COORDS.w * cover.renderW;
+  let height = BALL_COORDS.h * cover.renderH;
+
+  const isMobilePortrait = window.innerWidth <= 780 && window.innerHeight > window.innerWidth;
+  if (isMobilePortrait) {
+    const minTouchSize = 64;
+    width = Math.max(width, minTouchSize);
+    height = Math.max(height, minTouchSize);
+    // Keep touch target on-screen on narrow mobile portrait
+    left = Math.max(16, Math.min(left, window.innerWidth - width - 16));
+    top = Math.max(90, Math.min(top, window.innerHeight - height - 120));
+  }
+
+  hotspot.style.left = `${left}px`;
+  hotspot.style.top = `${top}px`;
+  hotspot.style.width = `${width}px`;
+  hotspot.style.height = `${height}px`;
 }
 
 export function stopStarsonVideo() {
@@ -76,6 +91,14 @@ export function openStarsonModal() {
   const modal = $('starsonModal');
   const iframe = $('starsonIframe');
   if (!modal) return;
+
+  // Clear any inline drag coordinates on mobile so CSS media queries control placement
+  if (window.innerWidth <= 780 || (window.matchMedia && window.matchMedia('(max-width: 1024px) and (orientation: portrait)').matches)) {
+    modal.style.left = '';
+    modal.style.top = '';
+    modal.style.right = '';
+    modal.style.bottom = '';
+  }
 
   if (iframe) {
     if (!iframe.src || iframe.src === 'about:blank' || iframe.src === window.location.href) {
@@ -116,9 +139,15 @@ export function initStarsonPlayer() {
   const modal = $('starsonModal');
 
   if (hotspot) {
+    let lastTriggerTime = 0;
     const handleTrigger = (e) => {
-      e.stopPropagation();
-      e.preventDefault();
+      const now = performance.now();
+      if (now - lastTriggerTime < 450) return;
+      lastTriggerTime = now;
+      if (e) {
+        e.stopPropagation();
+        if (e.cancelable) e.preventDefault();
+      }
       if (modal && !modal.hidden && modal.classList.contains('is-active')) {
         closeStarsonModal();
       } else {
@@ -131,7 +160,7 @@ export function initStarsonPlayer() {
         return;
       }
       handleTrigger(e);
-    });
+    }, { passive: false });
   }
 
   if (closeBtn) {

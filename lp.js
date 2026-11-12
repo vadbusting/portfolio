@@ -2,7 +2,8 @@
 function scrollToSection(targetId) {
   const targetElement = document.querySelector(targetId);
   if (targetElement) {
-    const offset = 60; // Fixed Header offset
+    const isMobilePortrait = window.matchMedia('(max-width: 1024px) and (orientation: portrait)').matches;
+    const offset = isMobilePortrait ? 52 : 60; // Mobile: 52px tab bar offset, Desktop: 60px header offset
     const elementPosition = targetElement.getBoundingClientRect().top;
     const offsetPosition = elementPosition + window.scrollY - offset;
     window.scrollTo({
