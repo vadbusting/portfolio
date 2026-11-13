@@ -2,6 +2,7 @@
  * TESHIMA LAB Portfolio — Dual Scrub Engine
  * Handles frame-accurate video scrubbing for Hero entrance and Floor dolly-in.
  */
+import { FLOORS, PATH } from './config.js';
 import { heroVideo, dolly, stage, plate, plateB, dollyLayer, scrollCue } from './dom.js';
 import { runtime, clamp01, canVideo } from './state.js';
 import { updateCenotaphByTime } from './cenotaph.js';
@@ -139,6 +140,7 @@ export function floorLoop(now) {
     if (runtime.callbacks.updateAtomVisibility) runtime.callbacks.updateAtomVisibility();
     if (runtime.callbacks.updateBraunVisibility) runtime.callbacks.updateBraunVisibility();
     if (runtime.callbacks.updateStarsonVisibility) runtime.callbacks.updateStarsonVisibility();
+    if (runtime.callbacks.updateSecretHotspots) runtime.callbacks.updateSecretHotspots();
   }
 
   const panX = 0.5 + (runtime.platePanX - 0.5) * clamp01(runtime.floorQ);
@@ -173,6 +175,7 @@ export function floorLoop(now) {
     if (runtime.callbacks.updateAtomVisibility) runtime.callbacks.updateAtomVisibility();
     if (runtime.callbacks.updateBraunVisibility) runtime.callbacks.updateBraunVisibility();
     if (runtime.callbacks.updateStarsonVisibility) runtime.callbacks.updateStarsonVisibility();
+    if (runtime.callbacks.updateSecretHotspots) runtime.callbacks.updateSecretHotspots();
     runtime.floorRaf = 0;
     if (runtime.callbacks.arrive) runtime.callbacks.arrive(runtime.cur, runtime.token);
     return;
@@ -197,6 +200,7 @@ export function floorLoop(now) {
     if (runtime.callbacks.updateAtomVisibility) runtime.callbacks.updateAtomVisibility();
     if (runtime.callbacks.updateBraunVisibility) runtime.callbacks.updateBraunVisibility();
     if (runtime.callbacks.updateStarsonVisibility) runtime.callbacks.updateStarsonVisibility();
+    if (runtime.callbacks.updateSecretHotspots) runtime.callbacks.updateSecretHotspots();
     runtime.floorRaf = 0;
     return;
   }
@@ -244,6 +248,12 @@ if (dolly) {
   dolly.addEventListener('error', () => {
     const s = dolly.currentSrc || dolly.getAttribute('src');
     if (!s || s === window.location.href || s === 'about:blank') return;
+    if (dolly.error && dolly.error.code === 1) return;
+    if (s.startsWith('blob:') && runtime.cur >= 1 && FLOORS[runtime.cur]) {
+      dolly.src = PATH.dolly(FLOORS[runtime.cur].key);
+      dolly.load();
+      return;
+    }
     runtime.videoBroken = true;
     if (stage) stage.classList.add('is-video-fallback');
     if (plate) plate.classList.remove('no-fade');
@@ -272,7 +282,13 @@ if (heroVideo) {
   heroVideo.addEventListener('error', () => {
     const s = heroVideo.currentSrc || heroVideo.getAttribute('src');
     if (!s || s === window.location.href || s === 'about:blank') return;
-    runtime.videoBroken = true;
+    if (heroVideo.error && heroVideo.error.code === 1) return;
+    if (s.startsWith('blob:')) {
+      heroVideo.src = PATH.heroVideo;
+      heroVideo.load();
+      return;
+    }
+    runtime.heroBroken = true;
     if (stage) stage.classList.add('is-hero-fallback');
   });
   if (heroVideo.readyState >= 1) {

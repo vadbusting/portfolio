@@ -1380,6 +1380,16 @@ body.cipher-locked canvas {
   background: rgba(255, 0, 85, 0.35) !important;
   box-shadow: 0 0 16px rgba(255, 0, 85, 0.6) !important;
 }
+.stage.is-debug-hotspots .jacketHotspot {
+  outline: 2px solid #00ff88 !important;
+  background: rgba(0, 255, 136, 0.25) !important;
+  box-shadow: 0 0 16px rgba(0, 255, 136, 0.5) !important;
+}
+.stage.is-debug-hotspots .hatHotspot {
+  outline: 2px solid #ffcc00 !important;
+  background: rgba(255, 204, 0, 0.25) !important;
+  box-shadow: 0 0 16px rgba(255, 204, 0, 0.5) !important;
+}
 
 /* --- 認証ヒント ポップアップモーダル (HAL 9000 SEARCH FOR CLUES) --- */
 .cipherHintModal {
@@ -2285,6 +2295,31 @@ body.cipher-locked canvas {
   outline: none !important;
   -webkit-tap-highlight-color: transparent;
   pointer-events: auto;
+}
+
+/* --- B???F JUGEND TECHNOKRAT Down Jacket & Hat Hotspots (隠しギミック・マウス変化なし) --- */
+.jacketHotspot,
+.hatHotspot {
+  position: absolute;
+  z-index: 60;
+  cursor: default !important;
+  pointer-events: auto !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+  user-select: none !important;
+}
+.hatHotspot {
+  border-radius: 50% !important;
+}
+.jacketHotspot[hidden],
+.hatHotspot[hidden] {
+  display: none !important;
+  pointer-events: none !important;
 }
 
 /* --- STARSON YouTube Floating Modal (50%透過ダークシック・角丸なし・影なし・ドラッグ可能) --- */

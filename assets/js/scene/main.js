@@ -15,6 +15,7 @@ import { initHotspotListeners } from './hotspots.js';
 import { initAtomListeners } from './atom.js';
 import { initBraunPlayer } from './braun-player.js';
 import { initStarsonPlayer } from './starson-player.js';
+import { initSecretHotspots } from './secret-b5.js';
 import {
   initModalListeners, isSecretUnlocked, openCipherModal,
   resetViewportZoomAndScroll
@@ -30,6 +31,7 @@ export function initScene() {
   initAtomListeners();
   initBraunPlayer();
   initStarsonPlayer();
+  initSecretHotspots();
   initModalListeners();
   initInputListeners();
 

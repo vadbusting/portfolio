@@ -31,6 +31,8 @@ if (plateA && plate) {
 // Interactive Layers
 export const stageHotspot = $('stageHotspot');
 export const emailHotspot = $('emailHotspot');
+export const jacketHotspot = $('jacketHotspot');
+export const hatHotspot = $('hatHotspot');
 export const headerCreditBtn = $('headerCreditBtn');
 export const creditModal = $('creditModal');
 export const creditModalClose = $('creditModalClose');

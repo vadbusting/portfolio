@@ -55,4 +55,4 @@ export const AUTH_CONFIG = Object.freeze({
   EXPIRATION_MS: 30 * 24 * 60 * 60 * 1000 // 30 days
 });
 
-export const MAX_BLOB_CACHE = 2;
+export const MAX_BLOB_CACHE = Device.isMobileOrTablet() ? 3 : 6;

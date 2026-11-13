@@ -166,6 +166,7 @@ export function arriveLobbyEnd() {
   updateAtomVisibility();
   updateBraunVisibility();
   updateStarsonVisibility();
+  if (runtime.callbacks.updateSecretHotspots) runtime.callbacks.updateSecretHotspots();
   if (scrollCue) scrollCue.classList.add('is-hidden');
   const stage = document.getElementById('stage');
   if (stage) stage.classList.remove('is-waiting-scroll');
@@ -240,6 +241,7 @@ export async function goFloor(i, opts = {}) {
 
   const stage = document.getElementById('stage');
   const reset = () => {
+    runtime.videoBroken = false;
     setPos(f);
     resetPlatePan();
     if (plate) {
@@ -255,7 +257,6 @@ export async function goFloor(i, opts = {}) {
         const dollyUrl = PATH.dolly(f.key);
         dolly.src = getVideoSrc(dollyUrl);
         dolly.load();
-        preloadVideoBlob(dollyUrl);
         const syncDollyFrame = () => {
           try {
             dolly.pause();
@@ -279,6 +280,7 @@ export async function goFloor(i, opts = {}) {
     updateAtomVisibility();
     updateBraunVisibility();
     updateStarsonVisibility();
+    if (runtime.callbacks.updateSecretHotspots) runtime.callbacks.updateSecretHotspots();
   };
 
   const loadPlates = () => Promise.all([
@@ -338,6 +340,7 @@ export function arrive(i, t) {
   updateAtomVisibility();
   updateBraunVisibility();
   updateStarsonVisibility();
+  if (runtime.callbacks.updateSecretHotspots) runtime.callbacks.updateSecretHotspots();
   updateStageHotspot();
   updateCreditBtnVisibility();
   if (runtime.usedKeyboard && portalLink) {

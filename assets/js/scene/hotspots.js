@@ -105,6 +105,7 @@ export function hidePortal() {
   }
   if (portalLink) portalLink.tabIndex = -1;
   if (stageHotspot) stageHotspot.hidden = true;
+  if (runtime.callbacks.updateSecretHotspots) runtime.callbacks.updateSecretHotspots();
 }
 
 runtime.callbacks.hidePortal = hidePortal;
@@ -155,5 +156,4 @@ export function initHotspotListeners() {
       }
       e.stopPropagation();
     });
-  }
-}
+  }}

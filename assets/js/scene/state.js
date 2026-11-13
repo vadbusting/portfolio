@@ -18,6 +18,7 @@ export const runtime = {
   isTouchDragging: false,
   lastDragTime: 0,
   videoBroken: false,
+  heroBroken: false,
   heroUnlocking: false,
   heroUnlocked: false,
   heroQ: 0,
@@ -38,6 +39,7 @@ export const runtime = {
     updateBraunHotspotPosition: null,
     updateStarsonVisibility: null,
     updateStarsonHotspotPosition: null,
+    updateSecretHotspots: null,
     drawSeq: null,
     seq: null
   }
@@ -65,6 +67,7 @@ export function setState(s) {
   if (runtime.callbacks.updateCreditBtnVisibility) runtime.callbacks.updateCreditBtnVisibility();
   if (runtime.callbacks.updateBraunVisibility) runtime.callbacks.updateBraunVisibility();
   if (runtime.callbacks.updateStarsonVisibility) runtime.callbacks.updateStarsonVisibility();
+  if (runtime.callbacks.updateSecretHotspots) runtime.callbacks.updateSecretHotspots();
 }
 
 export function setDip(on) {
@@ -91,6 +94,7 @@ export function resetPlatePan() {
   if (runtime.callbacks.updateAtomDollPosition) runtime.callbacks.updateAtomDollPosition();
   if (runtime.callbacks.updateBraunHotspotPosition) runtime.callbacks.updateBraunHotspotPosition();
   if (runtime.callbacks.updateStarsonHotspotPosition) runtime.callbacks.updateStarsonHotspotPosition();
+  if (runtime.callbacks.updateSecretHotspots) runtime.callbacks.updateSecretHotspots();
   if (runtime.callbacks.seq && runtime.cur === 0) {
     runtime.callbacks.seq.dirty = true;
     if (runtime.callbacks.drawSeq) runtime.callbacks.drawSeq();
