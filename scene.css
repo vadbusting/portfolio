@@ -1976,7 +1976,7 @@ body.cipher-locked canvas {
 .braunHotspot {
   position: absolute;
   z-index: 45;
-  cursor: pointer !important;
+  cursor: default !important;
   pointer-events: auto !important;
   background: transparent !important;
   border: none !important;
@@ -2278,7 +2278,7 @@ body.cipher-locked canvas {
 .ballHotspot {
   position: absolute;
   z-index: 60;
-  cursor: pointer;
+  cursor: default !important;
   border-radius: 50%;
   background: transparent !important;
   border: none !important;
