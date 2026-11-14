@@ -124,20 +124,23 @@ export const setPos = (f) => {
 
 export function initHotspotListeners() {
   if (stageHotspot) {
+    let lastStageClick = 0;
     stageHotspot.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       if (runtime.isTouchDragging || (performance.now() - runtime.lastDragTime < 350)) {
-        e.preventDefault();
-        e.stopPropagation();
         runtime.isTouchDragging = false;
         return;
       }
-      e.stopPropagation();
+      const now = performance.now();
+      if (now - lastStageClick < 600) return;
+      lastStageClick = now;
       if (runtime.cur >= 0) {
         const f = FLOORS[runtime.cur];
         if (f && f.href) {
           const targetHref = f.href;
           if (f.external) {
-            window.open(targetHref, '_blank', 'noopener noreferrer');
+            window.open(targetHref, '_blank', 'noopener,noreferrer');
           } else {
             location.href = targetHref;
           }

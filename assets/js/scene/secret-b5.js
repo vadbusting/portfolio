@@ -102,15 +102,18 @@ export function initSecretHotspots() {
 
   // Hat trigger: Pinterest (unchanged)
   if (hat) {
+    hat.removeAttribute('href');
+    hat.removeAttribute('target');
+    hat.removeAttribute('rel');
     let lastHatTrigger = 0;
     const triggerHat = (e) => {
-      const now = performance.now();
-      if (now - lastHatTrigger < 800) return;
-      lastHatTrigger = now;
       if (e) {
         e.stopPropagation();
         if (e.cancelable) e.preventDefault();
       }
+      const now = performance.now();
+      if (now - lastHatTrigger < 800) return;
+      lastHatTrigger = now;
       window.open(HAT_URL, '_blank', 'noopener,noreferrer');
     };
 
@@ -133,13 +136,13 @@ export function initSecretHotspots() {
   if (jacket) {
     let lastJacketTrigger = 0;
     const triggerJacket = (e) => {
-      const now = performance.now();
-      if (now - lastJacketTrigger < 500) return;
-      lastJacketTrigger = now;
       if (e) {
         e.stopPropagation();
         if (e.cancelable) e.preventDefault();
       }
+      const now = performance.now();
+      if (now - lastJacketTrigger < 500) return;
+      lastJacketTrigger = now;
       openJacketModal();
     };
 
@@ -167,10 +170,14 @@ export function initSecretHotspots() {
   }
 
   // Site Cards Click
+  let lastCardTrigger = 0;
   document.querySelectorAll('.jacketSiteCard').forEach(card => {
     const handleCard = (e) => {
       e.stopPropagation();
       if (e.cancelable) e.preventDefault();
+      const now = performance.now();
+      if (now - lastCardTrigger < 600) return;
+      lastCardTrigger = now;
       const url = card.dataset.url;
       if (url) {
         window.open(url, '_blank', 'noopener,noreferrer');
