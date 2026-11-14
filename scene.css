@@ -2433,3 +2433,144 @@ body.cipher-locked canvas {
   }
 }
 
+
+
+/* --- B???F Jacket 2-Site Chooser Modal (SELECT STORE) --- */
+.jacketModal {
+  position: fixed;
+  left: clamp(20px, 3.8vw, 64px);
+  bottom: clamp(20px, 3.8vw, 48px);
+  z-index: 85;
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+  width: clamp(340px, 30vw, 440px);
+  max-width: calc(100vw - 32px);
+}
+
+.jacketModal.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.jacketModal__dialog {
+  position: relative;
+  width: 100%;
+  background: rgba(18, 18, 18, 0.65) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6) !important;
+  padding: 12px 14px;
+  box-sizing: border-box;
+}
+
+.jacketSelectHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 8px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.jacketSelectTitle {
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: #ffffff;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.jacketCloseBtn {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  padding: 2px 6px !important;
+  cursor: pointer !important;
+  transition: color 0.2s ease !important;
+}
+
+.jacketCloseBtn:hover {
+  color: #ffffff !important;
+}
+
+.jacketSiteList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.jacketSiteCard {
+  background: #000000 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  display: block !important;
+  cursor: pointer !important;
+  transition: border-color 0.2s ease, transform 0.2s ease !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  text-decoration: none !important;
+}
+
+.jacketSiteCard:hover,
+.jacketSiteCard:focus-visible {
+  border-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.jacketSiteCard__cover {
+  width: 100%;
+  aspect-ratio: 3 / 1;
+  overflow: hidden;
+  background: #000;
+  display: block;
+}
+
+.jacketSiteCard__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.25s ease;
+}
+
+.jacketSiteCard:hover .jacketSiteCard__img {
+  transform: scale(1.02);
+}
+
+@media (max-width: 780px) {
+  .jacketModal {
+    left: 16px;
+    bottom: 16px;
+    width: min(340px, calc(100vw - 32px)) !important;
+  }
+}
+
+@media (max-height: 560px) and (orientation: landscape) {
+  .jacketModal {
+    left: max(16px, var(--sa-l));
+    bottom: max(12px, var(--sa-b));
+    width: 320px !important;
+  }
+  .jacketModal__dialog {
+    padding: 8px 10px;
+  }
+  .jacketSiteList {
+    gap: 6px;
+  }
+}

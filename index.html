@@ -159,8 +159,30 @@
     <a class="ballHotspot" id="ballHotspot" role="button" aria-label="STARSON Ball" tabindex="0" hidden></a>
 
     <!-- B???F 黒いダウンジャケット & 帽子 ホットスポット (完全透明・枠線・文字一切なし・隠しギミック) -->
-    <a class="jacketHotspot" id="jacketHotspot" href="https://jugendtechnokrat.netlify.app" target="_blank" rel="noopener noreferrer" aria-label="JUGEND TECHNOKRAT" tabindex="0" hidden></a>
+    <a class="jacketHotspot" id="jacketHotspot" role="button" aria-label="Archive Selection" tabindex="0" hidden></a>
     <a class="hatHotspot" id="hatHotspot" href="https://jp.pinterest.com/JugendTechnokrat" target="_blank" rel="noopener noreferrer" aria-label="Pinterest JUGEND TECHNOKRAT" tabindex="0" hidden></a>
+
+    <!-- B???F ジャケット 2サイト選択モーダル (SoundCloud ALBUM選択仕様) -->
+    <div class="jacketModal" id="jacketModal" aria-label="Select Store">
+      <div class="jacketModal__dialog">
+        <div class="jacketSelectHeader">
+          <span class="jacketSelectTitle">SELECT STORE</span>
+          <button type="button" class="jacketCloseBtn" id="jacketModalClose" aria-label="閉じる">✕</button>
+        </div>
+        <div class="jacketSiteList">
+          <button type="button" class="jacketSiteCard" data-url="https://jugendtechnokrat.netlify.app" aria-label="JUGEND TECHNOKRAT">
+            <div class="jacketSiteCard__cover">
+              <img src="assets/scenes/thumb_header_jugend.jpg" alt="JUGEND TECHNOKRAT" class="jacketSiteCard__img" draggable="false">
+            </div>
+          </button>
+          <button type="button" class="jacketSiteCard" data-url="https://halluzination.netlify.app" aria-label="Halluzination">
+            <div class="jacketSiteCard__cover">
+              <img src="assets/scenes/thumb_header_halluz.jpg" alt="Halluzination" class="jacketSiteCard__img" draggable="false">
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- BRAUN 2アルバム選択 & SoundCloud公式フローティングプレイヤー (画面左下・非ブロッキング・透過シック) -->
     <div class="braunModal" id="braunModal" aria-label="Audio Player">

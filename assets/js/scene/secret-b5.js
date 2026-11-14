@@ -1,7 +1,7 @@
 /**
- * TESHIMA LAB Portfolio — B???F Secret Hotspots (Down Jacket & Fedora Hat)
+ * TESHIMA LAB Portfolio / CREATOR INFO — B???F Secret Hotspots (Down Jacket & Fedora Hat)
  * Ultra-minimalist: invisible hitboxes with default cursor (hidden easter eggs).
- * Jacket -> https://jugendtechnokrat.netlify.app
+ * Jacket -> 2-Site Chooser Modal (JUGEND TECHNOKRAT & HALLUZINATION)
  * Hat    -> https://jp.pinterest.com/JugendTechnokrat
  */
 import { $, plate } from './dom.js';
@@ -22,7 +22,6 @@ const HAT_COORDS = Object.freeze({
   h: 300 / MASTER_H
 });
 
-export const JACKET_URL = 'https://jugendtechnokrat.netlify.app';
 export const HAT_URL = 'https://jp.pinterest.com/JugendTechnokrat';
 
 function getCoverRect(imgW, imgH, vw, vh, posX = 0.5, posY = 0.5) {
@@ -43,6 +42,20 @@ function getCoverRect(imgW, imgH, vw, vh, posX = 0.5, posY = 0.5) {
   return { renderW, renderH, offsetX, offsetY };
 }
 
+export function openJacketModal() {
+  const modal = $('jacketModal') || document.getElementById('jacketModal');
+  if (modal) {
+    modal.classList.add('is-active');
+  }
+}
+
+export function closeJacketModal() {
+  const modal = $('jacketModal') || document.getElementById('jacketModal');
+  if (modal) {
+    modal.classList.remove('is-active');
+  }
+}
+
 export function updateSecretHotspots(px = runtime.platePanX, py = runtime.platePanY) {
   const jacket = $('jacketHotspot') || document.getElementById('jacketHotspot');
   const hat = $('hatHotspot') || document.getElementById('hatHotspot');
@@ -54,6 +67,7 @@ export function updateSecretHotspots(px = runtime.platePanX, py = runtime.plateP
   if (!isB5End) {
     if (jacket) { jacket.hidden = true; jacket.style.display = 'none'; }
     if (hat) { hat.hidden = true; hat.style.display = 'none'; }
+    closeJacketModal();
     return;
   }
 
@@ -83,40 +97,96 @@ runtime.callbacks.updateSecretHotspots = updateSecretHotspots;
 export function initSecretHotspots() {
   const jacket = $('jacketHotspot') || document.getElementById('jacketHotspot');
   const hat = $('hatHotspot') || document.getElementById('hatHotspot');
+  const modalClose = $('jacketModalClose') || document.getElementById('jacketModalClose');
+  const modal = $('jacketModal') || document.getElementById('jacketModal');
 
-  const bindTrigger = (el, url) => {
-    if (!el) return;
-    let lastTriggerTime = 0;
-    const trigger = (e) => {
+  // Hat trigger: Pinterest (unchanged)
+  if (hat) {
+    let lastHatTrigger = 0;
+    const triggerHat = (e) => {
       const now = performance.now();
-      if (now - lastTriggerTime < 800) return;
-      lastTriggerTime = now;
+      if (now - lastHatTrigger < 800) return;
+      lastHatTrigger = now;
       if (e) {
         e.stopPropagation();
         if (e.cancelable) e.preventDefault();
       }
-      window.open(url, '_blank', 'noopener noreferrer');
+      window.open(HAT_URL, '_blank', 'noopener,noreferrer');
     };
 
-    el.addEventListener('click', (e) => {
+    hat.addEventListener('click', (e) => {
       if (runtime.isTouchDragging || (performance.now() - runtime.lastDragTime < 350)) {
         if (e && e.cancelable) e.preventDefault();
         runtime.isTouchDragging = false;
         return;
       }
-      trigger(e);
+      triggerHat(e);
     });
 
-    el.addEventListener('touchend', (e) => {
+    hat.addEventListener('touchend', (e) => {
+      if (runtime.isTouchDragging || (performance.now() - runtime.lastDragTime < 350)) return;
+      triggerHat(e);
+    }, { passive: false });
+  }
+
+  // Jacket trigger: Open 2-Site Chooser Modal
+  if (jacket) {
+    let lastJacketTrigger = 0;
+    const triggerJacket = (e) => {
+      const now = performance.now();
+      if (now - lastJacketTrigger < 500) return;
+      lastJacketTrigger = now;
+      if (e) {
+        e.stopPropagation();
+        if (e.cancelable) e.preventDefault();
+      }
+      openJacketModal();
+    };
+
+    jacket.addEventListener('click', (e) => {
       if (runtime.isTouchDragging || (performance.now() - runtime.lastDragTime < 350)) {
+        if (e && e.cancelable) e.preventDefault();
+        runtime.isTouchDragging = false;
         return;
       }
-      trigger(e);
-    }, { passive: false });
-  };
+      triggerJacket(e);
+    });
 
-  bindTrigger(jacket, JACKET_URL);
-  bindTrigger(hat, HAT_URL);
+    jacket.addEventListener('touchend', (e) => {
+      if (runtime.isTouchDragging || (performance.now() - runtime.lastDragTime < 350)) return;
+      triggerJacket(e);
+    }, { passive: false });
+  }
+
+  // Modal Close Button
+  if (modalClose) {
+    modalClose.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeJacketModal();
+    });
+  }
+
+  // Site Cards Click
+  document.querySelectorAll('.jacketSiteCard').forEach(card => {
+    const handleCard = (e) => {
+      e.stopPropagation();
+      if (e.cancelable) e.preventDefault();
+      const url = card.dataset.url;
+      if (url) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+        closeJacketModal();
+      }
+    };
+    card.addEventListener('click', handleCard);
+  });
+
+  // Close on Outside Click
+  document.addEventListener('pointerdown', (e) => {
+    if (!modal || !modal.classList.contains('is-active')) return;
+    if (e.target.closest('#jacketModal') || e.target.closest('#jacketHotspot')) return;
+    closeJacketModal();
+  });
+
   window.addEventListener('resize', () => updateSecretHotspots(), { passive: true });
   updateSecretHotspots();
 }
